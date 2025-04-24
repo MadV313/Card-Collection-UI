@@ -1,14 +1,12 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>DayZ CCG Duel UI</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="animations.js"></script>
+  <meta charset="UTF-8">
+  <title>DayZ CCG Duel UI - Practice Mode</title>
   <style>
     body {
       background-color: #101010;
-      color: #fff;
+      color: #ffffff;
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 20px;
@@ -52,6 +50,7 @@
       justify-content: center;
       gap: 12px;
       margin-top: 15px;
+      flex-wrap: wrap;
     }
     button {
       padding: 10px 20px;
@@ -71,26 +70,9 @@
       <div>Your HP: 200</div>
     </div>
 
-    <div class="card-row" id="opponent-field">
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1g7jxd2QoE_jwM7Xyd9NqzAXJRMGeFq4N');" title="AK-101"></div>
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1MPTCow3c2ISIvkLQia7w7t5UHKRiTxxM');" title="Bear Trap"></div>
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1TZB7Sh37Op9XjvvbTmPNI3UN37oqzYBr');" title="Gas Canister Trap"></div>
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1-1vMHqk1KkVdexTsOLv05pCkRqRU60Cs');" title="Trap (face-down)"></div>
-    </div>
-
-    <div class="card-row" id="your-field">
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1Rn_Dhp-cWqSoEN39xQ99HVgtWA7LlHDz');" title="M4-A1"></div>
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1LVgvRoGFm_dql7C2IZS9nzWL6MPXd3q9');" title="Derringer"></div>
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1sBWFZRQfLv9S2ObEIPdIbfuEiRe-S-V7');" title="Box of Ammo"></div>
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1-1vMHqk1KkVdexTsOLv05pCkRqRU60Cs');" title="Trap (face-down)"></div>
-    </div>
-
-    <div class="card-row" id="your-hand">
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1cJLHT1NTKmCvY5OhT_H8ziwYC97f8bpM');" title="BK-18"></div>
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1E-ncZMtYyPHIWira7-WpVbc8010fUGib');" title="Welding Mask"></div>
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1ggbWaO4_GvUPCTMz7mEuBhdb4bo8aos1');" title="Map"></div>
-      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1T8TtHukC-XOdcFKIwtKjyRbZKA9wHnY8');" title="Sewing Kit"></div>
-    </div>
+    <div class="card-row" id="opponent-field"></div>
+    <div class="card-row" id="your-field"></div>
+    <div class="card-row" id="your-hand"></div>
 
     <div class="card-row">
       <div class="pile" title="Draw Pile" style="background-image: url('https://drive.google.com/uc?export=view&id=1-1vMHqk1KkVdexTsOLv05pCkRqRU60Cs');"></div>
@@ -102,9 +84,65 @@
       <button onclick="alert('Play triggered')">Play Card</button>
       <button onclick="alert('Discard triggered')">Discard</button>
       <button onclick="alert('Turn ended')">End Turn</button>
+      <button onclick="startPracticeDuel()">Start Practice Mode</button>
     </div>
-  <div class="section" id="prompt">[System Message: Waiting for your move...]</div>
+
+    <div class="section" id="prompt">[System Message: Waiting for your move...]</div>
   </div>
-  <script src="practice_mode.js"></script>
+
+  <script>
+    // Dev Deck
+    const devDeck = [
+      {"card_id":"008","name":"BK-18","image_url":"https://drive.google.com/uc?export=view&id=1cJLHT1NTKmCvY5OhT_H8ziwYC97f8bpM"},
+      {"card_id":"059","name":"Welding Mask","image_url":"https://drive.google.com/uc?export=view&id=1E-ncZMtYyPHIWira7-WpVbc8010fUGib"},
+      {"card_id":"065","name":"Map","image_url":"https://drive.google.com/uc?export=view&id=1ggbWaO4_GvUPCTMz7mEuBhdb4bo8aos1"},
+      {"card_id":"089","name":"Sewing Kit","image_url":"https://drive.google.com/uc?export=view&id=1T8TtHukC-XOdcFKIwtKjyRbZKA9wHnY8"},
+      {"card_id":"022","name":"AK-101","image_url":"https://drive.google.com/uc?export=view&id=1g7jxd2QoE_jwM7Xyd9NqzAXJRMGeFq4N"},
+      {"card_id":"028","name":"Derringer","image_url":"https://drive.google.com/uc?export=view&id=1LVgvRoGFm_dql7C2IZS9nzWL6MPXd3q9"},
+      {"card_id":"001","name":"M4-A1","image_url":"https://drive.google.com/uc?export=view&id=1Rn_Dhp-cWqSoEN39xQ99HVgtWA7LlHDz"},
+      {"card_id":"083","name":"Box of Ammo","image_url":"https://drive.google.com/uc?export=view&id=1sBWFZRQfLv9S2ObEIPdIbfuEiRe-S-V7"}
+      // Add more if you’d like — this is enough to test visuals
+    ];
+
+    const gameState = {
+      player: {
+        hp: 200,
+        hand: [],
+        field: [],
+        deck: [...devDeck]
+      },
+      bot: {
+        hp: 200,
+        field: [],
+        deck: [...devDeck]
+      }
+    };
+
+    function startPracticeDuel() {
+      alert("Practice mode started.");
+      drawCard("player");
+      drawCard("player");
+      drawCard("bot");
+    }
+
+    function drawCard(target) {
+      const side = gameState[target];
+      if (side.hand.length < 4 && side.deck.length > 0) {
+        const card = side.deck.pop();
+        side.hand.push(card);
+        renderCardToUI(card, target);
+      }
+    }
+
+    function renderCardToUI(card, target) {
+      const rowId = target === "player" ? "your-hand" : "opponent-field";
+      const container = document.getElementById(rowId);
+      const cardDiv = document.createElement("div");
+      cardDiv.className = "card";
+      cardDiv.style.backgroundImage = `url('${card.image_url}')`;
+      cardDiv.title = card.name;
+      container.appendChild(cardDiv);
+    }
+  </script>
 </body>
 </html>
