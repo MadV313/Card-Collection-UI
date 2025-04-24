@@ -1,1 +1,0 @@
-// JS: animateCardAction(), trap overlays, summary trigger
