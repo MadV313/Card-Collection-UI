@@ -1,1 +1,110 @@
-<!DOCTYPE html><html><head><title>Duel UI</title></head><body><h1>Duel UI with Summary</h1></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DayZ CCG Duel UI</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="animations.js"></script>
+  <style>
+    body {
+      background-color: #101010;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .duel-ui {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .card-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .card {
+      width: 120px;
+      height: 170px;
+      background-size: cover;
+      border-radius: 8px;
+      border: 2px solid #555;
+      position: relative;
+    }
+    .pile {
+      width: 100px;
+      height: 140px;
+      background-size: cover;
+      border-radius: 6px;
+      border: 2px dashed #aaa;
+    }
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 15px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      background-color: #f9c74f;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="duel-ui">
+    <div class="status-bar">
+      <div>Opponent HP: 200</div>
+      <div>Wager: 10 Coins</div>
+      <div>Your HP: 200</div>
+    </div>
+
+    <div class="card-row" id="opponent-field">
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1g7jxd2QoE_jwM7Xyd9NqzAXJRMGeFq4N');" title="AK-101"></div>
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1MPTCow3c2ISIvkLQia7w7t5UHKRiTxxM');" title="Bear Trap"></div>
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1TZB7Sh37Op9XjvvbTmPNI3UN37oqzYBr');" title="Gas Canister Trap"></div>
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1-1vMHqk1KkVdexTsOLv05pCkRqRU60Cs');" title="Trap (face-down)"></div>
+    </div>
+
+    <div class="card-row" id="your-field">
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1Rn_Dhp-cWqSoEN39xQ99HVgtWA7LlHDz');" title="M4-A1"></div>
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1LVgvRoGFm_dql7C2IZS9nzWL6MPXd3q9');" title="Derringer"></div>
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1sBWFZRQfLv9S2ObEIPdIbfuEiRe-S-V7');" title="Box of Ammo"></div>
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1-1vMHqk1KkVdexTsOLv05pCkRqRU60Cs');" title="Trap (face-down)"></div>
+    </div>
+
+    <div class="card-row" id="your-hand">
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1cJLHT1NTKmCvY5OhT_H8ziwYC97f8bpM');" title="BK-18"></div>
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1E-ncZMtYyPHIWira7-WpVbc8010fUGib');" title="Welding Mask"></div>
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1ggbWaO4_GvUPCTMz7mEuBhdb4bo8aos1');" title="Map"></div>
+      <div class="card" style="background-image: url('https://drive.google.com/uc?export=view&id=1T8TtHukC-XOdcFKIwtKjyRbZKA9wHnY8');" title="Sewing Kit"></div>
+    </div>
+
+    <div class="card-row">
+      <div class="pile" title="Draw Pile" style="background-image: url('https://drive.google.com/uc?export=view&id=1-1vMHqk1KkVdexTsOLv05pCkRqRU60Cs');"></div>
+      <div class="pile" title="Discard Pile" style="background-image: url('https://drive.google.com/uc?export=view&id=1-1vMHqk1KkVdexTsOLv05pCkRqRU60Cs');"></div>
+    </div>
+
+    <div class="button-row">
+      <button onclick="alert('Draw triggered')">Draw</button>
+      <button onclick="alert('Play triggered')">Play Card</button>
+      <button onclick="alert('Discard triggered')">Discard</button>
+      <button onclick="alert('Turn ended')">End Turn</button>
+    </div>
+
+    <div class="section" id="prompt">[System Message: Waiting for your move...]</div>
+  </div>
+</body>
+</html>
