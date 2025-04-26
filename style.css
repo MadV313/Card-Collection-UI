@@ -1,0 +1,80 @@
+
+body {
+  background-color: #121212;
+  font-family: Arial, sans-serif;
+  color: white;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+h1 {
+  margin: 20px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 10px;
+  padding: 10px;
+  justify-items: center;
+}
+
+.card-container {
+  background-color: #1e1e1e;
+  padding: 10px;
+  width: 140px;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-container img {
+  width: 100%;
+  border-radius: 5px;
+}
+
+.card-container p {
+  margin: 5px 0;
+}
+
+button.scrap, button.sell {
+  background-color: #333;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  margin: 3px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+button.scrap:hover, button.sell:hover {
+  background-color: #555;
+}
+
+.common-border { border: 2px solid green; }
+.uncommon-border { border: 2px solid blue; }
+.rare-border { border: 2px solid purple; }
+.legendary-border { border: 2px solid gold; }
+.unique-border { border: 2px solid red; }
+
+.legendary-glow {
+  animation: glowPulse 2s infinite alternate;
+  box-shadow: 0 0 10px gold, 0 0 20px gold, 0 0 30px gold;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 5px gold, 0 0 10px gold, 0 0 15px gold; }
+  100% { box-shadow: 0 0 20px gold, 0 0 30px gold, 0 0 40px gold; }
+}
+
+/* 4 cards per row on phones */
+@media (max-width: 600px) {
+  .card-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
