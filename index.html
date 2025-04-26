@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>ALL DayZ CCG Cards</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+        .card {
+            background: #2e2e2e;
+            padding: 10px;
+            border-radius: 8px;
+            width: 150px;
+            text-align: center;
+        }
+        .card img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .card-info {
+            margin-top: 8px;
+        }
+        .card-number {
+            margin: 0;
+            font-weight: bold;
+        }
+        .card-owned {
+            margin: 0;
+            font-size: 0.9em;
+            color: #aaaaaa;
+        }
+    </style>
+</head>
+<body>
+    <h1>ALL DayZ CCG Cards</h1>
+    <div class="card-container">
+        <!-- Cards will be dynamically injected here -->
+    </div>
+    <script>
+        const cardContainer = document.querySelector('.card-container');
+        const cards = [];
+        for (let i = 0; i <= 127; i++) {
+            let number = i.toString().padStart(3, '0');
+            let type = "";
+            if (i === 0) {
+                type = "Unique";
+            } else if (i >= 1 && i <= 30) {
+                type = "Attack";
+            } else if (i >= 31 && i <= 60) {
+                type = "Defense";
+            } else if (i >= 61 && i <= 75) {
+                type = "Tactical";
+            } else if (i >= 76 && i <= 90) {
+                type = "Loot";
+            } else if (i >= 91 && i <= 105) {
+                type = "Infected";
+            } else if (i >= 106 && i <= 120) {
+                type = "Trap";
+            } else if (i >= 121 && i <= 127) {
+                type = "Specialty";
+            }
+            let filename = number + "_CardName_" + type + ".png"; // Placeholder
+            cards.push({number, filename});
+        }
+        
+        cards.forEach(card => {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+            cardDiv.innerHTML = `
+                <img src="images/cards/${card.filename}" alt="Card #${card.number}">
+                <div class="card-info">
+                    <p class="card-number">#${card.number}</p>
+                    <p class="card-owned">Owned: 0</p>
+                </div>
+            `;
+            cardContainer.appendChild(cardDiv);
+        });
+    </script>
+</body>
+</html>
