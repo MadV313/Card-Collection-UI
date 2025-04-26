@@ -1,1879 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ALL DayZ CCG Cards</title>
-  <style>
-    body {
-      background-color: #1a1a1a;
-      color: #f0f0f0;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    .card-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 20px;
-      justify-items: center;
-    }
-    .card {
-      background: #2e2e2e;
-      padding: 10px;
-      border-radius: 8px;
-      width: 150px;
-      text-align: center;
-      position: relative;
-      border: 3px solid grey; /* Default */
-    }
-    .border-common { border-color: grey; }
-    .border-uncommon { border-color: green; }
-    .border-rare { border-color: blue; }
-    .border-legendary { border-color: gold; }
-    .border-unique { border-color: purple; }
-    .card img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-    }
-    .type-emoji {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      font-size: 18px;
-    }
-    .card-info {
-      margin-top: 8px;
-    }
-    .card-number {
-      margin: 0;
-      font-weight: bold;
-    }
-    .card-owned {
-      margin: 4px 0;
-      font-size: 0.9em;
-      color: #aaaaaa;
-    }
-    .button-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-    }
-    .action-button {
-      background-color: #444;
-      border: none;
-      color: white;
-      padding: 3px 8px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.8em;
-    }
-    .action-button:hover {
-      background-color: #666;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>ALL DayZ CCG Cards</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+        .card {
+            background: #2e2e2e;
+            padding: 10px;
+            border-radius: 8px;
+            width: 150px;
+            text-align: center;
+            position: relative;
+        }
+        .card img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .card-info {
+            margin-top: 8px;
+        }
+        .card-number {
+            margin: 0;
+            font-weight: bold;
+        }
+        .card-owned {
+            margin: 0;
+            font-size: 0.9em;
+            color: #aaaaaa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+        .scrap-button, .sell-button {
+            background-color: #444;
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .scrap-button:hover {
+            background-color: #aa0000;
+        }
+        .sell-button:hover {
+            background-color: #00aa00;
+        }
+    </style>
 </head>
 <body>
-<h1>ALL DayZ CCG Cards</h1>
+    <h1>ALL DayZ CCG Cards</h1>
+    <div class="card-container">
 
-<div class="card-container">
+<!-- CARDS START BELOW -->
 
-<!-- Card 000 -->
-<div class="card border-unique">
-  <div class="type-emoji">🔒</div>
+<div class="card" style="border: 3px solid #FFD700;">
   <img src="images/cards/000_CardBack_Unique.png" alt="Card #000">
   <div class="card-info">
-    <p class="card-number">#000</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">🔒 #000</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 001 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/001_M4A1_Attack.png" alt="Card #001 M4A1">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/001_M4A1_Attack.png" alt="Card #001">
   <div class="card-info">
-    <p class="card-number">#001 M4A1</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #001</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 002 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/002_AKM_Attack.png" alt="Card #002 AKM">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/002_AKM_Attack.png" alt="Card #002">
   <div class="card-info">
-    <p class="card-number">#002 AKM</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #002</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 003 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/003_MosinNagant_Attack.png" alt="Card #003 Mosin Nagant">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/003_MosinNagant_Attack.png" alt="Card #003">
   <div class="card-info">
-    <p class="card-number">#003 Mosin Nagant</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #003</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 004 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/004_SKS_Attack.png" alt="Card #004 SKS">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/004_SKS_Attack.png" alt="Card #004">
   <div class="card-info">
-    <p class="card-number">#004 SKS</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #004</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 005 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/005_CR527_Attack.png" alt="Card #005 CR527">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/005_CR527_Attack.png" alt="Card #005">
   <div class="card-info">
-    <p class="card-number">#005 CR527</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #005</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 006 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/006_CR550Savanna_Attack.png" alt="Card #006 CR550 Savanna">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/006_CR550Savanna_Attack.png" alt="Card #006">
   <div class="card-info">
-    <p class="card-number">#006 CR550 Savanna</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #006</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 007 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/007_BK133_Attack.png" alt="Card #007 BK133">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/007_BK133_Attack.png" alt="Card #007">
   <div class="card-info">
-    <p class="card-number">#007 BK133</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #007</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 008 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/008_BK18_Attack.png" alt="Card #008 BK18">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/008_BK18_Attack.png" alt="Card #008">
   <div class="card-info">
-    <p class="card-number">#008 BK18</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #008</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 009 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/009_MKII_Attack.png" alt="Card #009 MKII">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/009_MKII_Attack.png" alt="Card #009">
   <div class="card-info">
-    <p class="card-number">#009 MKII</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #009</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 010 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/010_FX45_Attack.png" alt="Card #010 FX45">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/010_FX45_Attack.png" alt="Card #010">
   <div class="card-info">
-    <p class="card-number">#010 FX45</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #010</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-</div> 
-
-<!-- Card 011 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/011_Deagle_Attack.png" alt="Card #011 Deagle">
-  <div class="card-info">
-    <p class="card-number">#011 Deagle</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 012 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/012_VSSVintorez_Attack.png" alt="Card #012 VSS Vintorez">
-  <div class="card-info">
-    <p class="card-number">#012 VSS Vintorez</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 013 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/013_SVD_Attack.png" alt="Card #013 SVD">
-  <div class="card-info">
-    <p class="card-number">#013 SVD</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 014 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/014_M70Tundra_Attack.png" alt="Card #014 M70 Tundra">
-  <div class="card-info">
-    <p class="card-number">#014 M70 Tundra</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 015 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/015_IZH18_Attack.png" alt="Card #015 IZH-18">
-  <div class="card-info">
-    <p class="card-number">#015 IZH-18</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 016 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/016_SawedoffShotgun_Attack.png" alt="Card #016 Sawed-off Shotgun">
-  <div class="card-info">
-    <p class="card-number">#016 Sawed-off Shotgun</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 017 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/017_USG45_Attack.png" alt="Card #017 USG-45">
-  <div class="card-info">
-    <p class="card-number">#017 USG-45</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 018 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/018_UMP45_Attack.png" alt="Card #018 UMP-45">
-  <div class="card-info">
-    <p class="card-number">#018 UMP-45</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 019 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/019_KA74_Attack.png" alt="Card #019 KA-74">
-  <div class="card-info">
-    <p class="card-number">#019 KA-74</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 020 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/020_KAM_Attack.png" alt="Card #020 KA-M">
-  <div class="card-info">
-    <p class="card-number">#020 KA-M</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 021 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/021_FAL_Attack.png" alt="Card #021 FAL">
-  <div class="card-info">
-    <p class="card-number">#021 FAL</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 022 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/022_AK101_Attack.png" alt="Card #022 AK-101">
-  <div class="card-info">
-    <p class="card-number">#022 AK-101</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 023 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/023_AK74_Attack.png" alt="Card #023 AK-74">
-  <div class="card-info">
-    <p class="card-number">#023 AK-74</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 024 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/024_M16A2_Attack.png" alt="Card #024 M16-A2">
-  <div class="card-info">
-    <p class="card-number">#024 M16-A2</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 025 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/025_SG5K_Attack.png" alt="Card #025 SG5-K">
-  <div class="card-info">
-    <p class="card-number">#025 SG5-K</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 026 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/026_MP5K_Attack.png" alt="Card #026 MP5-K">
-  <div class="card-info">
-    <p class="card-number">#026 MP5-K</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 027 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/027_Repeater_Attack.png" alt="Card #027 Repeater">
-  <div class="card-info">
-    <p class="card-number">#027 Repeater</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 028 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/028_Derringer_Attack.png" alt="Card #028 Derringer">
-  <div class="card-info">
-    <p class="card-number">#028 Derringer</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 029 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/029_Longhorn_Attack.png" alt="Card #029 Longhorn">
-  <div class="card-info">
-    <p class="card-number">#029 Longhorn</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 030 -->
-<div class="card border-common">
-  <div class="type-emoji">⚔️</div>
-  <img src="images/cards/030_Crossbow_Attack.png" alt="Card #030 Crossbow">
-  <div class="card-info">
-    <p class="card-number">#030 Crossbow</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 031 -->
-<div class="card border-rare">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/031_TacticalVest_Defense.png" alt="Card #031 Tactical Vest">
-  <div class="card-info">
-    <p class="card-number">#031 Tactical Vest</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 032 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/032_BallisticHelmet_Defense.png" alt="Card #032 Ballistic Helmet">
-  <div class="card-info">
-    <p class="card-number">#032 Ballistic Helmet</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 033 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/033_AssaultHelmet_Defense.png" alt="Card #033 Assault Helmet">
-  <div class="card-info">
-    <p class="card-number">#033 Assault Helmet</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 034 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/034_CombatBoots_Defense.png" alt="Card #034 Combat Boots">
-  <div class="card-info">
-    <p class="card-number">#034 Combat Boots</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 035 -->
-<div class="card border-rare">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/035_PlateCarrier_Defense.png" alt="Card #035 Plate Carrier">
-  <div class="card-info">
-    <p class="card-number">#035 Plate Carrier</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 036 -->
-<div class="card border-rare">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/036_NBCSuit_Defense.png" alt="Card #036 NBC Suit">
-  <div class="card-info">
-    <p class="card-number">#036 NBC Suit</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 037 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/037_MotorbikeHelmet_Defense.png" alt="Card #037 Motorbike Helmet">
-  <div class="card-info">
-    <p class="card-number">#037 Motorbike Helmet</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 038 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/038_GorkaJacket_Defense.png" alt="Card #038 Gorka Jacket">
-  <div class="card-info">
-    <p class="card-number">#038 Gorka Jacket</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 039 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/039_GorkaPants_Defense.png" alt="Card #039 Gorka Pants">
-  <div class="card-info">
-    <p class="card-number">#039 Gorka Pants</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 040 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/040_CombatGloves_Defense.png" alt="Card #040 Combat Gloves">
-  <div class="card-info">
-    <p class="card-number">#040 Combat Gloves</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 041 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/041_HunterJacket_Defense.png" alt="Card #041 Hunter Jacket">
-  <div class="card-info">
-    <p class="card-number">#041 Hunter Jacket</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 042 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/042_TacticalShirt_Defense.png" alt="Card #042 Tactical Shirt">
-  <div class="card-info">
-    <p class="card-number">#042 Tactical Shirt</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 043 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/043_ParamedicJacket_Defense.png" alt="Card #043 Paramedic Jacket">
-  <div class="card-info">
-    <p class="card-number">#043 Paramedic Jacket</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 044 -->
-<div class="card border-rare">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/044_PressVest_Defense.png" alt="Card #044 Press Vest">
-  <div class="card-info">
-    <p class="card-number">#044 Press Vest</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 045 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/045_FirefighterPants_Defense.png" alt="Card #045 Firefighter Pants">
-  <div class="card-info">
-    <p class="card-number">#045 Firefighter Pants</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 046 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/046_M65Jacket_Defense.png" alt="Card #046 M65 Jacket">
-  <div class="card-info">
-    <p class="card-number">#046 M65 Jacket</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 047 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/047_RidersJacket_Defense.png" alt="Card #047 Riders Jacket">
-  <div class="card-info">
-    <p class="card-number">#047 Riders Jacket</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 048 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/048_LeatherShoes_Defense.png" alt="Card #048 Leather Shoes">
-  <div class="card-info">
-    <p class="card-number">#048 Leather Shoes</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 049 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/049_TracksuitJacket_Defense.png" alt="Card #049 Tracksuit Jacket">
-  <div class="card-info">
-    <p class="card-number">#049 Tracksuit Jacket</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 050 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/050_MilitaryBoots_Defense.png" alt="Card #050 Military Boots">
-  <div class="card-info">
-    <p class="card-number">#050 Military Boots</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 051 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/051_FieldVest_Defense.png" alt="Card #051 Field Vest">
-  <div class="card-info">
-    <p class="card-number">#051 Field Vest</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 052 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/052_ChestHolster_Defense.png" alt="Card #052 Chest Holster">
-  <div class="card-info">
-    <p class="card-number">#052 Chest Holster</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 053 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/053_StabproofVest_Defense.png" alt="Card #053 Stabproof Vest">
-  <div class="card-info">
-    <p class="card-number">#053 Stabproof Vest</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 054 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/054_AssaultBackpack_Defense.png" alt="Card #054 Assault Backpack">
-  <div class="card-info">
-    <p class="card-number">#054 Assault Backpack</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 055 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/055_DrybagBackpack_Defense.png" alt="Card #055 Drybag Backpack">
-  <div class="card-info">
-    <p class="card-number">#055 Drybag Backpack</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 056 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/056_TacticalBackpack_Defense.png" alt="Card #056 Tactical Backpack">
-  <div class="card-info">
-    <p class="card-number">#056 Tactical Backpack</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 057 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/057_SkateHelmet_Defense.png" alt="Card #057 Skate Helmet">
-  <div class="card-info">
-    <p class="card-number">#057 Skate Helmet</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 058 -->
-<div class="card border-common">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/058_BoonieHat_Defense.png" alt="Card #058 Boonie Hat">
-  <div class="card-info">
-    <p class="card-number">#058 Boonie Hat</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 059 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/059_WeldingMask_Defense.png" alt="Card #059 Welding Mask">
-  <div class="card-info">
-    <p class="card-number">#059 Welding Mask</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 060 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🛡️</div>
-  <img src="images/cards/060_ImprovisedVest_Defense.png" alt="Card #060 Improvised Vest">
-  <div class="card-info">
-    <p class="card-number">#060 Improvised Vest</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 061 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/061_Binoculars_Tactical.png" alt="Card #061 Binoculars">
-  <div class="card-info">
-    <p class="card-number">#061 Binoculars</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 062 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/062_Rangefinder_Tactical.png" alt="Card #062 Rangefinder">
-  <div class="card-info">
-    <p class="card-number">#062 Rangefinder</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 063 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/063_HandheldTransceiver_Tactical.png" alt="Card #063 Handheld Transceiver">
-  <div class="card-info">
-    <p class="card-number">#063 Handheld Transceiver</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 064 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/064_Compass_Tactical.png" alt="Card #064 Compass">
-  <div class="card-info">
-    <p class="card-number">#064 Compass</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 065 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/065_Map_Tactical.png" alt="Card #065 Map">
-  <div class="card-info">
-    <p class="card-number">#065 Map</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 066 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/066_Headtorch_Tactical.png" alt="Card #066 Headtorch">
-  <div class="card-info">
-    <p class="card-number">#066 Headtorch</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 067 -->
-<div class="card border-rare">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/067_NightVisionGoggles_Tactical.png" alt="Card #067 Night Vision Goggles">
-  <div class="card-info">
-    <p class="card-number">#067 Night Vision Goggles</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 068 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/068_TripWire_Tactical.png" alt="Card #068 Tripwire">
-  <div class="card-info">
-    <p class="card-number">#068 Tripwire</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 069 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/069_DuctTape_Tactical.png" alt="Card #069 Duct Tape">
-  <div class="card-info">
-    <p class="card-number">#069 Duct Tape</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 070 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/070_Megaphone_Tactical.png" alt="Card #070 Megaphone">
-  <div class="card-info">
-    <p class="card-number">#070 Megaphone</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 071 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/071_WalkieTalkie_Tactical.png" alt="Card #071 Walkie Talkie">
-  <div class="card-info">
-    <p class="card-number">#071 Walkie Talkie</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 072 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/072_Flashlight_Tactical.png" alt="Card #072 Flashlight">
-  <div class="card-info">
-    <p class="card-number">#072 Flashlight</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 073 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/073_GlowStick_Tactical.png" alt="Card #073 Glow Stick">
-  <div class="card-info">
-    <p class="card-number">#073 Glow Stick</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 074 -->
-<div class="card border-common">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/074_HuntingScope_Tactical.png" alt="Card #074 Hunting Scope">
-  <div class="card-info">
-    <p class="card-number">#074 Hunting Scope</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 075 -->
-<div class="card border-rare">
-  <div class="type-emoji">🧭</div>
-  <img src="images/cards/075_WeaponsCleaningKit_Tactical.png" alt="Card #075 Weapons Cleaning Kit">
-  <div class="card-info">
-    <p class="card-number">#075 Weapons Cleaning Kit</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 076 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/076_CanofTacticalBacon_Loot.png" alt="Card #076 Can of Tactical Bacon">
-  <div class="card-info">
-    <p class="card-number">#076 Can of Tactical Bacon</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 077 -->
-<div class="card border-rare">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/077_MRE_Loot.png" alt="Card #077 MRE">
-  <div class="card-info">
-    <p class="card-number">#077 MRE</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 078 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/078_Canteen_Loot.png" alt="Card #078 Canteen">
-  <div class="card-info">
-    <p class="card-number">#078 Canteen</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 079 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/079_BoxofNails_Loot.png" alt="Card #079 Box of Nails">
-  <div class="card-info">
-    <p class="card-number">#079 Box of Nails</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 080 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/080_JerryCan_Loot.png" alt="Card #080 Jerry Can">
-  <div class="card-info">
-    <p class="card-number">#080 Jerry Can</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 081 -->
-<div class="card border-rare">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/081_Dynamite_Loot.png" alt="Card #081 Dynamite">
-  <div class="card-info">
-    <p class="card-number">#081 Dynamite</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 082 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/082_FirstAidKit_Loot.png" alt="Card #082 First Aid Kit">
-  <div class="card-info">
-    <p class="card-number">#082 First Aid Kit</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 083 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/083_BoxofAmmo_Loot.png" alt="Card #083 Box of Ammo">
-  <div class="card-info">
-    <p class="card-number">#083 Box of Ammo</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 084 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/084_FishingRod_Loot.png" alt="Card #084 Fishing Rod">
-  <div class="card-info">
-    <p class="card-number">#084 Fishing Rod</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 085 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/085_Lockpick_Loot.png" alt="Card #085 Lockpick">
-  <div class="card-info">
-    <p class="card-number">#085 Lockpick</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 086 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/086_Battery_Loot.png" alt="Card #086 Battery">
-  <div class="card-info">
-    <p class="card-number">#086 Battery</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 087 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/087_Rope_Loot.png" alt="Card #087 Rope">
-  <div class="card-info">
-    <p class="card-number">#087 Rope</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 088 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/088_CookingPot_Loot.png" alt="Card #088 Cooking Pot">
-  <div class="card-info">
-    <p class="card-number">#088 Cooking Pot</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 089 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/089_SewingKit_Loot.png" alt="Card #089 Sewing Kit">
-  <div class="card-info">
-    <p class="card-number">#089 Sewing Kit</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 090 -->
-<div class="card border-common">
-  <div class="type-emoji">🎒</div>
-  <img src="images/cards/090_GunCleaningKit_Loot.png" alt="Card #090 Gun Cleaning Kit">
-  <div class="card-info">
-    <p class="card-number">#090 Gun Cleaning Kit</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 091 -->
-<div class="card border-common">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/091_Walker(Civilian)_Infected.png" alt="Card #091 Walker (Civilian)">
-  <div class="card-info">
-    <p class="card-number">#091 Walker (Civilian)</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 092 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/092_Runner(Military)_Infected.png" alt="Card #092 Runner (Military)">
-  <div class="card-info">
-    <p class="card-number">#092 Runner (Military)</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 093 -->
-<div class="card border-common">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/093_Crawler_Infected.png" alt="Card #093 Crawler">
-  <div class="card-info">
-    <p class="card-number">#093 Crawler</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 094 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/094_BurntInfected_Infected.png" alt="Card #094 Burnt Infected">
-  <div class="card-info">
-    <p class="card-number">#094 Burnt Infected</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 095 -->
-<div class="card border-common">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/095_PoliceInfected_Infected.png" alt="Card #095 Police Infected">
-  <div class="card-info">
-    <p class="card-number">#095 Police Infected</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 096 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/096_HazmatInfected_Infected.png" alt="Card #096 Hazmat Infected">
-  <div class="card-info">
-    <p class="card-number">#096 Hazmat Infected</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 097 -->
-<div class="card border-common">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/097_DoctorInfected_Infected.png" alt="Card #097 Doctor Infected">
-  <div class="card-info">
-    <p class="card-number">#097 Doctor Infected</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 098 -->
-<div class="card border-common">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/098_HunterInfected_Infected.png" alt="Card #098 Hunter Infected">
-  <div class="card-info">
-    <p class="card-number">#098 Hunter Infected</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 099 -->
-<div class="card border-common">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/099_SurvivorInfected_Infected.png" alt="Card #099 Survivor Infected">
-  <div class="card-info">
-    <p class="card-number">#099 Survivor Infected</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 100 -->
-<div class="card border-rare">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/100_PrisonerInfected_Infected.png" alt="Card #100 Prisoner Infected">
-  <div class="card-info">
-    <p class="card-number">#100 Prisoner Infected</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 101 -->
-<div class="card border-rare">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/101_Spitter(Mutated)_Infected.png" alt="Card #101 Spitter (Mutated)">
-  <div class="card-info">
-    <p class="card-number">#101 Spitter (Mutated)</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 102 -->
-<div class="card border-legendary">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/102_Bloater_Infected.png" alt="Card #102 Bloater">
-  <div class="card-info">
-    <p class="card-number">#102 Bloater</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 103 -->
-<div class="card border-rare">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/103_FastInfected_Infected.png" alt="Card #103 Fast Infected">
-  <div class="card-info">
-    <p class="card-number">#103 Fast Infected</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 104 -->
-<div class="card border-rare">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/104_ButcherInfected_Infected.png" alt="Card #104 Butcher Infected">
-  <div class="card-info">
-    <p class="card-number">#104 Butcher Infected</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 105 -->
-<div class="card border-legendary">
-  <div class="type-emoji">☣️</div>
-  <img src="images/cards/105_Behemoth_Infected.png" alt="Card #105 Behemoth">
-  <div class="card-info">
-    <p class="card-number">#105 Behemoth</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 106 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/106_BearTrap_Trap.png" alt="Card #106 Bear Trap">
-  <div class="card-info">
-    <p class="card-number">#106 Bear Trap</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 107 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/107_TripwireTrap_Trap.png" alt="Card #107 Tripwire Trap">
-  <div class="card-info">
-    <p class="card-number">#107 Tripwire Trap</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 108 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/108_Landmine_Trap.png" alt="Card #108 Landmine">
-  <div class="card-info">
-    <p class="card-number">#108 Landmine</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 109 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/109_MakeshiftCharge_Trap.png" alt="Card #109 Makeshift Charge">
-  <div class="card-info">
-    <p class="card-number">#109 Makeshift Charge</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 110 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/110_PerimeterTrap_Trap.png" alt="Card #110 Perimeter Trap">
-  <div class="card-info">
-    <p class="card-number">#110 Perimeter Trap</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 111 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/111_FireBarrelTrap_Trap.png" alt="Card #111 Fire Barrel Trap">
-  <div class="card-info">
-    <p class="card-number">#111 Fire Barrel Trap</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 112 -->
-<div class="card border-common">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/112_WireSnare_Trap.png" alt="Card #112 Wire Snare">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/011_Deagle_Attack.png" alt="Card #011">
   <div class="card-info">
-    <p class="card-number">#112 Wire Snare</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #011</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 113 -->
-<div class="card border-common">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/113_SpikedLogTrap_Trap.png" alt="Card #113 Spiked Log Trap">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/012_VSSVintorez_Attack.png" alt="Card #012">
   <div class="card-info">
-    <p class="card-number">#113 Spiked Log Trap</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #012</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 114 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/114_ExplosiveGrenadeTrap_Trap.png" alt="Card #114 Explosive Grenade Trap">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/013_SVD_Attack.png" alt="Card #013">
   <div class="card-info">
-    <p class="card-number">#114 Explosive Grenade Trap</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #013</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 115 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/115_GasCanisterTrap_Trap.png" alt="Card #115 Gas Canister Trap">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/014_M70Tundra_Attack.png" alt="Card #014">
   <div class="card-info">
-    <p class="card-number">#115 Gas Canister Trap</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #014</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 116 -->
-<div class="card border-common">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/116_FlareDistraction_Trap.png" alt="Card #116 Flare Distraction">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/015_IZH18_Attack.png" alt="Card #015">
   <div class="card-info">
-    <p class="card-number">#116 Flare Distraction</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #015</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 117 -->
-<div class="card border-uncommon">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/117_AlarmTripWire_Trap.png" alt="Card #117 Alarm Tripwire">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/016_SawedoffShotgun_Attack.png" alt="Card #016">
   <div class="card-info">
-    <p class="card-number">#117 Alarm Tripwire</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #016</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 118 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/118_SpringloadedBreachTrap_Trap.png" alt="Card #118 Springloaded Breach Trap">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/017_USG45_Attack.png" alt="Card #017">
   <div class="card-info">
-    <p class="card-number">#118 Springloaded Breach Trap</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #017</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 119 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/119_IEDPressurePlate_Trap.png" alt="Card #119 IED Pressure Plate">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/018_UMP45_Attack.png" alt="Card #018">
   <div class="card-info">
-    <p class="card-number">#119 IED Pressure Plate</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #018</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 120 -->
-<div class="card border-rare">
-  <div class="type-emoji">⚙️</div>
-  <img src="images/cards/120_SwingingSpikedBat_Trap.png" alt="Card #120 Swinging Spiked Bat">
+<div class="card" style="border: 3px solid #00FF00;">
+  <img src="images/cards/019_KA74_Attack.png" alt="Card #019">
   <div class="card-info">
-    <p class="card-number">#120 Swinging Spiked Bat</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
+    <p class="card-number">⚔️ #019</p>
+    <p class="card-owned">
+      <button class="scrap-button">SCRAP</button> Owned: 0 <button class="sell-button">SELL</button>
+    </p>
   </div>
 </div>
 
-<!-- Card 121 -->
-<div class="card border-legendary">
-  <div class="type-emoji">⭐</div>
-  <img src="images/cards/121_TheAgency_Specialty.png" alt="Card #121 The Agency">
-  <div class="card-info">
-    <p class="card-number">#121 The Agency</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 122 -->
-<div class="card border-legendary">
-  <div class="type-emoji">⭐</div>
-  <img src="images/cards/122_TheTrader_Specialty.png" alt="Card #122 The Trader">
-  <div class="card-info">
-    <p class="card-number">#122 The Trader</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 123 -->
-<div class="card border-legendary">
-  <div class="type-emoji">⭐</div>
-  <img src="images/cards/123_JakubNowak_Specialty.png" alt="Card #123 Jakub Nowak">
-  <div class="card-info">
-    <p class="card-number">#123 Jakub Nowak</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 124 -->
-<div class="card border-legendary">
-  <div class="type-emoji">⭐</div>
-  <img src="images/cards/124_Dr.Wesker_Specialty.png" alt="Card #124 Dr. Wesker">
-  <div class="card-info">
-    <p class="card-number">#124 Dr. Wesker</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 125 -->
-<div class="card border-legendary">
-  <div class="type-emoji">⭐</div>
-  <img src="images/cards/125_ElenaKovak_Specialty.png" alt="Card #125 Elena Kovak">
-  <div class="card-info">
-    <p class="card-number">#125 Elena Kovak</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 126 -->
-<div class="card border-legendary">
-  <div class="type-emoji">⭐</div>
-  <img src="images/cards/126_Lt.Col.EmilBoren_Specialty.png" alt="Card #126 Lt. Col. Emil Boren">
-  <div class="card-info">
-    <p class="card-number">#126 Lt. Col. Emil Boren</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
-
-<!-- Card 127 -->
-<div class="card border-legendary">
-  <div class="type-emoji">⭐</div>
-  <img src="images/cards/127_IsabelleLaurent_Specialty.png" alt="Card #127 Isabelle Laurent">
-  <div class="card-info">
-    <p class="card-number">#127 Isabelle Laurent</p>
-    <div class="button-container">
-      <button class="action-button">Scrap</button>
-      <p class="card-owned">Owned: 0</p>
-      <button class="action-button">Sell</button>
-    </div>
-  </div>
-</div>
+<!-- END OF PART 1 -->
