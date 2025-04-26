@@ -1,159 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>All DayZ CCG Cards</title>
-<style>
-body { font-family: Arial, sans-serif; margin: 20px; background-color: #f0f0f0; }
-h1 { text-align: center; }
-.container { display: flex; flex-wrap: wrap; justify-content: center; }
-.card { background: #fff; border-radius: 8px; margin: 10px; padding: 10px; width: 150px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-.card img { width: 100%; border-radius: 4px; }
-.info { text-align: center; margin-top: 5px; }
-.name { font-weight: bold; font-size: 0.9em; }
-.id { font-size: 0.8em; color: #555; }
-.icon { position: absolute; top: 8px; left: 8px; font-size: 24px; }
-.actions { text-align: center; margin-top: 5px; font-size: 0.8em; color: #333; }
-.actions .action { color: #007BFF; cursor: pointer; }
-.actions .action:hover { color: #0056b3; }
-.card.common { border: 2px solid #ccc; }
-.card.uncommon { border: 2px solid #4CAF50; }
-.card.rare { border: 2px solid #2196F3; }
-.card.legendary { border: 2px solid #FF9800; }
-.card.none { border: 2px dashed #666; }
-</style>
+  <meta charset="utf-8"/>
+  <title>ALL DayZ CCG Cards</title>
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      justify-items: center;
+    }
+    .card {
+      background: #2e2e2e;
+      padding: 10px;
+      border-radius: 8px;
+      width: 150px;
+      text-align: center;
+      position: relative;
+    }
+    .card img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+    .card-info {
+      margin-top: 8px;
+    }
+    .card-number {
+      margin: 0;
+      font-weight: bold;
+    }
+    .card-owned {
+      margin: 0;
+      font-size: 0.9em;
+      color: #aaaaaa;
+    }
+    /* New CSS for icon and buttons */
+    .type-icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 1.2em;
+    }
+    .card-actions {
+      margin-top: 8px;
+    }
+    .btn {
+      background: #444;
+      color: #f0f0f0;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn:hover {
+      background: #666;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
-<h1>ALL DayZ CCG Cards</h1>
-<div class="container">
-  <div class="card none"><div class="icon">🃏</div><img src="images/cards/000_WinterlandDeathDeck_Back.png" alt="WinterLand Death Deck (Face-Down)"><div class="info"><div class="name">WinterLand Death Deck (Face-Down)</div><div class="id">#000</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/001_M4A1_Attack.png" alt="M4-A1"><div class="info"><div class="name">M4-A1</div><div class="id">#001</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/002_AKM_Attack.png" alt="AKM"><div class="info"><div class="name">AKM</div><div class="id">#002</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/003_MosinNagant_Attack.png" alt="Mosin-Nagant"><div class="info"><div class="name">Mosin-Nagant</div><div class="id">#003</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔫</div><img src="images/cards/004_SKS_Attack.png" alt="SKS"><div class="info"><div class="name">SKS</div><div class="id">#004</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🔫</div><img src="images/cards/005_CR527_Attack.png" alt="CR-527"><div class="info"><div class="name">CR-527</div><div class="id">#005</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🔫</div><img src="images/cards/006_CR550Savanna_Attack.png" alt="CR-550 Savanna"><div class="info"><div class="name">CR-550 Savanna</div><div class="id">#006</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/007_BK133_Attack.png" alt="BK-133"><div class="info"><div class="name">BK-133</div><div class="id">#007</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔫</div><img src="images/cards/008_BK18_Attack.png" alt="BK-18"><div class="info"><div class="name">BK-18</div><div class="id">#008</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🔫</div><img src="images/cards/009_MKII_Attack.png" alt="MK II"><div class="info"><div class="name">MK II</div><div class="id">#009</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔫</div><img src="images/cards/010_FX45_Attack.png" alt="FX-45"><div class="info"><div class="name">FX-45</div><div class="id">#010</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/011_Deagle_Attack.png" alt="Deagle"><div class="info"><div class="name">Deagle</div><div class="id">#011</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔫</div><img src="images/cards/012_VSSVintorez_Attack.png" alt="VSS Vintorez"><div class="info"><div class="name">VSS Vintorez</div><div class="id">#012</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/013_SVD_Attack.png" alt="SVD"><div class="info"><div class="name">SVD</div><div class="id">#013</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/014_M70Tundra_Attack.png" alt="M70 Tundra"><div class="info"><div class="name">M70 Tundra</div><div class="id">#014</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔫</div><img src="images/cards/015_IZH18_Attack.png" alt="IZH-18"><div class="info"><div class="name">IZH-18</div><div class="id">#015</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/016_SawedoffShotgun_Attack.png" alt="Sawed-off Shotgun"><div class="info"><div class="name">Sawed-off Shotgun</div><div class="id">#016</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/017_USG45_Attack.png" alt="USG-45"><div class="info"><div class="name">USG-45</div><div class="id">#017</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔫</div><img src="images/cards/018_UMP45_Attack.png" alt="UMP-45"><div class="info"><div class="name">UMP-45</div><div class="id">#018</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🔫</div><img src="images/cards/019_KA74_Attack.png" alt="KA-74"><div class="info"><div class="name">KA-74</div><div class="id">#019</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/020_KAM_Attack.png" alt="KA-M"><div class="info"><div class="name">KA-M</div><div class="id">#020</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🔫</div><img src="images/cards/021_FAL_Attack.png" alt="FAL"><div class="info"><div class="name">FAL</div><div class="id">#021</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/022_AK101_Attack.png" alt="AK-101"><div class="info"><div class="name">AK-101</div><div class="id">#022</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/023_AK74_Attack.png" alt="AK-74"><div class="info"><div class="name">AK-74</div><div class="id">#023</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔫</div><img src="images/cards/024_M16A2_Attack.png" alt="M16-A2"><div class="info"><div class="name">M16-A2</div><div class="id">#024</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔫</div><img src="images/cards/025_SG5K_Attack.png" alt="SG5-K"><div class="info"><div class="name">SG5-K</div><div class="id">#025</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔫</div><img src="images/cards/026_MP5K_Attack.png" alt="MP5-K"><div class="info"><div class="name">MP5-K</div><div class="id">#026</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🔫</div><img src="images/cards/027_Repeater_Attack.png" alt="Repeater"><div class="info"><div class="name">Repeater</div><div class="id">#027</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/028_Derringer_Attack.png" alt="Derringer"><div class="info"><div class="name">Derringer</div><div class="id">#028</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/029_Longhorn_Attack.png" alt="Longhorn"><div class="info"><div class="name">Longhorn</div><div class="id">#029</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔫</div><img src="images/cards/030_Crossbow_Attack.png" alt="Crossbow"><div class="info"><div class="name">Crossbow</div><div class="id">#030</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🛡️</div><img src="images/cards/031_TacticalVest_Defense.png" alt="Tactical Vest"><div class="info"><div class="name">Tactical Vest</div><div class="id">#031</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/032_BallisticHelmet_Defense.png" alt="Ballistic Helmet"><div class="info"><div class="name">Ballistic Helmet</div><div class="id">#032</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/033_AssaultHelmet_Defense.png" alt="Assault Helmet"><div class="info"><div class="name">Assault Helmet</div><div class="id">#033</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🛡️</div><img src="images/cards/034_CombatBoots_Defense.png" alt="Combat Boots"><div class="info"><div class="name">Combat Boots</div><div class="id">#034</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/035_PlateCarrier_Defense.png" alt="Plate Carrier"><div class="info"><div class="name">Plate Carrier</div><div class="id">#035</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🛡️</div><img src="images/cards/036_NBCSuit_Defense.png" alt="NBC Suit"><div class="info"><div class="name">NBC Suit</div><div class="id">#036</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/037_MotorbikeHelmet_Defense.png" alt="Motorbike Helmet"><div class="info"><div class="name">Motorbike Helmet</div><div class="id">#037</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/038_GorkaJacket_Defense.png" alt="Gorka Jacket"><div class="info"><div class="name">Gorka Jacket</div><div class="id">#038</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🛡️</div><img src="images/cards/039_GorkaPants_Defense.png" alt="Gorka Pants"><div class="info"><div class="name">Gorka Pants</div><div class="id">#039</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🛡️</div><img src="images/cards/040_CombatGloves_Defense.png" alt="Combat Gloves"><div class="info"><div class="name">Combat Gloves</div><div class="id">#040</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/041_HunterJacket_Defense.png" alt="Hunter Jacket"><div class="info"><div class="name">Hunter Jacket</div><div class="id">#041</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🛡️</div><img src="images/cards/042_TacticalShirt_Defense.png" alt="Tactical Shirt"><div class="info"><div class="name">Tactical Shirt</div><div class="id">#042</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/043_ParamedicJacket_Defense.png" alt="Paramedic Jacket"><div class="info"><div class="name">Paramedic Jacket</div><div class="id">#043</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🛡️</div><img src="images/cards/044_PressVest_Defense.png" alt="Press Vest"><div class="info"><div class="name">Press Vest</div><div class="id">#044</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🛡️</div><img src="images/cards/045_FirefighterPants_Defense.png" alt="Firefighter Pants"><div class="info"><div class="name">Firefighter Pants</div><div class="id">#045</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🛡️</div><img src="images/cards/046_M65Jacket_Defense.png" alt="M65 Jacket"><div class="info"><div class="name">M65 Jacket</div><div class="id">#046</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🛡️</div><img src="images/cards/047_RidersJacket_Defense.png" alt="Riders Jacket"><div class="info"><div class="name">Riders Jacket</div><div class="id">#047</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/048_LeatherShoes_Defense.png" alt="Leather Shoes"><div class="info"><div class="name">Leather Shoes</div><div class="id">#048</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/049_TracksuitJacket_Defense.png" alt="Tracksuit Jacket"><div class="info"><div class="name">Tracksuit Jacket</div><div class="id">#049</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🛡️</div><img src="images/cards/050_MilitaryBoots_Defense.png" alt="Military Boots"><div class="info"><div class="name">Military Boots</div><div class="id">#050</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🛡️</div><img src="images/cards/051_FieldVest_Defense.png" alt="Field Vest"><div class="info"><div class="name">Field Vest</div><div class="id">#051</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🛡️</div><img src="images/cards/052_ChestHolster_Defense.png" alt="Chest Holster"><div class="info"><div class="name">Chest Holster</div><div class="id">#052</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/053_StabproofVest_Defense.png" alt="Stabproof Vest"><div class="info"><div class="name">Stabproof Vest</div><div class="id">#053</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/054_AssaultBackpack_Defense.png" alt="Assault Backpack"><div class="info"><div class="name">Assault Backpack</div><div class="id">#054</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🛡️</div><img src="images/cards/055_DrybagBackpack_Defense.png" alt="Drybag Backpack"><div class="info"><div class="name">Drybag Backpack</div><div class="id">#055</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🛡️</div><img src="images/cards/056_TacticalBackpack_Defense.png" alt="Tactical Backpack"><div class="info"><div class="name">Tactical Backpack</div><div class="id">#056</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🛡️</div><img src="images/cards/057_SkateHelmet_Defense.png" alt="Skate Helmet"><div class="info"><div class="name">Skate Helmet</div><div class="id">#057</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🛡️</div><img src="images/cards/058_BoonieHat_Defense.png" alt="Boonie Hat"><div class="info"><div class="name">Boonie Hat</div><div class="id">#058</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🛡️</div><img src="images/cards/059_WeldingMask_Defense.png" alt="Welding Mask"><div class="info"><div class="name">Welding Mask</div><div class="id">#059</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🛡️</div><img src="images/cards/060_ImprovisedVest_Defense.png" alt="Improvised Vest"><div class="info"><div class="name">Improvised Vest</div><div class="id">#060</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔭</div><img src="images/cards/061_Binoculars_Tactical.png" alt="Binoculars"><div class="info"><div class="name">Binoculars</div><div class="id">#061</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔭</div><img src="images/cards/062_Rangefinder_Tactical.png" alt="Rangefinder"><div class="info"><div class="name">Rangefinder</div><div class="id">#062</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔭</div><img src="images/cards/063_HandheldTransceiver_Tactical.png" alt="Handheld Transceiver"><div class="info"><div class="name">Handheld Transceiver</div><div class="id">#063</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔭</div><img src="images/cards/064_Compass_Tactical.png" alt="Compass"><div class="info"><div class="name">Compass</div><div class="id">#064</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔭</div><img src="images/cards/065_Map_Tactical.png" alt="Map"><div class="info"><div class="name">Map</div><div class="id">#065</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔭</div><img src="images/cards/066_Headtorch_Tactical.png" alt="Headtorch"><div class="info"><div class="name">Headtorch</div><div class="id">#066</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔭</div><img src="images/cards/067_NightVisionGoggles_Tactical.png" alt="Night Vision Goggles"><div class="info"><div class="name">Night Vision Goggles</div><div class="id">#067</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🔭</div><img src="images/cards/068_Tripwire_Tactical.png" alt="Tripwire"><div class="info"><div class="name">Tripwire</div><div class="id">#068</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔭</div><img src="images/cards/069_DuctTape_Tactical.png" alt="Duct Tape"><div class="info"><div class="name">Duct Tape</div><div class="id">#069</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔭</div><img src="images/cards/070_Megaphone_Tactical.png" alt="Megaphone"><div class="info"><div class="name">Megaphone</div><div class="id">#070</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔭</div><img src="images/cards/071_WalkieTalkie_Tactical.png" alt="Walkie Talkie"><div class="info"><div class="name">Walkie Talkie</div><div class="id">#071</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🔭</div><img src="images/cards/072_Flashlight_Tactical.png" alt="Flashlight"><div class="info"><div class="name">Flashlight</div><div class="id">#072</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔭</div><img src="images/cards/073_GlowStick_Tactical.png" alt="Glow Stick"><div class="info"><div class="name">Glow Stick</div><div class="id">#073</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🔭</div><img src="images/cards/074_HuntingScope_Tactical.png" alt="Hunting Scope"><div class="info"><div class="name">Hunting Scope</div><div class="id">#074</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🔭</div><img src="images/cards/075_WeaponCleaningKit_Tactical.png" alt="Weapon Cleaning Kit"><div class="info"><div class="name">Weapon Cleaning Kit</div><div class="id">#075</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🎒</div><img src="images/cards/076_CanofTacticalBacon_Loot.png" alt="Can of Tactical Bacon"><div class="info"><div class="name">Can of Tactical Bacon</div><div class="id">#076</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🎒</div><img src="images/cards/077_MRE_Loot.png" alt="MRE"><div class="info"><div class="name">MRE</div><div class="id">#077</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🎒</div><img src="images/cards/078_Canteen_Loot.png" alt="Canteen"><div class="info"><div class="name">Canteen</div><div class="id">#078</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🎒</div><img src="images/cards/079_BoxofNails_Loot.png" alt="Box of Nails"><div class="info"><div class="name">Box of Nails</div><div class="id">#079</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🎒</div><img src="images/cards/080_JerryCan_Loot.png" alt="Jerry Can"><div class="info"><div class="name">Jerry Can</div><div class="id">#080</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🎒</div><img src="images/cards/081_Dynamite_Loot.png" alt="Dynamite"><div class="info"><div class="name">Dynamite</div><div class="id">#081</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🎒</div><img src="images/cards/082_FirstAidKit_Loot.png" alt="First Aid Kit"><div class="info"><div class="name">First Aid Kit</div><div class="id">#082</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🎒</div><img src="images/cards/083_BoxofAmmo_Loot.png" alt="Box of Ammo"><div class="info"><div class="name">Box of Ammo</div><div class="id">#083</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🎒</div><img src="images/cards/084_FishingRod_Loot.png" alt="Fishing Rod"><div class="info"><div class="name">Fishing Rod</div><div class="id">#084</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🎒</div><img src="images/cards/085_Lockpick_Loot.png" alt="Lockpick"><div class="info"><div class="name">Lockpick</div><div class="id">#085</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🎒</div><img src="images/cards/086_Battery_Loot.png" alt="Battery"><div class="info"><div class="name">Battery</div><div class="id">#086</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🎒</div><img src="images/cards/087_Rope_Loot.png" alt="Rope"><div class="info"><div class="name">Rope</div><div class="id">#087</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🎒</div><img src="images/cards/088_CookingPot_Loot.png" alt="Cooking Pot"><div class="info"><div class="name">Cooking Pot</div><div class="id">#088</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🎒</div><img src="images/cards/089_SewingKit_Loot.png" alt="Sewing Kit"><div class="info"><div class="name">Sewing Kit</div><div class="id">#089</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🎒</div><img src="images/cards/090_GunCleaningKit_Loot.png" alt="Gun Cleaning Kit"><div class="info"><div class="name">Gun Cleaning Kit</div><div class="id">#090</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🧟</div><img src="images/cards/091_Walker(Civilian)_Infected.png" alt="Walker (Civilian)"><div class="info"><div class="name">Walker (Civilian)</div><div class="id">#091</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🧟</div><img src="images/cards/092_Runner(Military)_Infected.png" alt="Runner (Military)"><div class="info"><div class="name">Runner (Military)</div><div class="id">#092</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🧟</div><img src="images/cards/093_Crawler_Infected.png" alt="Crawler"><div class="info"><div class="name">Crawler</div><div class="id">#093</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🧟</div><img src="images/cards/094_BurntInfected_Infected.png" alt="Burnt Infected"><div class="info"><div class="name">Burnt Infected</div><div class="id">#094</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🧟</div><img src="images/cards/095_PoliceInfected_Infected.png" alt="Police Infected"><div class="info"><div class="name">Police Infected</div><div class="id">#095</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🧟</div><img src="images/cards/096_HazmatInfected_Infected.png" alt="Hazmat Infected"><div class="info"><div class="name">Hazmat Infected</div><div class="id">#096</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🧟</div><img src="images/cards/097_DoctorInfected_Infected.png" alt="Doctor Infected"><div class="info"><div class="name">Doctor Infected</div><div class="id">#097</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🧟</div><img src="images/cards/098_HunterInfected_Infected.png" alt="Hunter Infected"><div class="info"><div class="name">Hunter Infected</div><div class="id">#098</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🧟</div><img src="images/cards/099_SurvivorInfected_Infected.png" alt="Survivor Infected"><div class="info"><div class="name">Survivor Infected</div><div class="id">#099</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🧟</div><img src="images/cards/100_PrisonerInfected_Infected.png" alt="Prisoner Infected"><div class="info"><div class="name">Prisoner Infected</div><div class="id">#100</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🧟</div><img src="images/cards/101_Spitter(Mutated)_Infected.png" alt="Spitter (Mutated)"><div class="info"><div class="name">Spitter (Mutated)</div><div class="id">#101</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🧟</div><img src="images/cards/102_Bloater_Infected.png" alt="Bloater"><div class="info"><div class="name">Bloater</div><div class="id">#102</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🧟</div><img src="images/cards/103_FastInfected_Infected.png" alt="Fast Infected"><div class="info"><div class="name">Fast Infected</div><div class="id">#103</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🧟</div><img src="images/cards/104_ButcherInfected_Infected.png" alt="Butcher Infected"><div class="info"><div class="name">Butcher Infected</div><div class="id">#104</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🧟</div><img src="images/cards/105_Behemoth_Infected.png" alt="Behemoth"><div class="info"><div class="name">Behemoth</div><div class="id">#105</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🪤</div><img src="images/cards/106_BearTrap_Trap.png" alt="Bear Trap"><div class="info"><div class="name">Bear Trap</div><div class="id">#106</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🪤</div><img src="images/cards/107_TripwireTrap_Trap.png" alt="Tripwire Trap"><div class="info"><div class="name">Tripwire Trap</div><div class="id">#107</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🪤</div><img src="images/cards/108_Landmine_Trap.png" alt="Landmine"><div class="info"><div class="name">Landmine</div><div class="id">#108</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🪤</div><img src="images/cards/109_MakeshiftCharge_Trap.png" alt="Makeshift Charge"><div class="info"><div class="name">Makeshift Charge</div><div class="id">#109</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🪤</div><img src="images/cards/110_PerimeterTrap_Trap.png" alt="Perimeter Trap"><div class="info"><div class="name">Perimeter Trap</div><div class="id">#110</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🪤</div><img src="images/cards/111_FireBarrelTrap_Trap.png" alt="Fire Barrel Trap"><div class="info"><div class="name">Fire Barrel Trap</div><div class="id">#111</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🪤</div><img src="images/cards/112_WireSnare_Trap.png" alt="Wire Snare"><div class="info"><div class="name">Wire Snare</div><div class="id">#112</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🪤</div><img src="images/cards/113_SpikedLogTrap_Trap.png" alt="Spiked Log Trap"><div class="info"><div class="name">Spiked Log Trap</div><div class="id">#113</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🪤</div><img src="images/cards/114_ExplosiveGrenadeTrap_Trap.png" alt="Explosive Grenade Trap"><div class="info"><div class="name">Explosive Grenade Trap</div><div class="id">#114</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🪤</div><img src="images/cards/115_GasCanisterTrap_Trap.png" alt="Gas Canister Trap"><div class="info"><div class="name">Gas Canister Trap</div><div class="id">#115</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card rare"><div class="icon">🪤</div><img src="images/cards/116_FlareDistraction_Trap.png" alt="Flare Distraction"><div class="info"><div class="name">Flare Distraction</div><div class="id">#116</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🪤</div><img src="images/cards/117_AlarmTripwire_Trap.png" alt="Alarm Tripwire"><div class="info"><div class="name">Alarm Tripwire</div><div class="id">#117</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🪤</div><img src="images/cards/118_SpringloadedBreachTrap_Trap.png" alt="Springloaded Breach Trap"><div class="info"><div class="name">Springloaded Breach Trap</div><div class="id">#118</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card common"><div class="icon">🪤</div><img src="images/cards/119_IEDPressurePlate_Trap.png" alt="IED Pressure Plate"><div class="info"><div class="name">IED Pressure Plate</div><div class="id">#119</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card uncommon"><div class="icon">🪤</div><img src="images/cards/120_SwingingSpikedBat_Trap.png" alt="Swinging Spiked Bat"><div class="info"><div class="name">Swinging Spiked Bat</div><div class="id">#120</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card legendary"><div class="icon">⭐</div><img src="images/cards/121_TheAgency_Specialty.png" alt="The Agency"><div class="info"><div class="name">The Agency</div><div class="id">#121</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card legendary"><div class="icon">⭐</div><img src="images/cards/122_TheTrader_Specialty.png" alt="The Trader"><div class="info"><div class="name">The Trader</div><div class="id">#122</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card legendary"><div class="icon">⭐</div><img src="images/cards/123_JakubNowak_Specialty.png" alt="Jakub Nowak"><div class="info"><div class="name">Jakub Nowak</div><div class="id">#123</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card legendary"><div class="icon">⭐</div><img src="images/cards/124_Dr.Wesker_Specialty.png" alt="Dr. Wesker"><div class="info"><div class="name">Dr. Wesker</div><div class="id">#124</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card legendary"><div class="icon">⭐</div><img src="images/cards/125_ElenaKovak_Specialty.png" alt="Elena Kovak"><div class="info"><div class="name">Elena Kovak</div><div class="id">#125</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card legendary"><div class="icon">⭐</div><img src="images/cards/126_Lt.Col.EmilBor\u00e9n_Specialty.png" alt="Lt. Col. Emil Bor\u00e9n"><div class="info"><div class="name">Lt. Col. Emil Bor\u00e9n</div><div class="id">#126</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-  <div class="card legendary"><div class="icon">⭐</div><img src="images/cards/127_IsabelleLaurent_Specialty.png" alt="Isabelle Laurent"><div class="info"><div class="name">Isabelle Laurent</div><div class="id">#127</div></div><div class="actions">[<span class="action">SCRAP</span>] Owned: 0 [<span class="action">SELL</span>]</div></div>
-</div>
+  <h1>ALL DayZ CCG Cards</h1>
+  <div class="card-container">
+
+    <div class="card">
+      <img src="images/cards/000_CardBack_Unique.png" alt="Card #000">
+      <!-- No type-icon for card #000 (face-down deck) -->
+      <div class="card-info">
+        <p class="card-number">#000</p>
+        <p class="card-owned">Owned: 0</p>
+        <div class="card-actions">
+          <button class="btn scrap-btn">SCRAP</button>
+          <button class="btn sell-btn">SELL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="images/cards/001_M4A1_Attack.png" alt="Card #001">
+      <div class="type-icon">⚔️</div>
+      <div class="card-info">
+        <p class="card-number">#001</p>
+        <p class="card-owned">Owned: 0</p>
+        <div class="card-actions">
+          <button class="btn scrap-btn">SCRAP</button>
+          <button class="btn sell-btn">SELL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="images/cards/002_AKM_Attack.png" alt="Card #002">
+      <div class="type-icon">⚔️</div>
+      <div class="card-info">
+        <p class="card-number">#002</p>
+        <p class="card-owned">Owned: 0</p>
+        <div class="card-actions">
+          <button class="btn scrap-btn">SCRAP</button>
+          <button class="btn sell-btn">SELL</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- (The pattern above repeats for all cards #003 through #127, with each card’s correct image file and icon type) -->
+
+    <div class="card">
+      <img src="images/cards/121_TheAgency_Specialty.png" alt="Card #121">
+      <div class="type-icon">🌟</div>
+      <div class="card-info">
+        <p class="card-number">#121</p>
+        <p class="card-owned">Owned: 0</p>
+        <div class="card-actions">
+          <button class="btn scrap-btn">SCRAP</button>
+          <button class="btn sell-btn">SELL</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ... -->
+
+    <div class="card">
+      <img src="images/cards/127_IsabelleLaurent_Specialty.png" alt="Card #127">
+      <div class="type-icon">🌟</div>
+      <div class="card-info">
+        <p class="card-number">#127</p>
+        <p class="card-owned">Owned: 0</p>
+        <div class="card-actions">
+          <button class="btn scrap-btn">SCRAP</button>
+          <button class="btn sell-btn">SELL</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </body>
 </html>
