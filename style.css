@@ -1,4 +1,3 @@
-
 body {
   background-color: #111;
 }
@@ -86,14 +85,24 @@ button.scrap:hover, button.sell:hover {
   font-size: 1.4rem;
 }
 
-
 /* Force all text to white */
 body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
-    color: #ffffff !important;
+  color: #ffffff !important;
 }
-
 
 /* Red border for facedown cards */
 .facedown-card {
-    border: 3px solid red !important;
+  border: 3px solid red !important;
+}
+
+/* Return to Hub button styling */
+.return-hub-button {
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: #222;
+  color: #fff;
+  border: none;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
 }
