@@ -5,23 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ALL DayZ CCG Cards</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    #hub-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      z-index: 1000;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 60px;
+    }
+
+    #coin-balance-display {
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background-color: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 5px;
+    }
+
+    .card-number {
+      font-weight: bold;
+    }
+
+    .card-name {
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .card-count {
+      font-size: 13px;
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
+  <a href="https://madv313.github.io/Duel-Bot/" id="hub-button">Back to Hub</a>
+  
   <h1>Players Card Collection</h1>
-<div id="coin-balance-display" style="margin-bottom: 20px; font-size: 1.2rem;">
-  🪙 Coin Balance:  <span id="coin-balance">0</span>
-</div>
-  
-  <!-- Return to Hub Button -->
-<div class="return-hub-wrapper">
-  <a href="https://madv313.github.io/Duel-Bot/" class="return-hub-button">← Return to Hub</a>
-</div>
-  
-  <div class="card-grid">
-   
+
+  <div id="coin-balance-display">
+    🪙 Coin Balance: <span id="coin-balance">0</span>
   </div>
 
-  <script src="script.js"></script>
+  <div class="card-grid" id="card-grid">
+    <!-- Cards will be inserted here dynamically -->
+  </div>
+
+  <script src="collection.js"></script>
 </body>
 </html>
 
