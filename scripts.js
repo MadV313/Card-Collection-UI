@@ -1,105 +1,105 @@
-// Assuming you have a list of all cards with their numbers, names, rarities, etc.
-
+// Generate all card elements
 cards.forEach(card => {
-    const cardContainer = document.createElement('div');
-    cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
-    cardContainer.setAttribute('data-rarity', card.rarity);
-    cardContainer.setAttribute('data-owned', card.owned);
+  const cardContainer = document.createElement('div');
+  cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
+  cardContainer.setAttribute('data-rarity', card.rarity);
+  cardContainer.setAttribute('data-owned', card.owned);
+  cardContainer.setAttribute('data-card-id', card.cardId || card.card_id); // Fallback safe
 
-    // Fix: Use card.card_id as fallback
-    const cardId = card.cardId || card.card_id;
-    cardContainer.setAttribute('data-card-id', cardId);
+  const cardImg = document.createElement('img');
+  cardImg.classList.add('facedown-card');
+  cardImg.src = 'images/cards/000_CardBack_Unique.png'; // Start with card back
+  cardImg.alt = card.name;
 
-    const cardImg = document.createElement('img');
-    cardImg.classList.add('facedown-card');
-    cardImg.src = 'images/cards/000_CardBack_Unique.png';
-    cardImg.alt = card.name;
+  const cardNumberSpan = document.createElement('span');
+  cardNumberSpan.classList.add('card-number');
+  cardNumberSpan.textContent = `#${card.number}`;
 
-    const cardNumberSpan = document.createElement('span');
-    cardNumberSpan.classList.add('card-number');
-    cardNumberSpan.textContent = `#${card.number}`;
+  const cardNameSpan = document.createElement('span');
+  cardNameSpan.classList.add('card-name');
 
-    const cardNameSpan = document.createElement('span');
-    cardNameSpan.classList.add('card-name');
+  const emojiSpan = document.createElement('span');
+  emojiSpan.classList.add('emoji');
 
-    const emojiSpan = document.createElement('span');
-    emojiSpan.classList.add('emoji');
+  if (card.owned > 0) {
+    cardNameSpan.textContent = `#${card.number} ${card.name}`;
+    emojiSpan.textContent = emojiMap[card.number];
+    cardImg.src = `images/cards/${card.imageFileName}`; // Load real image
+  } else {
+    cardNameSpan.textContent = `#${card.number}`;
+    emojiSpan.textContent = "🔒";
+  }
 
-    if (card.owned === 0) {
-        cardNameSpan.textContent = `#${card.number}`;
-        emojiSpan.textContent = "🔒";
-    } else {
-        cardNameSpan.textContent = `#${card.number} ${card.name}`;
-        emojiSpan.textContent = emojiMap[card.number];
-        cardImg.src = `images/cards/${card.imageFileName}`;
-    }
+  const cardInfoDiv = document.createElement('div');
+  cardInfoDiv.classList.add('card-info');
+  cardInfoDiv.appendChild(cardNumberSpan);
+  cardInfoDiv.appendChild(cardNameSpan);
+  cardInfoDiv.appendChild(emojiSpan);
 
-    const cardInfoDiv = document.createElement('div');
-    cardInfoDiv.classList.add('card-info');
-    cardInfoDiv.appendChild(cardNumberSpan);
-    cardInfoDiv.appendChild(cardNameSpan);
-    cardInfoDiv.appendChild(emojiSpan);
+  const actionsDiv = document.createElement('div');
+  actionsDiv.classList.add('card-actions-vertical');
 
-    const actionsDiv = document.createElement('div');
-    actionsDiv.classList.add('card-actions-vertical');
-    const scrapButton = document.createElement('button');
-    scrapButton.classList.add('scrap');
-    scrapButton.textContent = '[SCRAP]';
-    const sellButton = document.createElement('button');
-    sellButton.classList.add('sell');
-    sellButton.textContent = '[SELL]';
-    const ownedCountSpan = document.createElement('span');
-    ownedCountSpan.classList.add('owned-count');
-    ownedCountSpan.textContent = `Owned: ${card.owned}`;
+  const scrapButton = document.createElement('button');
+  scrapButton.classList.add('scrap');
+  scrapButton.textContent = '[SCRAP]';
 
-    actionsDiv.appendChild(scrapButton);
-    actionsDiv.appendChild(ownedCountSpan);
-    actionsDiv.appendChild(sellButton);
+  const sellButton = document.createElement('button');
+  sellButton.classList.add('sell');
+  sellButton.textContent = '[SELL]';
 
-    cardContainer.appendChild(cardImg);
-    cardContainer.appendChild(cardInfoDiv);
-    cardContainer.appendChild(actionsDiv);
+  const ownedCountSpan = document.createElement('span');
+  ownedCountSpan.classList.add('owned-count');
+  ownedCountSpan.textContent = `Owned: ${card.owned}`;
 
-    document.getElementById('cards-container').appendChild(cardContainer);
+  actionsDiv.appendChild(scrapButton);
+  actionsDiv.appendChild(ownedCountSpan);
+  actionsDiv.appendChild(sellButton);
+
+  cardContainer.appendChild(cardImg);
+  cardContainer.appendChild(cardInfoDiv);
+  cardContainer.appendChild(actionsDiv);
+
+  document.getElementById('cards-container').appendChild(cardContainer);
 });
 
-// === MOCK UNLOCK HIGHLIGHT + TEMPORARY IMAGE REVEAL ===
+// Run highlight logic only AFTER cards are rendered
+initHighlightRecentUnlocks();
 
-window.addEventListener('load', () => {
-    const recentUnlocks = JSON.parse(localStorage.getItem("recentUnlocks"));
+function initHighlightRecentUnlocks() {
+  const recentUnlocks = JSON.parse(localStorage.getItem("recentUnlocks"));
+  if (!recentUnlocks || !recentUnlocks.length) return;
 
-    if (recentUnlocks && recentUnlocks.length) {
-        // Show "New Cards Unlocked!" banner
-        const banner = document.createElement("div");
-        banner.id = "new-unlocked-banner";
-        banner.innerText = "New Cards Unlocked!";
-        document.body.appendChild(banner);
+  // Banner
+  const banner = document.createElement("div");
+  banner.id = "new-unlocked-banner";
+  banner.innerText = "New Cards Unlocked!";
+  document.body.appendChild(banner);
 
-        // Highlight recently unlocked cards
-        recentUnlocks.forEach(card => {
-            const id = card.cardId || card.card_id;
-            const cardEl = document.querySelector(`[data-card-id="${id}"]`);
-            if (cardEl) {
-                cardEl.classList.add("highlight-glow");
+  // Loop + highlight
+  recentUnlocks.forEach(card => {
+    const id = card.cardId || card.card_id;
+    const match = document.querySelector(`[data-card-id="${id}"]`);
+    if (match) {
+      match.classList.add("highlight-glow");
+      const img = match.querySelector("img");
 
-                const img = cardEl.querySelector("img");
-                if (img && img.src.includes("000_CardBack_Unique.png")) {
-                    const filename = card.filename || card.imageFileName;
-                    img.src = `images/cards/${filename}`;
-                    img.classList.add("temporary-reveal");
-                }
-            }
-        });
-
-        // Cleanup
-        setTimeout(() => {
-            document.getElementById("new-unlocked-banner")?.remove();
-            document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
-            document.querySelectorAll(".temporary-reveal").forEach(img => {
-                img.src = "images/cards/000_CardBack_Unique.png";
-                img.classList.remove("temporary-reveal");
-            });
-            localStorage.removeItem("recentUnlocks");
-        }, 3000);
+      // Only swap image if still showing back
+      if (img && img.src.includes("000_CardBack_Unique.png")) {
+        const filename = card.filename || card.imageFileName;
+        img.src = `images/cards/${filename}`;
+        img.classList.add("temporary-reveal");
+      }
     }
-});
+  });
+
+  // Clean up after 3 sec
+  setTimeout(() => {
+    document.getElementById("new-unlocked-banner")?.remove();
+    document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
+    document.querySelectorAll(".temporary-reveal").forEach(img => {
+      img.src = "images/cards/000_CardBack_Unique.png";
+      img.classList.remove("temporary-reveal");
+    });
+    localStorage.removeItem("recentUnlocks");
+  }, 3000);
+}
