@@ -5,14 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ALL DayZ CCG Cards</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    #return-to-hub {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      background-color: #444;
+      color: white;
+      padding: 10px 16px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      z-index: 9999;
+    }
+
+    #return-to-hub:hover {
+      background-color: #666;
+    }
+  </style>
 </head>
 <body>
-  <h1>Players Card Collection</h1>
-<div id="coin-balance-display" style="margin-bottom: 20px; font-size: 1.2rem;">
-  🪙 Coin Balance:  <span id="coin-balance">0</span>
-</div>
-  <div class="card-grid">
+  <a id="return-to-hub" href="https://madv313.github.io/Duel-Bot/">← Return to HUB</a>
 
+  <h1>Players Card Collection</h1>
+
+  <div id="coin-balance-display" style="margin-bottom: 20px; font-size: 1.2rem;">
+    🪙 Coin Balance:  <span id="coin-balance">0</span>
+  </div>
+
+  <div class="card-grid">
+    
     <div class="card-container unique-border" data-rarity="Unique" data-owned="0">
       <img class="facedown-card" class="facedown-card" src="images/cards/000_CardBack_Unique.png" alt="WinterLand Death Deck (Face-Down)">
       <p>#000</p>
