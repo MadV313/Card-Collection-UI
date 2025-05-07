@@ -85,14 +85,49 @@ button.scrap:hover, button.sell:hover {
   font-size: 1.4rem;
 }
 
-
 /* Force all text to white */
 body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
-    color: #ffffff !important;
+  color: #ffffff !important;
 }
-
 
 /* Red border for facedown cards */
 .facedown-card {
-    border: 3px solid red !important;
+  border: 3px solid red !important;
+}
+
+/* NEW VISUAL UNLOCK EFFECTS */
+#new-unlocked-banner {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+  animation: glowFade 3s ease-out forwards;
+  z-index: 9999;
+}
+
+@keyframes glowFade {
+  0%   { opacity: 0; transform: translateX(-50%) scale(0.9); }
+  10%  { opacity: 1; transform: translateX(-50%) scale(1); }
+  90%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) scale(1); }
+}
+
+.highlight-glow {
+  outline: 3px solid #00ffff;
+  box-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff;
+  animation: shimmer 1.5s infinite alternate;
+}
+
+@keyframes shimmer {
+  0% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+.temporary-reveal {
+  transition: all 0.3s ease-in-out;
+  z-index: 1;
 }
