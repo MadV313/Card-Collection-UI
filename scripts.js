@@ -5,6 +5,7 @@ cards.forEach(card => {
     cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
     cardContainer.setAttribute('data-rarity', card.rarity);
     cardContainer.setAttribute('data-owned', card.owned);
+    cardContainer.setAttribute('data-card-id', card.cardId); // Needed for highlight logic
 
     const cardImg = document.createElement('img');
     cardImg.classList.add('facedown-card');
@@ -28,7 +29,7 @@ cards.forEach(card => {
     } else {
         cardNameSpan.textContent = `#${card.number} ${card.name}`;
         emojiSpan.textContent = emojiMap[card.number];
-        cardImg.src = `images/cards/${card.imageFileName}`; // Swap in real image if owned
+        cardImg.src = `images/cards/${card.imageFileName}`; // Show real image if owned
     }
 
     const cardInfoDiv = document.createElement('div');
@@ -59,3 +60,40 @@ cards.forEach(card => {
 
     document.getElementById('cards-container').appendChild(cardContainer);
 });
+
+// === MOCK UNLOCK HIGHLIGHT + TEMPORARY IMAGE REVEAL ===
+
+const recentUnlocks = JSON.parse(localStorage.getItem("recentUnlocks"));
+
+if (recentUnlocks && recentUnlocks.length) {
+    // Show "New Cards Unlocked!" banner
+    const banner = document.createElement("div");
+    banner.id = "new-unlocked-banner";
+    banner.innerText = "New Cards Unlocked!";
+    document.body.appendChild(banner);
+
+    // Highlight each recently unlocked card
+    recentUnlocks.forEach(card => {
+        const cardEl = document.querySelector(`[data-card-id="${card.cardId}"]`);
+        if (cardEl) {
+            cardEl.classList.add("highlight-glow");
+
+            const img = cardEl.querySelector("img");
+            if (img && img.src.includes("000_CardBack_Unique.png")) {
+                img.src = `images/cards/${card.filename}`;
+                img.classList.add("temporary-reveal");
+            }
+        }
+    });
+
+    // Cleanup after 3 seconds
+    setTimeout(() => {
+        document.getElementById("new-unlocked-banner")?.remove();
+        document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
+        document.querySelectorAll(".temporary-reveal").forEach(img => {
+            img.src = "images/cards/000_CardBack_Unique.png";
+            img.classList.remove("temporary-reveal");
+        });
+        localStorage.removeItem("recentUnlocks");
+    }, 3000);
+}
