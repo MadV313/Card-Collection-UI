@@ -4,32 +4,6 @@ body {
 
 h1 {
   margin: 20px;
-  text-align: center;
-}
-
-#coin-balance-display {
-  margin: 0 auto 20px auto;
-  font-size: 1.2rem;
-  text-align: center;
-}
-
-/* Return to Hub Button wrapper */
-.return-hub-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.return-hub-button {
-  display: inline-block;
-  padding: 10px 16px;
-  background-color: #222;
-  color: #fff;
-  border: none;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
 }
 
 .card-grid {
@@ -93,6 +67,7 @@ button.scrap:hover, button.sell:hover {
   100% { box-shadow: 0 0 20px gold, 0 0 30px gold, 0 0 40px gold; }
 }
 
+/* Force 2 cards per row on phones */
 @media (max-width: 600px) {
   .card-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -102,6 +77,7 @@ button.scrap:hover, button.sell:hover {
   }
 }
 
+/* Top-right emoji */
 .card-type-emoji {
   position: absolute;
   top: 5px;
@@ -109,10 +85,14 @@ button.scrap:hover, button.sell:hover {
   font-size: 1.4rem;
 }
 
+
+/* Force all text to white */
 body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
-  color: #ffffff !important;
+    color: #ffffff !important;
 }
 
+
+/* Red border for facedown cards */
 .facedown-card {
-  border: 3px solid red !important;
+    border: 3px solid red !important;
 }
