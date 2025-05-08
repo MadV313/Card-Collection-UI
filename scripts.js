@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  // === MOCK UNLOCK HIGHLIGHT + TEMPORARY IMAGE REVEAL ===
+  // === UNLOCK HIGHLIGHT ===
   if (fromPack && recentUnlocks && recentUnlocks.length) {
     const banner = document.createElement("div");
     banner.id = "new-unlocked-banner";
@@ -109,6 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(banner);
 
     recentUnlocks.forEach(card => {
+      if (!card.isNew) return;
+
       const rawId = card.cardId || card.card_id || '';
       const id = rawId.replace(/^#/, '');
       console.log("Looking for card ID:", id);
@@ -119,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
         match.classList.add("highlight-glow");
 
         const img = match.querySelector("img");
-        if (img && img.src.endsWith("000_CardBack_Unique.png")) {
+        if (img && img.src.includes("000_CardBack_Unique.png")) {
           const filename = card.filename || card.imageFileName;
           img.src = `images/cards/${filename}`;
           img.classList.add("temporary-reveal");
@@ -132,9 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       document.getElementById("new-unlocked-banner")?.remove();
       document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
-      document.querySelectorAll(".temporary-reveal").forEach(img => {
-        img.classList.remove("temporary-reveal");
-      });
+      // We no longer revert card images after reveal
       localStorage.removeItem("recentUnlocks");
     }, 3000);
   }
