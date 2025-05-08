@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const fromPack = urlParams.get('fromPackReveal') === 'true';
+
   // === CARD RENDERING ===
   cards.forEach(card => {
     const cardContainer = document.createElement('div');
@@ -64,35 +67,37 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // === MOCK UNLOCK HIGHLIGHT + TEMPORARY IMAGE REVEAL ===
-  const recentUnlocks = JSON.parse(localStorage.getItem("recentUnlocks"));
-  if (!recentUnlocks || !recentUnlocks.length) return;
+  if (fromPack) {
+    const recentUnlocks = JSON.parse(localStorage.getItem("recentUnlocks"));
+    if (!recentUnlocks || !recentUnlocks.length) return;
 
-  const banner = document.createElement("div");
-  banner.id = "new-unlocked-banner";
-  banner.innerText = "New Cards Unlocked!";
-  document.body.appendChild(banner);
+    const banner = document.createElement("div");
+    banner.id = "new-unlocked-banner";
+    banner.innerText = "New Cards Unlocked!";
+    document.body.appendChild(banner);
 
-  recentUnlocks.forEach(card => {
-    const id = card.cardId || card.card_id;
-    const match = document.querySelector(`[data-card-id="${id}"]`);
-    if (match) {
-      match.classList.add("highlight-glow");
-      const img = match.querySelector("img");
-      if (img && img.src.includes("000_CardBack_Unique.png")) {
-        const filename = card.filename || card.imageFileName;
-        img.src = `images/cards/${filename}`;
-        img.classList.add("temporary-reveal");
+    recentUnlocks.forEach(card => {
+      const id = card.cardId || card.card_id;
+      const match = document.querySelector(`[data-card-id="${id}"]`);
+      if (match) {
+        match.classList.add("highlight-glow");
+        const img = match.querySelector("img");
+        if (img && img.src.includes("000_CardBack_Unique.png")) {
+          const filename = card.filename || card.imageFileName;
+          img.src = `images/cards/${filename}`;
+          img.classList.add("temporary-reveal");
+        }
       }
-    }
-  });
-
-  setTimeout(() => {
-    document.getElementById("new-unlocked-banner")?.remove();
-    document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
-    document.querySelectorAll(".temporary-reveal").forEach(img => {
-      img.src = "images/cards/000_CardBack_Unique.png";
-      img.classList.remove("temporary-reveal");
     });
-    localStorage.removeItem("recentUnlocks");
-  }, 3000);
+
+    setTimeout(() => {
+      document.getElementById("new-unlocked-banner")?.remove();
+      document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
+      document.querySelectorAll(".temporary-reveal").forEach(img => {
+        img.src = "images/cards/000_CardBack_Unique.png";
+        img.classList.remove("temporary-reveal");
+      });
+      localStorage.removeItem("recentUnlocks");
+    }, 3000);
+  }
 });
