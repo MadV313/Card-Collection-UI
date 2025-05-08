@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const debugBox = document.createElement('div');
   debugBox.style.position = 'fixed';
   debugBox.style.bottom = '10px';
@@ -21,8 +21,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
-  const recentRaw = localStorage.getItem("recentUnlocks");
-  const recentUnlocks = recentRaw ? JSON.parse(recentRaw) : [];
+
+  async function getRecentUnlocks() {
+    const recentRaw = localStorage.getItem("recentUnlocks");
+    if (recentRaw) return JSON.parse(recentRaw);
+
+    // Attempt backend fetch
+    try {
+      const res = await fetch("/packReveal");
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      log("Loaded from backend.");
+      return data;
+    } catch {
+      // Fallback to mock file
+      try {
+        const mock = await fetch("data/mock_pack_reveal.json");
+        const mockData = await mock.json();
+        log("Loaded from mock fallback.");
+        return mockData;
+      } catch {
+        log("Failed to load cards.");
+        return [];
+      }
+    }
+  }
+
+  const recentUnlocks = fromPack ? await getRecentUnlocks() : [];
 
   if (!fromPack) {
     log("fromPackReveal=false");
@@ -114,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  // === UNLOCK HIGHLIGHT ===
   if (fromPack && recentUnlocks.length) {
     const banner = document.createElement("div");
     banner.id = "new-unlocked-banner";
@@ -123,14 +147,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     recentUnlocks.forEach(card => {
       if (!card.isNew) return;
-
       const rawId = card.cardId || card.card_id || '';
       const id = rawId.replace(/^#/, '');
-
       const match = document.querySelector(`[data-card-id="${id}"]`);
-      if (match) {
-        match.classList.add("highlight-glow");
-      }
+      if (match) match.classList.add("highlight-glow");
     });
 
     setTimeout(() => {
