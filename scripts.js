@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const cardImg = document.createElement('img');
     cardImg.alt = card.name;
+    cardImg.loading = "lazy"; // Image performance boost
     cardImg.src = ownedCount > 0 ? `images/cards/${filename}` : 'images/cards/000_CardBack_Unique.png';
     cardImg.classList.add('facedown-card');
     if (isNewUnlock) cardImg.classList.add('shimmer');
