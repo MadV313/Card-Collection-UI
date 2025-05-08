@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // On-screen debug box for mobile
   const debugBox = document.createElement('div');
   debugBox.style.position = 'fixed';
   debugBox.style.bottom = '10px';
@@ -23,17 +22,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
   const recentRaw = localStorage.getItem("recentUnlocks");
-  const recentUnlocks = recentRaw ? JSON.parse(recentRaw) : null;
+  const recentUnlocks = recentRaw ? JSON.parse(recentRaw) : [];
 
   if (!fromPack) {
     log("fromPackReveal=false");
-  } else if (!recentUnlocks || !recentUnlocks.length) {
+  } else if (!recentUnlocks.length) {
     log("No recentUnlocks.");
   } else {
     log("Triggering highlight...");
   }
-
-  const cards = recentUnlocks || [];
 
   const emojiByType = {
     attack: "⚔️",
@@ -51,13 +48,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return emojiByType[typePart] || "";
   };
 
+  const cards = recentUnlocks;
+
   cards.forEach(card => {
     const rawId = card.cardId || card.card_id || '';
     const cleanId = rawId.replace(/^#/, '');
     const ownedCount = card.owned ?? (card.isNew ? 1 : 0);
-    const isNewUnlock = card.isNew === true;
+    const isNewUnlock = !!card.isNew;
 
-    console.log("Rendering card with ID:", cleanId);
+    const filename = card.filename || card.imageFileName || "000_CardBack_Unique.png";
 
     const cardContainer = document.createElement('div');
     cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
@@ -67,15 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cardImg = document.createElement('img');
     cardImg.alt = card.name;
-
-    if (ownedCount > 0 || isNewUnlock) {
-      cardImg.src = `images/cards/${card.imageFileName || card.filename}`;
-      cardImg.classList.add('facedown-card');
-      if (isNewUnlock) cardImg.classList.add('shimmer');
-    } else {
-      cardImg.src = 'images/cards/000_CardBack_Unique.png';
-      cardImg.classList.add('facedown-card');
-    }
+    cardImg.src = ownedCount > 0 ? `images/cards/${filename}` : 'images/cards/000_CardBack_Unique.png';
+    cardImg.classList.add('facedown-card');
+    if (isNewUnlock) cardImg.classList.add('shimmer');
 
     const cardNumberSpan = document.createElement('span');
     cardNumberSpan.classList.add('card-number');
@@ -83,17 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cardNameSpan = document.createElement('span');
     cardNameSpan.classList.add('card-name');
+    cardNameSpan.textContent = ownedCount > 0 ? `#${card.number} ${card.name}` : `#${card.number}`;
 
     const emojiSpan = document.createElement('span');
     emojiSpan.classList.add('emoji');
-
-    if (ownedCount > 0 || isNewUnlock) {
-      cardNameSpan.textContent = `#${card.number} ${card.name}`;
-      emojiSpan.textContent = getTypeEmoji(card.imageFileName || card.filename);
-    } else {
-      cardNameSpan.textContent = `#${card.number}`;
-      emojiSpan.textContent = "🔒";
-    }
+    emojiSpan.textContent = ownedCount > 0 ? getTypeEmoji(filename) : "🔒";
 
     const cardInfoDiv = document.createElement('div');
     cardInfoDiv.classList.add('card-info');
@@ -128,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // === UNLOCK HIGHLIGHT ===
-  if (fromPack && recentUnlocks && recentUnlocks.length) {
+  if (fromPack && recentUnlocks.length) {
     const banner = document.createElement("div");
     banner.id = "new-unlocked-banner";
     banner.innerText = "New Cards Unlocked!";
@@ -139,14 +126,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const rawId = card.cardId || card.card_id || '';
       const id = rawId.replace(/^#/, '');
-      console.log("Looking for card ID:", id);
 
       const match = document.querySelector(`[data-card-id="${id}"]`);
       if (match) {
-        console.log("✓ Matched and highlighting:", id);
         match.classList.add("highlight-glow");
-      } else {
-        console.warn("No match found for unlock ID:", id);
       }
     });
 
