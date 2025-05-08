@@ -33,14 +33,13 @@ document.addEventListener("DOMContentLoaded", () => {
     log("Triggering highlight...");
   }
 
-  // Use mock cards (fallback or for testing)
   const cards = recentUnlocks || [
     {
       cardId: "#001",
       number: "001",
       name: "M4-A1",
       rarity: "Rare",
-      owned: 1,
+      owned: 0,
       imageFileName: "001_M4A1_Attack.png"
     },
     {
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       number: "126",
       name: "Lt. Col. Emil Borén",
       rarity: "Legendary",
-      owned: 1,
+      owned: 0,
       imageFileName: "126_Lt.Col.EmilBoren_Specialty.png"
     },
     {
@@ -61,11 +60,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
-  const emojiMap = {
-    "001": "🔫",
-    "036": "☢️",
-    "126": "⭐"
-    // Add more if needed
+  const emojiByType = {
+    attack: "⚔️",
+    defense: "🛡️",
+    loot: "🎒",
+    tactical: "🧭",
+    trap: "🧨",
+    infected: "☣️",
+    specialty: "✨",
+    special: "✨"
+  };
+
+  const getTypeEmoji = (filename = "") => {
+    const typePart = filename.split("_").pop().split(".")[0].toLowerCase();
+    return emojiByType[typePart] || "";
   };
 
   cards.forEach(card => {
@@ -96,8 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (card.owned > 0) {
       cardNameSpan.textContent = `#${card.number} ${card.name}`;
-      emojiSpan.textContent = emojiMap[card.number] || "";
-      cardImg.src = `images/cards/${card.imageFileName}`;
+      emojiSpan.textContent = getTypeEmoji(card.imageFileName || card.filename);
+      cardImg.src = `images/cards/${card.imageFileName || card.filename}`;
     } else {
       cardNameSpan.textContent = `#${card.number}`;
       emojiSpan.textContent = "🔒";
