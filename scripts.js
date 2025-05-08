@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // On-screen debug box for mobile
+  // Debug overlay
   const debugBox = document.createElement('div');
   debugBox.style.position = 'fixed';
   debugBox.style.bottom = '10px';
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const log = (msg) => {
     debugBox.innerText = `Debug: ${msg}`;
-    setTimeout(() => debugBox.remove(), 5000);
+    setTimeout(() => debugBox.remove(), 6000);
   };
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -37,12 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
   cards.forEach(card => {
     const rawId = card.cardId || card.card_id || '';
     const cleanId = rawId.replace(/^#/, '');
-    console.log("Rendering card with ID:", cleanId);
-
     const cardContainer = document.createElement('div');
     cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
-    cardContainer.setAttribute('data-rarity', card.rarity);
-    cardContainer.setAttribute('data-owned', card.owned);
     cardContainer.setAttribute('data-card-id', cleanId);
 
     const cardImg = document.createElement('img');
@@ -50,20 +46,22 @@ document.addEventListener("DOMContentLoaded", () => {
     cardImg.src = 'images/cards/000_CardBack_Unique.png';
     cardImg.alt = card.name;
 
+    if (card.owned > 0) {
+      cardImg.src = `images/cards/${card.imageFileName}`;
+    }
+
     const cardNumberSpan = document.createElement('span');
     cardNumberSpan.classList.add('card-number');
     cardNumberSpan.textContent = `#${card.number}`;
 
     const cardNameSpan = document.createElement('span');
     cardNameSpan.classList.add('card-name');
-
     const emojiSpan = document.createElement('span');
     emojiSpan.classList.add('emoji');
 
     if (card.owned > 0) {
       cardNameSpan.textContent = `#${card.number} ${card.name}`;
       emojiSpan.textContent = emojiMap[card.number];
-      cardImg.src = `images/cards/${card.imageFileName}`;
     } else {
       cardNameSpan.textContent = `#${card.number}`;
       emojiSpan.textContent = "🔒";
@@ -71,9 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cardInfoDiv = document.createElement('div');
     cardInfoDiv.classList.add('card-info');
-    cardInfoDiv.appendChild(cardNumberSpan);
-    cardInfoDiv.appendChild(cardNameSpan);
-    cardInfoDiv.appendChild(emojiSpan);
+    cardInfoDiv.append(cardNumberSpan, cardNameSpan, emojiSpan);
 
     const actionsDiv = document.createElement('div');
     actionsDiv.classList.add('card-actions-vertical');
@@ -81,59 +77,42 @@ document.addEventListener("DOMContentLoaded", () => {
     const scrapButton = document.createElement('button');
     scrapButton.classList.add('scrap');
     scrapButton.textContent = '[SCRAP]';
-
     const sellButton = document.createElement('button');
     sellButton.classList.add('sell');
     sellButton.textContent = '[SELL]';
+    const ownedCount = document.createElement('span');
+    ownedCount.classList.add('owned-count');
+    ownedCount.textContent = `Owned: ${card.owned}`;
 
-    const ownedCountSpan = document.createElement('span');
-    ownedCountSpan.classList.add('owned-count');
-    ownedCountSpan.textContent = `Owned: ${card.owned}`;
+    actionsDiv.append(scrapButton, ownedCount, sellButton);
 
-    actionsDiv.appendChild(scrapButton);
-    actionsDiv.appendChild(ownedCountSpan);
-    actionsDiv.appendChild(sellButton);
-
-    cardContainer.appendChild(cardImg);
-    cardContainer.appendChild(cardInfoDiv);
-    cardContainer.appendChild(actionsDiv);
-
+    cardContainer.append(cardImg, cardInfoDiv, actionsDiv);
     document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  // === UNLOCK HIGHLIGHT (PERMANENT) ===
-  if (fromPack && recentUnlocks && recentUnlocks.length) {
-    setTimeout(() => {
-      const banner = document.createElement("div");
-      banner.id = "new-unlocked-banner";
-      banner.innerText = "New Cards Unlocked!";
-      document.body.appendChild(banner);
+  // === NEW CARD HIGHLIGHT ===
+  if (fromPack && recentUnlocks?.length) {
+    const banner = document.createElement("div");
+    banner.id = "new-unlocked-banner";
+    banner.innerText = "New Cards Unlocked!";
+    document.body.appendChild(banner);
 
-      recentUnlocks.forEach(card => {
-        const rawId = card.cardId || card.card_id || '';
-        const id = rawId.replace(/^#/, '');
-        console.log("Looking for card ID:", id);
-
-        const match = document.querySelector(`[data-card-id="${id}"]`);
-        if (match) {
-          console.log("✓ Matched and highlighting:", id);
-          match.classList.add("highlight-glow");
-
-          const img = match.querySelector("img");
-          if (img && img.src.includes("000_CardBack_Unique.png")) {
-            const filename = card.imageFileName || card.filename;
-            img.src = `images/cards/${filename}`;
-          }
-        } else {
-          console.warn("No match found for unlock ID:", id);
+    recentUnlocks.forEach(card => {
+      const id = (card.cardId || card.card_id || '').replace(/^#/, '');
+      const el = document.querySelector(`[data-card-id="${id}"]`);
+      if (el) {
+        el.classList.add("highlight-glow");
+        const img = el.querySelector('img');
+        if (img && img.src.includes('000_CardBack_Unique.png')) {
+          img.src = `images/cards/${card.filename}`;
+          img.classList.add("flip-in");
         }
-      });
+      }
+    });
 
-      setTimeout(() => {
-        document.getElementById("new-unlocked-banner")?.remove();
-        document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
-        localStorage.removeItem("recentUnlocks");
-      }, 3000);
-    }, 300); // Slight delay to ensure DOM is painted
+    setTimeout(() => {
+      document.getElementById("new-unlocked-banner")?.remove();
+      localStorage.removeItem("recentUnlocks");
+    }, 4000);
   }
 });
