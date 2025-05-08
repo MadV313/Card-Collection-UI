@@ -33,32 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
     log("Triggering highlight...");
   }
 
-  const cards = recentUnlocks || [
-    {
-      cardId: "#001",
-      number: "001",
-      name: "M4-A1",
-      rarity: "Rare",
-      owned: 0,
-      imageFileName: "001_M4A1_Attack.png"
-    },
-    {
-      cardId: "#126",
-      number: "126",
-      name: "Lt. Col. Emil Borén",
-      rarity: "Legendary",
-      owned: 0,
-      imageFileName: "126_Lt.Col.EmilBoren_Specialty.png"
-    },
-    {
-      cardId: "#036",
-      number: "036",
-      name: "NBC Suit",
-      rarity: "Common",
-      owned: 0,
-      imageFileName: "036_NBCSuit_Defense.png"
-    }
-  ];
+  // Use recent unlocks from pack reveal, or show nothing if none
+  const cards = recentUnlocks || [];
 
   const emojiByType = {
     attack: "⚔️",
@@ -79,12 +55,14 @@ document.addEventListener("DOMContentLoaded", () => {
   cards.forEach(card => {
     const rawId = card.cardId || card.card_id || '';
     const cleanId = rawId.replace(/^#/, '');
+    const ownedCount = card.owned ?? 0;
+
     console.log("Rendering card with ID:", cleanId);
 
     const cardContainer = document.createElement('div');
     cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
     cardContainer.setAttribute('data-rarity', card.rarity);
-    cardContainer.setAttribute('data-owned', card.owned);
+    cardContainer.setAttribute('data-owned', ownedCount);
     cardContainer.setAttribute('data-card-id', cleanId);
 
     const cardImg = document.createElement('img');
@@ -102,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const emojiSpan = document.createElement('span');
     emojiSpan.classList.add('emoji');
 
-    if (card.owned > 0) {
+    if (ownedCount > 0) {
       cardNameSpan.textContent = `#${card.number} ${card.name}`;
       emojiSpan.textContent = getTypeEmoji(card.imageFileName || card.filename);
       cardImg.src = `images/cards/${card.imageFileName || card.filename}`;
@@ -130,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const ownedCountSpan = document.createElement('span');
     ownedCountSpan.classList.add('owned-count');
-    ownedCountSpan.textContent = `Owned: ${card.owned}`;
+    ownedCountSpan.textContent = `Owned: ${ownedCount}`;
 
     actionsDiv.appendChild(scrapButton);
     actionsDiv.appendChild(ownedCountSpan);
