@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // === CARD RENDERING ===
   cards.forEach(card => {
     const rawId = card.cardId || card.card_id || '';
-    const cleanId = rawId.replace(/^#/, ''); // strip leading #
+    const cleanId = rawId.replace(/^#/, '');
     console.log("Rendering card with ID:", cleanId);
 
     const cardContainer = document.createElement('div');
@@ -101,42 +101,39 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  // === MOCK UNLOCK HIGHLIGHT + TEMPORARY IMAGE REVEAL ===
+  // === UNLOCK HIGHLIGHT (PERMANENT) ===
   if (fromPack && recentUnlocks && recentUnlocks.length) {
-    const banner = document.createElement("div");
-    banner.id = "new-unlocked-banner";
-    banner.innerText = "New Cards Unlocked!";
-    document.body.appendChild(banner);
-
-    recentUnlocks.forEach(card => {
-      const rawId = card.cardId || card.card_id || '';
-      const id = rawId.replace(/^#/, ''); // match the stripped version
-      console.log("Looking for card ID:", id);
-
-      const match = document.querySelector(`[data-card-id="${id}"]`);
-      if (match) {
-        console.log("✓ Matched and highlighting:", id);
-        match.classList.add("highlight-glow");
-
-        const img = match.querySelector("img");
-        if (img && img.src.includes("000_CardBack_Unique.png")) {
-          const filename = card.filename || card.imageFileName;
-          img.src = `images/cards/${filename}`;
-          img.classList.add("temporary-reveal");
-        }
-      } else {
-        console.warn("No match found for unlock ID:", id);
-      }
-    });
-
     setTimeout(() => {
-      document.getElementById("new-unlocked-banner")?.remove();
-      document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
-      document.querySelectorAll(".temporary-reveal").forEach(img => {
-        img.src = "images/cards/000_CardBack_Unique.png";
-        img.classList.remove("temporary-reveal");
+      const banner = document.createElement("div");
+      banner.id = "new-unlocked-banner";
+      banner.innerText = "New Cards Unlocked!";
+      document.body.appendChild(banner);
+
+      recentUnlocks.forEach(card => {
+        const rawId = card.cardId || card.card_id || '';
+        const id = rawId.replace(/^#/, '');
+        console.log("Looking for card ID:", id);
+
+        const match = document.querySelector(`[data-card-id="${id}"]`);
+        if (match) {
+          console.log("✓ Matched and highlighting:", id);
+          match.classList.add("highlight-glow");
+
+          const img = match.querySelector("img");
+          if (img && img.src.includes("000_CardBack_Unique.png")) {
+            const filename = card.imageFileName || card.filename;
+            img.src = `images/cards/${filename}`;
+          }
+        } else {
+          console.warn("No match found for unlock ID:", id);
+        }
       });
-      localStorage.removeItem("recentUnlocks");
-    }, 3000);
+
+      setTimeout(() => {
+        document.getElementById("new-unlocked-banner")?.remove();
+        document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
+        localStorage.removeItem("recentUnlocks");
+      }, 3000);
+    }, 300); // Slight delay to ensure DOM is painted
   }
 });
