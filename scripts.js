@@ -33,7 +33,41 @@ document.addEventListener("DOMContentLoaded", () => {
     log("Triggering highlight...");
   }
 
-  // === CARD RENDERING ===
+  // Use mock cards (fallback or for testing)
+  const cards = recentUnlocks || [
+    {
+      cardId: "#001",
+      number: "001",
+      name: "M4-A1",
+      rarity: "Rare",
+      owned: 1,
+      imageFileName: "001_M4A1_Attack.png"
+    },
+    {
+      cardId: "#126",
+      number: "126",
+      name: "Lt. Col. Emil Borén",
+      rarity: "Legendary",
+      owned: 1,
+      imageFileName: "126_Lt.Col.EmilBoren_Specialty.png"
+    },
+    {
+      cardId: "#036",
+      number: "036",
+      name: "NBC Suit",
+      rarity: "Common",
+      owned: 0,
+      imageFileName: "036_NBCSuit_Defense.png"
+    }
+  ];
+
+  const emojiMap = {
+    "001": "🔫",
+    "036": "☢️",
+    "126": "⭐"
+    // Add more if needed
+  };
+
   cards.forEach(card => {
     const rawId = card.cardId || card.card_id || '';
     const cleanId = rawId.replace(/^#/, '');
@@ -62,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (card.owned > 0) {
       cardNameSpan.textContent = `#${card.number} ${card.name}`;
-      emojiSpan.textContent = emojiMap[card.number];
+      emojiSpan.textContent = emojiMap[card.number] || "";
       cardImg.src = `images/cards/${card.imageFileName}`;
     } else {
       cardNameSpan.textContent = `#${card.number}`;
@@ -134,7 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       document.getElementById("new-unlocked-banner")?.remove();
       document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
-      // We no longer revert card images after reveal
       localStorage.removeItem("recentUnlocks");
     }, 3000);
   }
