@@ -1,24 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const debugBox = document.createElement('div');
-  debugBox.style.position = 'fixed';
-  debugBox.style.bottom = '10px';
-  debugBox.style.right = '10px';
-  debugBox.style.padding = '8px 12px';
-  debugBox.style.background = 'rgba(0,0,0,0.85)';
-  debugBox.style.color = '#00ff99';
-  debugBox.style.fontSize = '12px';
-  debugBox.style.zIndex = '9999';
-  debugBox.style.borderRadius = '6px';
-  debugBox.style.maxWidth = '220px';
-  debugBox.style.fontFamily = 'monospace';
-  debugBox.innerText = 'Debug: loading...';
-  document.body.appendChild(debugBox);
-
-  const log = (msg) => {
-    debugBox.innerText = `Debug: ${msg}`;
-    setTimeout(() => debugBox.remove(), 5000);
-  };
-
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
 
@@ -26,36 +6,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     const recentRaw = localStorage.getItem("recentUnlocks");
     if (recentRaw) return JSON.parse(recentRaw);
 
-    // Attempt backend fetch
     try {
       const res = await fetch("/packReveal");
       if (!res.ok) throw new Error();
       const data = await res.json();
-      log("Loaded from backend.");
       return data;
     } catch {
-      // Fallback to mock file
       try {
         const mock = await fetch("data/mock_pack_reveal.json");
         const mockData = await mock.json();
-        log("Loaded from mock fallback.");
         return mockData;
       } catch {
-        log("Failed to load cards.");
         return [];
       }
     }
   }
 
   const recentUnlocks = fromPack ? await getRecentUnlocks() : [];
-
-  if (!fromPack) {
-    log("fromPackReveal=false");
-  } else if (!recentUnlocks.length) {
-    log("No recentUnlocks.");
-  } else {
-    log("Triggering highlight...");
-  }
 
   const emojiByType = {
     attack: "⚔️",
