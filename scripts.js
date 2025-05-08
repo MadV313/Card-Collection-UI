@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     log("Triggering highlight...");
   }
 
-  // Use recent unlocks from pack reveal, or show nothing if none
   const cards = recentUnlocks || [];
 
   const emojiByType = {
@@ -55,7 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
   cards.forEach(card => {
     const rawId = card.cardId || card.card_id || '';
     const cleanId = rawId.replace(/^#/, '');
-    const ownedCount = card.owned ?? 0;
+    const ownedCount = card.owned ?? (card.isNew ? 1 : 0);
+    const isNewUnlock = card.isNew === true;
 
     console.log("Rendering card with ID:", cleanId);
 
@@ -66,9 +66,16 @@ document.addEventListener("DOMContentLoaded", () => {
     cardContainer.setAttribute('data-card-id', cleanId);
 
     const cardImg = document.createElement('img');
-    cardImg.classList.add('facedown-card');
-    cardImg.src = 'images/cards/000_CardBack_Unique.png';
     cardImg.alt = card.name;
+
+    if (ownedCount > 0 || isNewUnlock) {
+      cardImg.src = `images/cards/${card.imageFileName || card.filename}`;
+      cardImg.classList.add('facedown-card');
+      if (isNewUnlock) cardImg.classList.add('shimmer');
+    } else {
+      cardImg.src = 'images/cards/000_CardBack_Unique.png';
+      cardImg.classList.add('facedown-card');
+    }
 
     const cardNumberSpan = document.createElement('span');
     cardNumberSpan.classList.add('card-number');
@@ -80,10 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const emojiSpan = document.createElement('span');
     emojiSpan.classList.add('emoji');
 
-    if (ownedCount > 0) {
+    if (ownedCount > 0 || isNewUnlock) {
       cardNameSpan.textContent = `#${card.number} ${card.name}`;
       emojiSpan.textContent = getTypeEmoji(card.imageFileName || card.filename);
-      cardImg.src = `images/cards/${card.imageFileName || card.filename}`;
     } else {
       cardNameSpan.textContent = `#${card.number}`;
       emojiSpan.textContent = "🔒";
@@ -139,13 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (match) {
         console.log("✓ Matched and highlighting:", id);
         match.classList.add("highlight-glow");
-
-        const img = match.querySelector("img");
-        if (img && img.src.includes("000_CardBack_Unique.png")) {
-          const filename = card.filename || card.imageFileName;
-          img.src = `images/cards/${filename}`;
-          img.classList.add("temporary-reveal");
-        }
       } else {
         console.warn("No match found for unlock ID:", id);
       }
