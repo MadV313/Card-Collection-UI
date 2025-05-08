@@ -1,9 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // On-screen debug box for mobile
+  const debugBox = document.createElement('div');
+  debugBox.style.position = 'fixed';
+  debugBox.style.bottom = '10px';
+  debugBox.style.right = '10px';
+  debugBox.style.padding = '8px 12px';
+  debugBox.style.background = 'rgba(0,0,0,0.85)';
+  debugBox.style.color = '#00ff99';
+  debugBox.style.fontSize = '12px';
+  debugBox.style.zIndex = '9999';
+  debugBox.style.borderRadius = '6px';
+  debugBox.style.maxWidth = '200px';
+  debugBox.style.fontFamily = 'monospace';
+  debugBox.innerText = 'Debug: loading...';
+  document.body.appendChild(debugBox);
+
+  const log = (msg) => {
+    debugBox.innerText = `Debug: ${msg}`;
+    setTimeout(() => debugBox.remove(), 5000);
+  };
+
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
+  const recentRaw = localStorage.getItem("recentUnlocks");
+  const recentUnlocks = recentRaw ? JSON.parse(recentRaw) : null;
 
-  console.log("Page loaded. fromPackReveal param:", fromPack);
-  console.log("recentUnlocks raw (before parse):", localStorage.getItem("recentUnlocks"));
+  if (!fromPack) {
+    log("fromPackReveal=false");
+  } else if (!recentUnlocks || !recentUnlocks.length) {
+    log("No recentUnlocks.");
+  } else {
+    log("Triggering highlight...");
+  }
 
   // === CARD RENDERING ===
   cards.forEach(card => {
@@ -11,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
     cardContainer.setAttribute('data-rarity', card.rarity);
     cardContainer.setAttribute('data-owned', card.owned);
-    cardContainer.setAttribute('data-card-id', card.cardId || card.card_id); // Fallback
+    cardContainer.setAttribute('data-card-id', card.cardId || card.card_id);
 
     const cardImg = document.createElement('img');
     cardImg.classList.add('facedown-card');
@@ -70,16 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // === MOCK UNLOCK HIGHLIGHT + TEMPORARY IMAGE REVEAL ===
-  if (fromPack) {
-    console.log("Triggering mock unlock highlight logic...");
-    const recentUnlocks = JSON.parse(localStorage.getItem("recentUnlocks"));
-    console.log("Parsed recentUnlocks:", recentUnlocks);
-
-    if (!recentUnlocks || !recentUnlocks.length) {
-      console.warn("No recent unlocks found. Skipping animation.");
-      return;
-    }
-
+  if (fromPack && recentUnlocks && recentUnlocks.length) {
     const banner = document.createElement("div");
     banner.id = "new-unlocked-banner";
     banner.innerText = "New Cards Unlocked!";
@@ -89,7 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = card.cardId || card.card_id;
       const match = document.querySelector(`[data-card-id="${id}"]`);
       if (match) {
-        console.log("Highlighting card:", id);
         match.classList.add("highlight-glow");
         const img = match.querySelector("img");
         if (img && img.src.includes("000_CardBack_Unique.png")) {
@@ -97,8 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
           img.src = `images/cards/${filename}`;
           img.classList.add("temporary-reveal");
         }
-      } else {
-        console.warn("Card not found on screen for highlight:", id);
       }
     });
 
@@ -111,7 +127,5 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       localStorage.removeItem("recentUnlocks");
     }, 3000);
-  } else {
-    console.log("fromPackReveal param missing or false. Skipping highlight logic.");
   }
 });
