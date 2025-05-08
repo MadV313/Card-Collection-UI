@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   debugBox.style.fontSize = '12px';
   debugBox.style.zIndex = '9999';
   debugBox.style.borderRadius = '6px';
-  debugBox.style.maxWidth = '200px';
+  debugBox.style.maxWidth = '220px';
   debugBox.style.fontFamily = 'monospace';
   debugBox.innerText = 'Debug: loading...';
   document.body.appendChild(debugBox);
@@ -35,11 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === CARD RENDERING ===
   cards.forEach(card => {
+    const cardId = card.cardId || card.card_id;
+    console.log("Rendering card with ID:", cardId);
+
     const cardContainer = document.createElement('div');
     cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
     cardContainer.setAttribute('data-rarity', card.rarity);
     cardContainer.setAttribute('data-owned', card.owned);
-    cardContainer.setAttribute('data-card-id', card.cardId || card.card_id);
+    cardContainer.setAttribute('data-card-id', cardId);
 
     const cardImg = document.createElement('img');
     cardImg.classList.add('facedown-card');
@@ -106,15 +109,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     recentUnlocks.forEach(card => {
       const id = card.cardId || card.card_id;
+      console.log("Looking for card ID:", id);
+
       const match = document.querySelector(`[data-card-id="${id}"]`);
       if (match) {
+        console.log("✓ Matched and highlighting:", id);
         match.classList.add("highlight-glow");
+
         const img = match.querySelector("img");
         if (img && img.src.includes("000_CardBack_Unique.png")) {
           const filename = card.filename || card.imageFileName;
           img.src = `images/cards/${filename}`;
           img.classList.add("temporary-reveal");
         }
+      } else {
+        console.warn("No match found for unlock ID:", id);
       }
     });
 
