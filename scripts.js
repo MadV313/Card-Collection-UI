@@ -35,14 +35,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === CARD RENDERING ===
   cards.forEach(card => {
-    const cardId = card.cardId || card.card_id;
-    console.log("Rendering card with ID:", cardId);
+    const rawId = card.cardId || card.card_id || '';
+    const cleanId = rawId.replace(/^#/, ''); // strip leading #
+    console.log("Rendering card with ID:", cleanId);
 
     const cardContainer = document.createElement('div');
     cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
     cardContainer.setAttribute('data-rarity', card.rarity);
     cardContainer.setAttribute('data-owned', card.owned);
-    cardContainer.setAttribute('data-card-id', cardId);
+    cardContainer.setAttribute('data-card-id', cleanId);
 
     const cardImg = document.createElement('img');
     cardImg.classList.add('facedown-card');
@@ -108,7 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(banner);
 
     recentUnlocks.forEach(card => {
-      const id = card.cardId || card.card_id;
+      const rawId = card.cardId || card.card_id || '';
+      const id = rawId.replace(/^#/, ''); // match the stripped version
       console.log("Looking for card ID:", id);
 
       const match = document.querySelector(`[data-card-id="${id}"]`);
