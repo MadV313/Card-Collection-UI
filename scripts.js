@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
 
+  console.log("Page loaded. fromPackReveal param:", fromPack);
+  console.log("recentUnlocks raw (before parse):", localStorage.getItem("recentUnlocks"));
+
   // === CARD RENDERING ===
   cards.forEach(card => {
     const cardContainer = document.createElement('div');
@@ -68,8 +71,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === MOCK UNLOCK HIGHLIGHT + TEMPORARY IMAGE REVEAL ===
   if (fromPack) {
+    console.log("Triggering mock unlock highlight logic...");
     const recentUnlocks = JSON.parse(localStorage.getItem("recentUnlocks"));
-    if (!recentUnlocks || !recentUnlocks.length) return;
+    console.log("Parsed recentUnlocks:", recentUnlocks);
+
+    if (!recentUnlocks || !recentUnlocks.length) {
+      console.warn("No recent unlocks found. Skipping animation.");
+      return;
+    }
 
     const banner = document.createElement("div");
     banner.id = "new-unlocked-banner";
@@ -80,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = card.cardId || card.card_id;
       const match = document.querySelector(`[data-card-id="${id}"]`);
       if (match) {
+        console.log("Highlighting card:", id);
         match.classList.add("highlight-glow");
         const img = match.querySelector("img");
         if (img && img.src.includes("000_CardBack_Unique.png")) {
@@ -87,6 +97,8 @@ document.addEventListener("DOMContentLoaded", () => {
           img.src = `images/cards/${filename}`;
           img.classList.add("temporary-reveal");
         }
+      } else {
+        console.warn("Card not found on screen for highlight:", id);
       }
     });
 
@@ -99,5 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       localStorage.removeItem("recentUnlocks");
     }, 3000);
+  } else {
+    console.log("fromPackReveal param missing or false. Skipping highlight logic.");
   }
 });
