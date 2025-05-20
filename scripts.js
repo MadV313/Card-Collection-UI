@@ -42,11 +42,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const cards = recentUnlocks;
 
+  let totalOwned = 0;
+
   cards.forEach(card => {
     const rawId = card.cardId || card.card_id || '';
     const cleanId = rawId.replace(/^#/, '');
     const ownedCount = card.owned ?? (card.isNew ? 1 : 0);
     const isNewUnlock = !!card.isNew;
+
+    if (ownedCount > 0) {
+      totalOwned += ownedCount;
+    }
 
     const filename = card.filename || card.imageFileName || "000_CardBack_Unique.png";
 
@@ -106,6 +112,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById('cards-container').appendChild(cardContainer);
   });
+
+  // 🔢 Inject card count display (x / 250)
+  const maxCollection = 250;
+  const counterElement = document.getElementById("collection-count");
+  if (counterElement) {
+    counterElement.textContent = `Cards Collected: ${totalOwned} / ${maxCollection}`;
+  }
 
   if (fromPack && recentUnlocks.length) {
     const banner = document.createElement("div");
