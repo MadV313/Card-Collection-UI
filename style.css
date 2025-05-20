@@ -131,3 +131,13 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   transition: all 0.3s ease-in-out;
   z-index: 1;
 }
+
+/* ✅ NEW: Card Counter Display */
+.collection-header {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px black;
+}
