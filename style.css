@@ -1,171 +1,143 @@
 body {
-  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)),
-              url('images/backgrounds/dayz_winter_scene.jpg') no-repeat center center fixed;
-  background-size: cover;
-  font-family: Arial, sans-serif;
-  color: #f0f0f0;
-  overflow-y: scroll;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: #111;
 }
 
-.snow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-  background-image: url('images/effects/snowfall.gif');
-  background-size: cover;
-  opacity: 0.2;
+h1 {
+  margin: 20px;
 }
 
-.header, .footer {
-  background-color: rgba(0, 0, 0, 0);
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  padding: 10px;
+  justify-items: center;
+}
+
+.card-container {
+  background-color: #1e1e1e;
+  padding: 10px;
+  width: 140px;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 15px;
-  width: 100%;
-}
-
-.footer {
-  margin-top: auto;
-}
-
-.deck-summary {
-  width: 100%;
-  text-align: center;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.deck-summary.full-deck {
-  color: gold;
-  text-shadow: 0 0 10px gold;
-  transition: all 0.3s ease-in-out;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-.deck-summary.pulse {
-  animation: pulse 0.4s;
-}
-
-.card-border-wrap.limit-reached {
-  border-color: red !important;
-  box-shadow: 0 0 8px 3px red !important;
-}
-
-/* ✅ Switch to grid */
-.deck-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  justify-content: center;
-  gap: 15px;
-  margin: 30px 20px 40px 20px;
-}
-
-/* 🟩 Green glow if selected */
-.card-border-wrap.selected-card {
-  box-shadow: 0 0 12px 3px limegreen;
-  border-color: limegreen !important;
-}
-
-/* 🔲 Default card wrapper */
-.card-border-wrap {
-  padding: 3px;
-  border: 3px solid gray;
-  border-radius: 10px;
-  box-sizing: border-box;
-  transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
-}
-
-.card {
-  width: 140px;
-  height: 210px;
-  border: 2px solid #1b1b1b;
-  border-radius: 6px;
-  background-color: #1b1b1b;
-  overflow: hidden;
-  text-align: center;
   position: relative;
 }
 
-.card img {
+.card-container img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  border-radius: 5px;
 }
 
-button {
-  background-color: teal;
+.card-container p {
+  margin: 5px 0;
+}
+
+button.scrap, button.sell {
+  background-color: #333;
   border: none;
-  padding: 10px 20px;
   color: white;
-  font-size: 16px;
+  padding: 5px 10px;
+  margin: 3px;
+  border-radius: 5px;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 
-button.disabled {
-  background-color: gray;
+button.scrap:hover, button.sell:hover {
+  background-color: #555;
 }
 
-button.animate {
-  animation: glow 1s infinite alternate;
+.common-border { border: 2px solid green; }
+.uncommon-border { border: 2px solid blue; }
+.rare-border { border: 2px solid purple; }
+.legendary-border { border: 2px solid gold; }
+.unique-border { border: 2px solid red; }
+
+.legendary-glow {
+  animation: glowPulse 2s infinite alternate;
+  box-shadow: 0 0 10px gold, 0 0 20px gold, 0 0 30px gold;
 }
 
-@keyframes glow {
-  from { box-shadow: 0 0 5px teal; }
-  to { box-shadow: 0 0 20px teal; }
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 5px gold, 0 0 10px gold, 0 0 15px gold; }
+  100% { box-shadow: 0 0 20px gold, 0 0 30px gold, 0 0 40px gold; }
 }
 
-/* ✅ Responsive fixes */
-@media (max-width: 768px) {
-  body {
-    background-size: contain;
-    background-position: top center;
+/* Force 2 cards per row on phones */
+@media (max-width: 600px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-
-  .deck-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .card {
-    width: 160px;
-    height: 240px;
+  .card-container {
+    width: 100px;
   }
 }
 
-/* 🔗 Back to Hub button */
-.back-to-hub {
+/* Top-right emoji */
+.card-type-emoji {
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  font-size: 1.4rem;
+}
+
+/* Force all text to white */
+body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
+  color: #ffffff !important;
+}
+
+/* Red border for facedown cards */
+.facedown-card {
+  border: 3px solid red !important;
+}
+
+/* NEW VISUAL UNLOCK EFFECTS */
+#new-unlocked-banner {
   position: fixed;
-  top: 15px;
-  right: 15px;
-  background-color: rgba(0, 128, 128, 0.7);
-  color: white;
-  padding: 10px 16px;
-  font-size: 14px;
-  border: 2px solid white;
-  border-radius: 8px;
-  cursor: pointer;
-  text-decoration: none;
-  z-index: 1100;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+  animation: glowFade 3s ease-out forwards;
+  z-index: 9999;
 }
 
-.back-to-hub:hover {
-  background-color: rgba(0, 128, 128, 0.9);
-  transform: scale(1.05);
+@keyframes glowFade {
+  0%   { opacity: 0; transform: translateX(-50%) scale(0.9); }
+  10%  { opacity: 1; transform: translateX(-50%) scale(1); }
+  90%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) scale(1); }
+}
+
+.highlight-glow {
+  outline: 3px solid #00ffff;
+  box-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff;
+  animation: shimmer 1.5s infinite alternate;
+}
+
+@keyframes shimmer {
+  0% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+.temporary-reveal {
+  transition: all 0.3s ease-in-out;
+  z-index: 1;
+}
+
+/* ✅ NEW: Card Counter Display */
+.collection-header {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px black;
 }
