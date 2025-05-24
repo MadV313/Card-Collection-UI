@@ -24,12 +24,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       thumb.src = `images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
       thumb.alt = `#${entry.id}`;
       thumb.classList.add("thumb");
+      thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
 
-      const label = document.createElement("span");
-      label.textContent = `#${entry.id}`;
+      const removeBtn = document.createElement("button");
+      removeBtn.innerHTML = "🗑";
+      removeBtn.title = "Remove from trade queue";
+      removeBtn.addEventListener("click", () => {
+        tradeQueue.splice(index, 1);
+        updateTradeBadge();
+      });
 
       div.appendChild(thumb);
-      div.appendChild(label);
+      div.appendChild(removeBtn);
       container.appendChild(div);
     });
   }
@@ -143,7 +149,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (toAdd < quantity) alert(`⚠️ Only ${toAdd} trade slot(s) remaining.`);
 
       for (let i = 0; i < toAdd; i++) {
-        tradeQueue.push({ id: cleanId, filename });
+        tradeQueue.push({ id: cleanId, filename, rarity: card.rarity });
       }
 
       alert(`✅ Card #${cleanId} x${toAdd} added to trade queue.`);
