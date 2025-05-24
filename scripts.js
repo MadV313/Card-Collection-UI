@@ -19,9 +19,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     tradeQueue.forEach((entry, index) => {
       const div = document.createElement("div");
       div.classList.add("trade-card-entry");
-      div.textContent = `#${entry.id}`;
+
+      const thumb = document.createElement("img");
+      thumb.src = `images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
+      thumb.alt = `#${entry.id}`;
+      thumb.classList.add("thumb");
+
+      const label = document.createElement("span");
+      label.textContent = `#${entry.id}`;
+
+      div.appendChild(thumb);
+      div.appendChild(label);
       container.appendChild(div);
     });
+  }
+
+  // Toggle bar logic
+  if (!document.getElementById("toggle-bottom-bar")) {
+    const toggle = document.createElement("button");
+    toggle.id = "toggle-bottom-bar";
+    toggle.textContent = "⬆️ Toggle Queue Bar";
+    toggle.addEventListener("click", () => {
+      const bar = document.getElementById("trade-bottom-bar");
+      bar.classList.toggle("collapsed");
+    });
+    document.body.appendChild(toggle);
   }
 
   async function getRecentUnlocks() {
@@ -36,8 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch {
       try {
         const mock = await fetch("data/mock_pack_reveal.json");
-        const mockData = await mock.json();
-        return mockData;
+        return await mock.json();
       } catch {
         return [];
       }
@@ -47,14 +68,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const recentUnlocks = fromPack ? await getRecentUnlocks() : [];
 
   const emojiByType = {
-    attack: "⚔️",
-    defense: "🛡️",
-    loot: "🎒",
-    tactical: "🧭",
-    trap: "🧨",
-    infected: "☣️",
-    specialty: "✨",
-    special: "✨"
+    attack: "⚔️", defense: "🛡️", loot: "🎒", tactical: "🧭",
+    trap: "🧨", infected: "☣️", specialty: "✨", special: "✨"
   };
 
   const getTypeEmoji = (filename = "") => {
@@ -70,16 +85,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cleanId = rawId.replace(/^#/, '');
     const ownedCount = card.owned ?? (card.isNew ? 1 : 0);
     const isNewUnlock = !!card.isNew;
-
     if (ownedCount > 0) totalOwned += ownedCount;
 
     const filename = card.filename || card.imageFileName || "000_CardBack_Unique.png";
 
     const cardContainer = document.createElement('div');
     cardContainer.classList.add('card-container', `${card.rarity.toLowerCase()}-border`);
-    cardContainer.setAttribute('data-rarity', card.rarity);
-    cardContainer.setAttribute('data-owned', ownedCount);
-    cardContainer.setAttribute('data-card-id', cleanId);
+    cardContainer.dataset.rarity = card.rarity;
+    cardContainer.dataset.owned = ownedCount;
+    cardContainer.dataset.cardId = cleanId;
 
     const cardImg = document.createElement('img');
     cardImg.alt = card.name;
@@ -102,9 +116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const cardInfoDiv = document.createElement('div');
     cardInfoDiv.classList.add('card-info');
-    cardInfoDiv.appendChild(cardNumberSpan);
-    cardInfoDiv.appendChild(cardNameSpan);
-    cardInfoDiv.appendChild(emojiSpan);
+    cardInfoDiv.append(cardNumberSpan, cardNameSpan, emojiSpan);
 
     const actionsDiv = document.createElement('div');
     actionsDiv.classList.add('card-actions-vertical');
@@ -128,12 +140,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const availableSpots = 3 - tradeQueue.length;
       const toAdd = Math.min(quantity, availableSpots);
-      if (toAdd < quantity) {
-        alert(`⚠️ Only ${toAdd} trade slot(s) remaining.`);
-      }
+      if (toAdd < quantity) alert(`⚠️ Only ${toAdd} trade slot(s) remaining.`);
 
       for (let i = 0; i < toAdd; i++) {
-        tradeQueue.push({ id: cleanId });
+        tradeQueue.push({ id: cleanId, filename });
       }
 
       alert(`✅ Card #${cleanId} x${toAdd} added to trade queue.`);
@@ -153,19 +163,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     ownedCountSpan.classList.add('owned-count');
     ownedCountSpan.textContent = `Owned: ${ownedCount}`;
 
-    actionsDiv.appendChild(tradeButton);
-    actionsDiv.appendChild(ownedCountSpan);
-    actionsDiv.appendChild(sellButton);
-
-    cardContainer.appendChild(cardImg);
-    cardContainer.appendChild(cardInfoDiv);
-    cardContainer.appendChild(actionsDiv);
-
+    actionsDiv.append(tradeButton, ownedCountSpan, sellButton);
+    cardContainer.append(cardImg, cardInfoDiv, actionsDiv);
     document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  const maxCollection = 250;
+  if (!document.getElementById("trade-queue-badge")) {
+    const badge = document.createElement("div");
+    badge.id = "trade-queue-badge";
+    document.body.appendChild(badge);
+  }
 
+  if (!document.getElementById("trade-bottom-bar")) {
+    const bar = document.createElement("div");
+    bar.id = "trade-bottom-bar";
+    bar.innerHTML = `
+      <strong>🧳 Trade Queue:</strong>
+      <div id="bottom-trade-list"></div>
+    `;
+    document.body.appendChild(bar);
+  }
+
+  if (!document.getElementById("toggle-bottom-bar")) {
+    const toggle = document.createElement("button");
+    toggle.id = "toggle-bottom-bar";
+    toggle.textContent = "⬆️ Toggle Queue Bar";
+    toggle.addEventListener("click", () => {
+      const bar = document.getElementById("trade-bottom-bar");
+      bar.classList.toggle("collapsed");
+    });
+    document.body.appendChild(toggle);
+  }
+
+  const maxCollection = 250;
   const collectionCount = document.getElementById("collection-count");
   if (collectionCount) {
     collectionCount.textContent = `Cards Collected: ${cards.length} / 127`;
@@ -200,24 +230,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
       localStorage.removeItem("recentUnlocks");
     }, 3000);
-  }
-
-  // ✅ Inject trade queue badge if missing
-  if (!document.getElementById("trade-queue-badge")) {
-    const badge = document.createElement("div");
-    badge.id = "trade-queue-badge";
-    document.body.appendChild(badge);
-  }
-
-  // ✅ Inject bottom trade bar
-  if (!document.getElementById("trade-bottom-bar")) {
-    const bar = document.createElement("div");
-    bar.id = "trade-bottom-bar";
-    bar.innerHTML = `
-      <strong>🧳 Trade Queue:</strong>
-      <div id="bottom-trade-list"></div>
-    `;
-    document.body.appendChild(bar);
   }
 
   updateTradeBadge();
