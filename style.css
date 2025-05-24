@@ -220,3 +220,15 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   gap: 4px;
   margin-top: 5px;
 }
+
+/* ✅ NEW: Queued Trade Button State */
+button.trade.queued {
+  background-color: gold;
+  color: black;
+  border: 2px solid white;
+  box-shadow: 0 0 8px gold, 0 0 12px white inset;
+}
+
+button.trade.queued:hover {
+  background-color: #ffd700;
+}
