@@ -2,6 +2,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
 
+  const useMockVisuals = true; // TEMPORARY toggle for visual test
+  const maxCollection = 250;
+  const maxUniqueCards = 127;
+
   async function getRecentUnlocks() {
     const recentRaw = localStorage.getItem("recentUnlocks");
     if (recentRaw) return JSON.parse(recentRaw);
@@ -22,7 +26,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  const recentUnlocks = fromPack ? await getRecentUnlocks() : [];
+  let recentUnlocks = fromPack ? await getRecentUnlocks() : [];
+
+  // Fallback to full mock deck if testing visuals
+  if (useMockVisuals && !recentUnlocks.length) {
+    try {
+      const mockDeck = await fetch("mock_deckData.json");
+      recentUnlocks = await mockDeck.json();
+    } catch (err) {
+      console.error("Failed to load mock deck for visual test");
+      recentUnlocks = [];
+    }
+  }
 
   const emojiByType = {
     attack: "⚔️",
@@ -41,8 +56,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const cards = recentUnlocks;
-
   let totalOwned = 0;
+  const ownedMap = {};
 
   cards.forEach(card => {
     const rawId = card.cardId || card.card_id || '';
@@ -50,9 +65,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ownedCount = card.owned ?? (card.isNew ? 1 : 0);
     const isNewUnlock = !!card.isNew;
 
-    if (ownedCount > 0) {
-      totalOwned += ownedCount;
-    }
+    if (!ownedMap[cleanId]) ownedMap[cleanId] = 0;
+    ownedMap[cleanId] += ownedCount;
+    totalOwned += ownedCount;
 
     const filename = card.filename || card.imageFileName || "000_CardBack_Unique.png";
 
@@ -110,14 +125,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     cardContainer.appendChild(cardInfoDiv);
     cardContainer.appendChild(actionsDiv);
 
-    document.getElementById('cards-container').appendChild(cardContainer);
+    document.getElementById('cards-container')?.appendChild(cardContainer);
   });
 
-  const maxCollection = 250;
+  const uniqueUnlocked = Object.keys(ownedMap).length;
 
   const collectionCount = document.getElementById("collection-count");
   if (collectionCount) {
-    collectionCount.textContent = `Cards Collected: ${cards.length} / 127`;
+    collectionCount.textContent = `Cards Collected: ${uniqueUnlocked} / ${maxUniqueCards}`;
   }
 
   const totalOwnedCount = document.getElementById("total-owned-count");
@@ -128,6 +143,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const warningBanner = document.getElementById("ownership-warning");
   if (warningBanner) {
     warningBanner.style.display = totalOwned >= 247 ? "block" : "none";
+  }
+
+  if (useMockVisuals) {
+    const coinEl = document.getElementById("coin-balance");
+    if (coinEl) coinEl.textContent = "13";
   }
 
   if (fromPack && recentUnlocks.length) {
@@ -146,8 +166,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     setTimeout(() => {
       document.getElementById("new-unlocked-banner")?.remove();
-      document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
-      localStorage.removeItem("recentUnlocks");
-    }, 3000);
-  }
-});
+      document.querySe
