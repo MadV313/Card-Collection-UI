@@ -3,14 +3,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fromPack = urlParams.get('fromPackReveal') === 'true';
   const tradeQueue = [];
 
-  function updateTradeBadge() {
-    const badge = document.getElementById("trade-queue-badge");
-    if (!badge) return;
-    badge.textContent = `🧳 Trade Queue: ${tradeQueue.length} / 3`;
-    badge.classList.toggle("glow", tradeQueue.length >= 3);
-    updateBottomBar();
-  }
-
   function updateBottomBar() {
     const container = document.getElementById("bottom-trade-list");
     if (!container) return;
