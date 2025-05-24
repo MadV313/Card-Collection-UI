@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const cardImg = document.createElement('img');
     cardImg.alt = card.name;
-    cardImg.loading = "lazy"; // Image performance boost
+    cardImg.loading = "lazy";
     cardImg.src = ownedCount > 0 ? `images/cards/${filename}` : 'images/cards/000_CardBack_Unique.png';
     cardImg.classList.add('facedown-card');
     if (isNewUnlock) cardImg.classList.add('shimmer');
@@ -113,11 +113,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  // 🔢 Inject card count display (x / 250)
   const maxCollection = 250;
-  const counterElement = document.getElementById("collection-count");
-  if (counterElement) {
-    counterElement.textContent = `Cards Collected: ${totalOwned} / ${maxCollection}`;
+
+  const collectionCount = document.getElementById("collection-count");
+  if (collectionCount) {
+    collectionCount.textContent = `Cards Collected: ${cards.length} / 127`;
+  }
+
+  const totalOwnedCount = document.getElementById("total-owned-count");
+  if (totalOwnedCount) {
+    totalOwnedCount.textContent = `Total Cards Owned: ${totalOwned} / ${maxCollection}`;
+  }
+
+  const warningBanner = document.getElementById("ownership-warning");
+  if (warningBanner) {
+    warningBanner.style.display = totalOwned >= 247 ? "block" : "none";
   }
 
   if (fromPack && recentUnlocks.length) {
