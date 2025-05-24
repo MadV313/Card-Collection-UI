@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
   const tradeQueue = [];
+  const sellQueue = [];
 
   function updateBottomBar() {
     const container = document.getElementById("bottom-trade-list");
@@ -32,13 +33,52 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Toggle bar logic
+  function updateSellBar() {
+    const container = document.getElementById("bottom-sell-list");
+    if (!container) return;
+
+    container.innerHTML = "";
+    sellQueue.forEach((entry, index) => {
+      const div = document.createElement("div");
+      div.classList.add("sell-card-entry");
+
+      const thumb = document.createElement("img");
+      thumb.src = `images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
+      thumb.alt = `#${entry.id}`;
+      thumb.classList.add("thumb");
+      thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
+
+      const removeBtn = document.createElement("button");
+      removeBtn.innerHTML = "🗑";
+      removeBtn.title = "Remove from sell queue";
+      removeBtn.addEventListener("click", () => {
+        sellQueue.splice(index, 1);
+        updateSellBar();
+      });
+
+      div.appendChild(thumb);
+      div.appendChild(removeBtn);
+      container.appendChild(div);
+    });
+  }
+
   if (!document.getElementById("toggle-bottom-bar")) {
     const toggle = document.createElement("button");
     toggle.id = "toggle-bottom-bar";
-    toggle.textContent = "⬆️ Toggle Queue Bar";
+    toggle.textContent = "⬆️ Toggle Trade Bar";
     toggle.addEventListener("click", () => {
       const bar = document.getElementById("trade-bottom-bar");
+      bar.classList.toggle("collapsed");
+    });
+    document.body.appendChild(toggle);
+  }
+
+  if (!document.getElementById("toggle-sell-bar")) {
+    const toggle = document.createElement("button");
+    toggle.id = "toggle-sell-bar";
+    toggle.textContent = "⬆️ Toggle Sell Bar";
+    toggle.addEventListener("click", () => {
+      const bar = document.getElementById("sell-bottom-bar");
       bar.classList.toggle("collapsed");
     });
     document.body.appendChild(toggle);
@@ -122,7 +162,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tradeButton = document.createElement('button');
     tradeButton.classList.add('trade');
     tradeButton.textContent = '[TRADE]';
-
     tradeButton.addEventListener('click', () => {
       if (tradeQueue.length >= 3) {
         alert("⚠️ You can only trade up to 3 cards.");
@@ -156,6 +195,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sellButton = document.createElement('button');
     sellButton.classList.add('sell');
     sellButton.textContent = '[SELL]';
+    sellButton.addEventListener('click', () => {
+      if (sellQueue.length >= 5) {
+        alert("⚠️ You can only sell up to 5 cards every 24 hours.");
+        return;
+      }
+
+      sellQueue.push({ id: cleanId, filename, rarity: card.rarity });
+      updateSellBar();
+    });
 
     const ownedCountSpan = document.createElement('span');
     ownedCountSpan.classList.add('owned-count');
@@ -166,17 +214,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  // Inject bottom bar
+  // Inject trade bar
   if (!document.getElementById("trade-bottom-bar")) {
     const bar = document.createElement("div");
     bar.id = "trade-bottom-bar";
-    bar.innerHTML = `
-      <strong>🧳 Trade Queue:</strong>
-      <div id="bottom-trade-list"></div>
-    `;
+    bar.innerHTML = `<strong>🧳 Trade Queue:</strong><div id="bottom-trade-list"></div>`;
     document.body.appendChild(bar);
   }
 
+  // Inject sell bar
+  if (!document.getElementById("sell-bottom-bar")) {
+    const bar = document.createElement("div");
+    bar.id = "sell-bottom-bar";
+    bar.innerHTML = `<strong>🗑 Sell Queue:</strong><div id="bottom-sell-list"></div>`;
+    document.body.appendChild(bar);
+  }
+
+  // Stats
   const maxCollection = 250;
   const collectionCount = document.getElementById("collection-count");
   if (collectionCount) {
@@ -193,6 +247,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     warningBanner.style.display = totalOwned >= 247 ? "block" : "none";
   }
 
+  // Highlight new unlocks
   if (fromPack && recentUnlocks.length) {
     const banner = document.createElement("div");
     banner.id = "new-unlocked-banner";
@@ -215,4 +270,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   updateBottomBar();
+  updateSellBar();
 });
