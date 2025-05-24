@@ -97,7 +97,7 @@ button.scrap:hover, button.sell:hover {
 /* Force 2 cards per row on phones */
 @media (max-width: 600px) {
   .card-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
   .card-container {
     width: 100px;
