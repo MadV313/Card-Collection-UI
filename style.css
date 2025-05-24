@@ -27,14 +27,13 @@ h1 {
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr); /* ⬅ 10 on desktop */
+  grid-template-columns: repeat(10, 1fr);
   justify-items: center;
   gap: 18px;
   padding: 5px;
   box-sizing: border-box;
 }
 
-/* 📱 3 cards per row on mobile */
 @media (max-width: 1200px) {
   .card-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -47,12 +46,24 @@ h1 {
   width: 140px;
   border-radius: 10px;
   overflow: hidden;
-  transition: transform 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
 }
+
+.card-container:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3), 0 0 25px rgba(0, 255, 255, 0.4);
+  z-index: 2;
+}
+
+.card-container.common-border:hover { box-shadow: 0 0 10px limegreen, 0 0 20px limegreen; }
+.card-container.uncommon-border:hover { box-shadow: 0 0 10px royalblue, 0 0 20px royalblue; }
+.card-container.rare-border:hover { box-shadow: 0 0 10px purple, 0 0 20px purple; }
+.card-container.legendary-border:hover { box-shadow: 0 0 15px gold, 0 0 30px gold; }
+.card-container.unique-border:hover { box-shadow: 0 0 15px crimson, 0 0 30px crimson; }
 
 .card-container img {
   width: 100%;
@@ -63,7 +74,8 @@ h1 {
   margin: 5px 0;
 }
 
-button.trade, button.sell {
+button.trade,
+button.sell {
   background-color: #333;
   border: none;
   color: white;
@@ -72,10 +84,19 @@ button.trade, button.sell {
   border-radius: 5px;
   font-size: 0.8rem;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-button.trade:hover, button.sell:hover {
+button.trade:hover,
+button.sell:hover {
   background-color: #555;
+}
+
+button.trade:active,
+button.sell:active {
+  border: 2px solid gold;
+  box-shadow: 0 0 10px gold, 0 0 20px gold inset;
+  transform: scale(0.97);
 }
 
 .common-border { border: 2px solid green; }
@@ -94,7 +115,6 @@ button.trade:hover, button.sell:hover {
   100% { box-shadow: 0 0 20px gold, 0 0 30px gold, 0 0 40px gold; }
 }
 
-/* Force 2 cards per row on phones */
 @media (max-width: 600px) {
   .card-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -104,7 +124,6 @@ button.trade:hover, button.sell:hover {
   }
 }
 
-/* Top-right emoji */
 .card-type-emoji {
   position: absolute;
   top: 5px;
@@ -112,17 +131,14 @@ button.trade:hover, button.sell:hover {
   font-size: 1.4rem;
 }
 
-/* Force all text to white */
 body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   color: #ffffff !important;
 }
 
-/* Red border for facedown cards */
 .facedown-card {
   border: 3px solid red !important;
 }
 
-/* NEW VISUAL UNLOCK EFFECTS */
 #new-unlocked-banner {
   position: fixed;
   top: 30px;
@@ -159,7 +175,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   z-index: 1;
 }
 
-/* ✅ NEW: Card Counter Display */
 .collection-header {
   font-size: 20px;
   font-weight: bold;
@@ -169,7 +184,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   text-shadow: 1px 1px 2px black;
 }
 
-/* ✅ NEW: Centered action buttons and count */
 .card-actions-vertical {
   display: flex;
   flex-direction: column;
