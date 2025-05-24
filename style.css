@@ -202,7 +202,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   flex-wrap: wrap;
   align-items: center;
 }
-
 .trade-card-entry {
   background: #222;
   padding: 6px 10px;
@@ -215,7 +214,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   align-items: center;
   gap: 6px;
 }
-
 .trade-card-entry img.thumb {
   width: 45px;
   height: auto;
@@ -223,7 +221,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   border: 1px solid #444;
   box-shadow: 0 0 5px gold;
 }
-
 .trade-card-entry button {
   background: crimson;
   color: white;
@@ -261,7 +258,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   flex-wrap: wrap;
   align-items: center;
 }
-
 .sell-card-entry {
   background: #222;
   padding: 6px 10px;
@@ -274,7 +270,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   align-items: center;
   gap: 6px;
 }
-
 .sell-card-entry img.thumb {
   width: 45px;
   height: auto;
@@ -282,7 +277,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   border: 1px solid #444;
   box-shadow: 0 0 5px crimson;
 }
-
 .sell-card-entry button {
   background: crimson;
   color: white;
@@ -296,8 +290,8 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 
 /* ✅ Limit Reached Flash Effect */
 @keyframes flashLimit {
-  0% { box-shadow: 0 0 5px red, 0 0 10px red; }
-  50% { box-shadow: 0 0 15px red, 0 0 25px red; }
+  0%   { box-shadow: 0 0 5px red, 0 0 10px red; }
+  50%  { box-shadow: 0 0 15px red, 0 0 25px red; }
   100% { box-shadow: 0 0 5px red, 0 0 10px red; }
 }
 .limit-reached {
