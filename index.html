@@ -11,7 +11,7 @@
       top: 70px;
       right: 20px;
       z-index: 999;
-      background-color: #008080; /* Teal */
+      background-color: #008080;
       border: 2px solid white;
       color: white;
       padding: 10px 20px;
@@ -21,12 +21,43 @@
       font-family: Arial, sans-serif;
       transition: background 0.3s, transform 0.2s;
     }
-    
+
     #return-to-hub:hover {
       border: 2px solid #00ffff;
       transform: scale(1.02);
       box-shadow: 0 0 15px #00ffff, 0 0 5px #00ffff inset;
       background-color: #004d4d;
+    }
+
+    #toggle-bottom-bar {
+      position: fixed;
+      bottom: 65px;
+      right: 20px;
+      z-index: 999;
+      background-color: #111;
+      border: 2px solid gold;
+      color: gold;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    #trade-bottom-bar.collapsed {
+      transform: translateY(100%);
+      transition: transform 0.4s ease;
+    }
+
+    #trade-bottom-bar {
+      transition: transform 0.4s ease;
+    }
+
+    .thumb {
+      width: 40px;
+      height: auto;
+      border-radius: 4px;
+      margin-right: 6px;
     }
   </style>
 </head>
@@ -37,11 +68,10 @@
   <h1>Players Card Collection</h1>
 
   <div id="coin-balance-display" style="margin-bottom: 20px; font-size: 1.2rem;">
-    🪙 Coin Balance:  <span id="coin-balance">0</span>
+    🪙 Coin Balance: <span id="coin-balance">0</span>
   </div>
-  
-  <div id="collection-count" class="collection-header">Cards Collected: 0 / 127</div>
 
+  <div id="collection-count" class="collection-header">Cards Collected: 0 / 127</div>
   <div id="total-owned-count" class="collection-header">Total Cards Owned: 0 / 250</div>
   <div id="ownership-warning" style="color: #ff5555; font-weight: bold; display: none;">
     ⚠️ You must sell at least 3 cards before opening a new pack!
@@ -50,53 +80,49 @@
   <div id="trade-queue-badge">🧳 Trade Queue: 0 / 3</div>
 
   <div class="card-grid">
-
     <script>
-fetch('mock_deckData.json')
-  .then(res => res.json())
-  .then(cards => {
-    const cardMap = {};
-    cards.forEach(card => {
-      const id = card.card_id.replace(/-DUP\d*$/, '');
-      cardMap[id] = (cardMap[id] || { ...card, count: 0 });
-      cardMap[id].count++;
-    });
+      fetch('mock_deckData.json')
+        .then(res => res.json())
+        .then(cards => {
+          const cardMap = {};
+          cards.forEach(card => {
+            const id = card.card_id.replace(/-DUP\d*$/, '');
+            cardMap[id] = (cardMap[id] || { ...card, count: 0 });
+            cardMap[id].count++;
+          });
 
-    // Loop through ALL existing card containers and update if owned
-    document.querySelectorAll('.card-container').forEach(container => {
-      const number = container.querySelector('p')?.textContent?.replace('#', '');
-      if (!number || !cardMap[number]) return; // Skip if not owned
+          document.querySelectorAll('.card-container').forEach(container => {
+            const number = container.querySelector('p')?.textContent?.replace('#', '');
+            if (!number || !cardMap[number]) return;
 
-      const owned = cardMap[number];
-      const img = container.querySelector('img');
-      const span = container.querySelector('.owned-count');
-      const rarity = owned["Card Rarity"];
+            const owned = cardMap[number];
+            const img = container.querySelector('img');
+            const span = container.querySelector('.owned-count');
+            const rarity = owned["Card Rarity"];
 
-      // Update front image, border, count
-      img.src = `images/cards/${owned.image}`;
-      img.classList.remove('facedown-card');
-      container.className = `card-container ${getRarityBorder(rarity)}`;
-      container.dataset.rarity = rarity;
-      container.dataset.owned = owned.count;
-      span.textContent = `Owned: ${owned.count}`;
-    });
+            img.src = `images/cards/${owned.image}`;
+            img.classList.remove('facedown-card');
+            container.className = `card-container ${getRarityBorder(rarity)}`;
+            container.dataset.rarity = rarity;
+            container.dataset.owned = owned.count;
+            span.textContent = `Owned: ${owned.count}`;
+          });
 
-    // Update collection counter
-    document.getElementById('collection-count').textContent =
-      `Cards Collected: ${Object.keys(cardMap).length} / 127`;
-  });
+          document.getElementById('collection-count').textContent =
+            `Cards Collected: ${Object.keys(cardMap).length} / 127`;
+        });
 
-function getRarityBorder(rarity) {
-  const map = {
-    "Common": "common-border",
-    "Uncommon": "uncommon-border",
-    "Rare": "rare-border",
-    "Legendary": "legendary-border",
-    "Unique": "unique-border"
-  };
-  return map[rarity] || '';
-}
-</script>
+      function getRarityBorder(rarity) {
+        const map = {
+          "Common": "common-border",
+          "Uncommon": "uncommon-border",
+          "Rare": "rare-border",
+          "Legendary": "legendary-border",
+          "Unique": "unique-border"
+        };
+        return map[rarity] || '';
+      }
+    </script>
     
     <div class="card-container unique-border" data-rarity="Unique" data-owned="0">
       <img class="facedown-card" class="facedown-card" src="images/cards/000_CardBack_Unique.png" alt="WinterLand Death Deck (Face-Down)">
