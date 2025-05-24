@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       removeBtn.title = "Remove from trade queue";
       removeBtn.addEventListener("click", () => {
         tradeQueue.splice(index, 1);
-        updateTradeBadge();
+        updateBottomBar();
       });
 
       div.appendChild(thumb);
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       alert(`✅ Card #${cleanId} x${toAdd} added to trade queue.`);
       tradeButton.classList.add("queued");
-      updateTradeBadge();
+      updateBottomBar();
 
       if (tradeQueue.length === 3) {
         alert("🎯 You have selected 3 cards for trade. No more can be added.");
@@ -166,12 +166,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  if (!document.getElementById("trade-queue-badge")) {
-    const badge = document.createElement("div");
-    badge.id = "trade-queue-badge";
-    document.body.appendChild(badge);
-  }
-
+  // Inject bottom bar
   if (!document.getElementById("trade-bottom-bar")) {
     const bar = document.createElement("div");
     bar.id = "trade-bottom-bar";
@@ -180,17 +175,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div id="bottom-trade-list"></div>
     `;
     document.body.appendChild(bar);
-  }
-
-  if (!document.getElementById("toggle-bottom-bar")) {
-    const toggle = document.createElement("button");
-    toggle.id = "toggle-bottom-bar";
-    toggle.textContent = "⬆️ Toggle Queue Bar";
-    toggle.addEventListener("click", () => {
-      const bar = document.getElementById("trade-bottom-bar");
-      bar.classList.toggle("collapsed");
-    });
-    document.body.appendChild(toggle);
   }
 
   const maxCollection = 250;
@@ -230,5 +214,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 3000);
   }
 
-  updateTradeBadge();
+  updateBottomBar();
 });
