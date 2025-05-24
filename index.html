@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ALL DayZ CCG Cards</title>
   <link rel="stylesheet" href="style.css">
   <style>
@@ -11,7 +11,7 @@
       top: 70px;
       right: 20px;
       z-index: 999;
-      background-color: #008080; /* Teal */
+      background-color: #008080;
       border: 2px solid white;
       color: white;
       padding: 10px 20px;
@@ -21,7 +21,6 @@
       font-family: Arial, sans-serif;
       transition: background 0.3s, transform 0.2s;
     }
-    
     #return-to-hub:hover {
       border: 2px solid #00ffff;
       transform: scale(1.02);
@@ -31,72 +30,102 @@
   </style>
 </head>
 <body>
+
+  <!-- ❄️ Snow Effect -->
   <div class="snow"></div>
+
+  <!-- 🔗 Back to HUB -->
   <a id="return-to-hub" href="https://madv313.github.io/HUB-UI/">← Return to HUB</a>
 
+  <!-- 🧾 Trade Sidebar -->
+  <div id="trade-sidebar">
+    <h2>🧳 Trade Queue</h2>
+    <div id="sidebar-list"></div>
+  </div>
+
+  <!-- 👁️ Toggle Button -->
+  <button id="toggle-sidebar-btn">📂 Trade Queue</button>
+
+  <!-- 🔝 Header -->
   <h1>Players Card Collection</h1>
 
+  <!-- 🪙 Coin Display -->
   <div id="coin-balance-display" style="margin-bottom: 20px; font-size: 1.2rem;">
-    🪙 Coin Balance:  <span id="coin-balance">0</span>
+    🪙 Coin Balance: <span id="coin-balance">0</span>
   </div>
-  
-  <div id="collection-count" class="collection-header">Cards Collected: 0 / 127</div>
 
+  <!-- 🔢 Collection Stats -->
+  <div id="collection-count" class="collection-header">Cards Collected: 0 / 127</div>
   <div id="total-owned-count" class="collection-header">Total Cards Owned: 0 / 250</div>
+
+  <!-- ⚠️ Max Limit Warning -->
   <div id="ownership-warning" style="color: #ff5555; font-weight: bold; display: none;">
     ⚠️ You must sell at least 3 cards before opening a new pack!
   </div>
 
+  <!-- 🧳 Trade Queue Badge -->
   <div id="trade-queue-badge">🧳 Trade Queue: 0 / 3</div>
 
-  <div class="card-grid">
+  <!-- 🎴 Card Grid -->
+  <div class="card-grid" id="cards-container">
 
-    <script>
-fetch('mock_deckData.json')
-  .then(res => res.json())
-  .then(cards => {
-    const cardMap = {};
-    cards.forEach(card => {
-      const id = card.card_id.replace(/-DUP\d*$/, '');
-      cardMap[id] = (cardMap[id] || { ...card, count: 0 });
-      cardMap[id].count++;
-    });
+  <!-- Card #000 (Face-down example) -->
+  <div class="card-container unique-border" data-rarity="Unique" data-owned="0">
+    <img class="facedown-card" src="images/cards/000_CardBack_Unique.png" alt="WinterLand Death Deck (Face-Down)">
+    <p>#000</p>
+    <div class="card-actions-vertical">
+      <button class="trade">[TRADE]</button>
+      <span class="owned-count">Owned: 0</span>
+      <button class="sell">[SELL]</button>
+    </div>
+  </div>
 
-    // Loop through ALL existing card containers and update if owned
-    document.querySelectorAll('.card-container').forEach(container => {
-      const number = container.querySelector('p')?.textContent?.replace('#', '');
-      if (!number || !cardMap[number]) return; // Skip if not owned
+</div>
 
-      const owned = cardMap[number];
-      const img = container.querySelector('img');
-      const span = container.querySelector('.owned-count');
-      const rarity = owned["Card Rarity"];
+  <!-- 🧠 Mock Data Update -->
+  <script>
+    fetch('mock_deckData.json')
+      .then(res => res.json())
+      .then(cards => {
+        const cardMap = {};
+        cards.forEach(card => {
+          const id = card.card_id.replace(/-DUP\d*$/, '');
+          cardMap[id] = (cardMap[id] || { ...card, count: 0 });
+          cardMap[id].count++;
+        });
 
-      // Update front image, border, count
-      img.src = `images/cards/${owned.image}`;
-      img.classList.remove('facedown-card');
-      container.className = `card-container ${getRarityBorder(rarity)}`;
-      container.dataset.rarity = rarity;
-      container.dataset.owned = owned.count;
-      span.textContent = `Owned: ${owned.count}`;
-    });
+        document.querySelectorAll('.card-container').forEach(container => {
+          const number = container.querySelector('p')?.textContent?.replace('#', '');
+          if (!number || !cardMap[number]) return;
 
-    // Update collection counter
-    document.getElementById('collection-count').textContent =
-      `Cards Collected: ${Object.keys(cardMap).length} / 127`;
-  });
+          const owned = cardMap[number];
+          const img = container.querySelector('img');
+          const span = container.querySelector('.owned-count');
+          const rarity = owned["Card Rarity"];
 
-function getRarityBorder(rarity) {
-  const map = {
-    "Common": "common-border",
-    "Uncommon": "uncommon-border",
-    "Rare": "rare-border",
-    "Legendary": "legendary-border",
-    "Unique": "unique-border"
-  };
-  return map[rarity] || '';
-}
-</script>
+          img.src = `images/cards/${owned.image}`;
+          img.classList.remove('facedown-card');
+          container.className = `card-container ${getRarityBorder(rarity)}`;
+          container.dataset.rarity = rarity;
+          container.dataset.owned = owned.count;
+          span.textContent = `Owned: ${owned.count}`;
+        });
+
+        document.getElementById('collection-count').textContent =
+          `Cards Collected: ${Object.keys(cardMap).length} / 127`;
+      });
+
+    function getRarityBorder(rarity) {
+      const map = {
+        "Common": "common-border",
+        "Uncommon": "uncommon-border",
+        "Rare": "rare-border",
+        "Legendary": "legendary-border",
+        "Unique": "unique-border"
+      };
+      return map[rarity] || '';
+    }
+  </script>
     
     <div class="card-container unique-border" data-rarity="Unique" data-owned="0">
       <img class="facedown-card" class="facedown-card" src="images/cards/000_CardBack_Unique.png" alt="WinterLand Death Deck (Face-Down)">
