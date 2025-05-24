@@ -51,9 +51,13 @@ h1 { margin: 20px; }
 
 .card-container:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(255,255,255,0.3), 0 0 25px rgba(0,255,255,0.4);
   z-index: 2;
 }
+.card-container.common-border:hover { box-shadow: 0 0 12px limegreen, 0 0 25px limegreen; }
+.card-container.uncommon-border:hover { box-shadow: 0 0 12px royalblue, 0 0 25px royalblue; }
+.card-container.rare-border:hover { box-shadow: 0 0 12px purple, 0 0 25px purple; }
+.card-container.legendary-border:hover { box-shadow: 0 0 15px gold, 0 0 30px gold; }
+.card-container.unique-border:hover { box-shadow: 0 0 15px crimson, 0 0 30px crimson; }
 
 .card-container img { width: 100%; border-radius: 5px; }
 .card-container p { margin: 5px 0; }
@@ -179,7 +183,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 /* ✅ Trade Queue Bar */
 #trade-bottom-bar {
   position: fixed;
-  bottom: 0;
+  bottom: 50px;
   left: 0;
   width: 100%;
   background-color: #111;
@@ -193,8 +197,11 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   justify-content: space-between;
   box-shadow: 0 -2px 10px rgba(255, 215, 0, 0.5);
   transition: transform 0.3s ease;
+  transform: translateY(100%);
 }
-#trade-bottom-bar.collapsed { transform: translateY(100%); }
+#trade-bottom-bar:not(.collapsed) {
+  transform: translateY(0%);
+}
 
 #bottom-trade-list {
   display: flex;
@@ -235,7 +242,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 /* ✅ Sell Queue Bar */
 #sell-bottom-bar {
   position: fixed;
-  bottom: 50px;
+  bottom: 0;
   left: 0;
   width: 100%;
   background-color: #111;
@@ -249,8 +256,11 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   justify-content: space-between;
   box-shadow: 0 -2px 10px rgba(220, 20, 60, 0.5);
   transition: transform 0.3s ease;
+  transform: translateY(100%);
 }
-#sell-bottom-bar.collapsed { transform: translateY(100%); }
+#sell-bottom-bar:not(.collapsed) {
+  transform: translateY(0%);
+}
 
 #bottom-sell-list {
   display: flex;
