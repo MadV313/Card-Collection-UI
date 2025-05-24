@@ -1,10 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
-
-  const useMockVisuals = true; // TEMPORARY toggle for visual test
-  const maxCollection = 250;
-  const maxUniqueCards = 127;
+  const tradeQueue = [];
 
   async function getRecentUnlocks() {
     const recentRaw = localStorage.getItem("recentUnlocks");
@@ -26,18 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  let recentUnlocks = fromPack ? await getRecentUnlocks() : [];
-
-  // Fallback to full mock deck if testing visuals
-  if (useMockVisuals && !recentUnlocks.length) {
-    try {
-      const mockDeck = await fetch("mock_deckData.json");
-      recentUnlocks = await mockDeck.json();
-    } catch (err) {
-      console.error("Failed to load mock deck for visual test");
-      recentUnlocks = [];
-    }
-  }
+  const recentUnlocks = fromPack ? await getRecentUnlocks() : [];
 
   const emojiByType = {
     attack: "⚔️",
@@ -57,7 +43,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const cards = recentUnlocks;
   let totalOwned = 0;
-  const ownedMap = {};
 
   cards.forEach(card => {
     const rawId = card.cardId || card.card_id || '';
@@ -65,9 +50,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ownedCount = card.owned ?? (card.isNew ? 1 : 0);
     const isNewUnlock = !!card.isNew;
 
-    if (!ownedMap[cleanId]) ownedMap[cleanId] = 0;
-    ownedMap[cleanId] += ownedCount;
-    totalOwned += ownedCount;
+    if (ownedCount > 0) {
+      totalOwned += ownedCount;
+    }
 
     const filename = card.filename || card.imageFileName || "000_CardBack_Unique.png";
 
@@ -105,9 +90,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     const actionsDiv = document.createElement('div');
     actionsDiv.classList.add('card-actions-vertical');
 
-    const scrapButton = document.createElement('button');
-    scrapButton.classList.add('scrap');
-    scrapButton.textContent = '[SCRAP]';
+    // [TRADE] button
+    const tradeButton = document.createElement('button');
+    tradeButton.classList.add('trade');
+    tradeButton.textContent = '[TRADE]';
+    tradeButton.addEventListener('click', () => {
+      if (tradeQueue.length >= 3) {
+        alert("⚠️ You can only trade up to 3 cards.");
+        return;
+      }
+
+      const qty = prompt("Enter quantity to trade (1–3):", "1");
+      const quantity = parseInt(qty);
+
+      if (isNaN(quantity) || quantity < 1 || quantity > 3) {
+        alert("❌ Invalid quantity. Must be between 1 and 3.");
+        return;
+      }
+
+      tradeQueue.push({ id: cleanId, quantity });
+      alert(`✅ Card #${cleanId} x${quantity} added to trade queue.`);
+
+      if (tradeQueue.length === 3) {
+        alert("🎯 You have selected 3 cards for trade. No more can be added.");
+      }
+    });
 
     const sellButton = document.createElement('button');
     sellButton.classList.add('sell');
@@ -117,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     ownedCountSpan.classList.add('owned-count');
     ownedCountSpan.textContent = `Owned: ${ownedCount}`;
 
-    actionsDiv.appendChild(scrapButton);
+    actionsDiv.appendChild(tradeButton);
     actionsDiv.appendChild(ownedCountSpan);
     actionsDiv.appendChild(sellButton);
 
@@ -125,14 +132,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     cardContainer.appendChild(cardInfoDiv);
     cardContainer.appendChild(actionsDiv);
 
-    document.getElementById('cards-container')?.appendChild(cardContainer);
+    document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  const uniqueUnlocked = Object.keys(ownedMap).length;
+  const maxCollection = 250;
 
   const collectionCount = document.getElementById("collection-count");
   if (collectionCount) {
-    collectionCount.textContent = `Cards Collected: ${uniqueUnlocked} / ${maxUniqueCards}`;
+    collectionCount.textContent = `Cards Collected: ${cards.length} / 127`;
   }
 
   const totalOwnedCount = document.getElementById("total-owned-count");
@@ -143,11 +150,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const warningBanner = document.getElementById("ownership-warning");
   if (warningBanner) {
     warningBanner.style.display = totalOwned >= 247 ? "block" : "none";
-  }
-
-  if (useMockVisuals) {
-    const coinEl = document.getElementById("coin-balance");
-    if (coinEl) coinEl.textContent = "13";
   }
 
   if (fromPack && recentUnlocks.length) {
@@ -166,4 +168,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     setTimeout(() => {
       document.getElementById("new-unlocked-banner")?.remove();
-      document.querySe
+      document.querySelectorAll(".highlight-glow").forEach(el => el.classList.remove("highlight-glow"));
+      localStorage.removeItem("recentUnlocks");
+    }, 3000);
+  }
+});
