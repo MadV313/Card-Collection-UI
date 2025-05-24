@@ -99,6 +99,17 @@ button.sell:active {
   transform: scale(0.97);
 }
 
+button.trade.queued {
+  background-color: gold;
+  color: black;
+  border: 2px solid white;
+  box-shadow: 0 0 8px gold, 0 0 12px white inset;
+}
+
+button.trade.queued:hover {
+  background-color: #ffd700;
+}
+
 #trade-queue-badge {
   position: fixed;
   top: 20px;
@@ -125,6 +136,72 @@ button.sell:active {
 @keyframes pulseQueueGlow {
   0%   { box-shadow: 0 0 10px gold; }
   100% { box-shadow: 0 0 25px gold; }
+}
+
+#trade-sidebar {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100%;
+  background-color: #111;
+  border-left: 2px solid gold;
+  box-shadow: -2px 0 10px gold;
+  padding: 20px;
+  transition: right 0.4s ease;
+  z-index: 2000;
+  overflow-y: auto;
+}
+
+#trade-sidebar.active {
+  right: 0;
+}
+
+#trade-sidebar h2 {
+  color: gold;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+}
+
+.queue-item {
+  background-color: #222;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 10px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.queue-item span {
+  font-size: 0.9rem;
+}
+
+.queue-item button {
+  background-color: crimson;
+  border: none;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+#toggle-sidebar-btn {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background-color: #111;
+  border: 2px solid gold;
+  color: gold;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 2001;
 }
 
 .common-border { border: 2px solid green; }
@@ -219,16 +296,4 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   justify-content: center;
   gap: 4px;
   margin-top: 5px;
-}
-
-/* ✅ NEW: Queued Trade Button State */
-button.trade.queued {
-  background-color: gold;
-  color: black;
-  border: 2px solid white;
-  box-shadow: 0 0 8px gold, 0 0 12px white inset;
-}
-
-button.trade.queued:hover {
-  background-color: #ffd700;
 }
