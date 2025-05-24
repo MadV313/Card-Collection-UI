@@ -8,7 +8,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!badge) return;
     badge.textContent = `🧳 Trade Queue: ${tradeQueue.length} / 3`;
     badge.classList.toggle("glow", tradeQueue.length >= 3);
+    updateSidebar();
   }
+
+  function updateSidebar() {
+    const sidebar = document.getElementById("trade-sidebar");
+    const list = document.getElementById("sidebar-list");
+    if (!sidebar || !list) return;
+
+    list.innerHTML = "";
+
+    tradeQueue.forEach((entry, index) => {
+      const item = document.createElement("div");
+      item.classList.add("queue-item");
+      item.innerHTML = `
+        <span>#${entry.id}</span>
+        <button onclick="removeFromQueue(${index})">Remove</button>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  window.removeFromQueue = (index) => {
+    tradeQueue.splice(index, 1);
+    updateTradeBadge();
+  };
 
   async function getRecentUnlocks() {
     const recentRaw = localStorage.getItem("recentUnlocks");
@@ -192,11 +216,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 3000);
   }
 
-  // ✅ Inject badge element if missing
+  // ✅ Inject trade queue badge and toggle button if missing
   if (!document.getElementById("trade-queue-badge")) {
     const badge = document.createElement("div");
     badge.id = "trade-queue-badge";
     document.body.appendChild(badge);
+  }
+
+  if (!document.getElementById("toggle-sidebar-btn")) {
+    const btn = document.createElement("button");
+    btn.id = "toggle-sidebar-btn";
+    btn.textContent = "👁️ View Trade Queue";
+    btn.addEventListener("click", () => {
+      document.getElementById("trade-sidebar")?.classList.toggle("active");
+    });
+    document.body.appendChild(btn);
+  }
+
+  if (!document.getElementById("trade-sidebar")) {
+    const sidebar = document.createElement("div");
+    sidebar.id = "trade-sidebar";
+    sidebar.innerHTML = `
+      <h2>🧾 Trade Queue</h2>
+      <div id="sidebar-list"></div>
+    `;
+    document.body.appendChild(sidebar);
   }
 
   updateTradeBadge();
