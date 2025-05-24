@@ -8,31 +8,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!badge) return;
     badge.textContent = `🧳 Trade Queue: ${tradeQueue.length} / 3`;
     badge.classList.toggle("glow", tradeQueue.length >= 3);
-    updateSidebar();
+    updateBottomBar();
   }
 
-  function updateSidebar() {
-    const sidebar = document.getElementById("trade-sidebar");
-    const list = document.getElementById("sidebar-list");
-    if (!sidebar || !list) return;
+  function updateBottomBar() {
+    const container = document.getElementById("bottom-trade-list");
+    if (!container) return;
 
-    list.innerHTML = "";
-
+    container.innerHTML = "";
     tradeQueue.forEach((entry, index) => {
-      const item = document.createElement("div");
-      item.classList.add("queue-item");
-      item.innerHTML = `
-        <span>#${entry.id}</span>
-        <button onclick="removeFromQueue(${index})">Remove</button>
-      `;
-      list.appendChild(item);
+      const div = document.createElement("div");
+      div.classList.add("trade-card-entry");
+      div.textContent = `#${entry.id}`;
+      container.appendChild(div);
     });
   }
-
-  window.removeFromQueue = (index) => {
-    tradeQueue.splice(index, 1);
-    updateTradeBadge();
-  };
 
   async function getRecentUnlocks() {
     const recentRaw = localStorage.getItem("recentUnlocks");
@@ -81,9 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ownedCount = card.owned ?? (card.isNew ? 1 : 0);
     const isNewUnlock = !!card.isNew;
 
-    if (ownedCount > 0) {
-      totalOwned += ownedCount;
-    }
+    if (ownedCount > 0) totalOwned += ownedCount;
 
     const filename = card.filename || card.imageFileName || "000_CardBack_Unique.png";
 
@@ -133,7 +121,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const qty = prompt("Enter quantity to trade (1–3):", "1");
       const quantity = parseInt(qty);
-
       if (isNaN(quantity) || quantity < 1 || quantity > 3) {
         alert("❌ Invalid quantity. Must be between 1 and 3.");
         return;
@@ -141,7 +128,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const availableSpots = 3 - tradeQueue.length;
       const toAdd = Math.min(quantity, availableSpots);
-
       if (toAdd < quantity) {
         alert(`⚠️ Only ${toAdd} trade slot(s) remaining.`);
       }
@@ -151,8 +137,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       alert(`✅ Card #${cleanId} x${toAdd} added to trade queue.`);
-      updateTradeBadge();
       tradeButton.classList.add("queued");
+      updateTradeBadge();
 
       if (tradeQueue.length === 3) {
         alert("🎯 You have selected 3 cards for trade. No more can be added.");
@@ -216,31 +202,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 3000);
   }
 
-  // ✅ Inject trade queue badge and toggle button if missing
+  // ✅ Inject trade queue badge if missing
   if (!document.getElementById("trade-queue-badge")) {
     const badge = document.createElement("div");
     badge.id = "trade-queue-badge";
     document.body.appendChild(badge);
   }
 
-  if (!document.getElementById("toggle-sidebar-btn")) {
-    const btn = document.createElement("button");
-    btn.id = "toggle-sidebar-btn";
-    btn.textContent = "👁️ View Trade Queue";
-    btn.addEventListener("click", () => {
-      document.getElementById("trade-sidebar")?.classList.toggle("active");
-    });
-    document.body.appendChild(btn);
-  }
-
-  if (!document.getElementById("trade-sidebar")) {
-    const sidebar = document.createElement("div");
-    sidebar.id = "trade-sidebar";
-    sidebar.innerHTML = `
-      <h2>🧾 Trade Queue</h2>
-      <div id="sidebar-list"></div>
+  // ✅ Inject bottom trade bar
+  if (!document.getElementById("trade-bottom-bar")) {
+    const bar = document.createElement("div");
+    bar.id = "trade-bottom-bar";
+    bar.innerHTML = `
+      <strong>🧳 Trade Queue:</strong>
+      <div id="bottom-trade-list"></div>
     `;
-    document.body.appendChild(sidebar);
+    document.body.appendChild(bar);
   }
 
   updateTradeBadge();
