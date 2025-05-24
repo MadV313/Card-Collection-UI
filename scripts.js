@@ -78,12 +78,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Toggle handlers
   document.getElementById("toggle-bottom-bar")?.addEventListener("click", () => {
-    document.getElementById("trade-bottom-bar")?.classList.toggle("collapsed");
+    const tradeBar = document.getElementById("trade-bottom-bar");
+    tradeBar?.classList.toggle("collapsed");
   });
 
   document.getElementById("toggle-sell-bar")?.addEventListener("click", () => {
-    document.getElementById("sell-bottom-bar")?.classList.toggle("collapsed");
+    const sellBar = document.getElementById("sell-bottom-bar");
+    sellBar?.classList.toggle("collapsed");
   });
 
   async function getRecentUnlocks() {
@@ -235,19 +238,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const maxCollection = 250;
-  const collectionCount = document.getElementById("collection-count");
-  if (collectionCount) {
-    collectionCount.textContent = `Cards Collected: ${cards.length} / 127`;
-  }
+  document.getElementById("collection-count").textContent = `Cards Collected: ${cards.length} / 127`;
+  document.getElementById("total-owned-count").textContent = `Total Cards Owned: ${totalOwned} / ${maxCollection}`;
 
-  const totalOwnedCount = document.getElementById("total-owned-count");
-  if (totalOwnedCount) {
-    totalOwnedCount.textContent = `Total Cards Owned: ${totalOwned} / ${maxCollection}`;
-  }
-
-  const warningBanner = document.getElementById("ownership-warning");
-  if (warningBanner) {
-    warningBanner.style.display = totalOwned >= 247 ? "block" : "none";
+  if (totalOwned >= 247) {
+    document.getElementById("ownership-warning").style.display = "block";
   }
 
   if (fromPack && recentUnlocks.length) {
