@@ -63,7 +63,7 @@ h1 {
   margin: 5px 0;
 }
 
-button.scrap, button.sell {
+button.trade, button.sell {
   background-color: #333;
   border: none;
   color: white;
@@ -74,7 +74,7 @@ button.scrap, button.sell {
   cursor: pointer;
 }
 
-button.scrap:hover, button.sell:hover {
+button.trade:hover, button.sell:hover {
   background-color: #555;
 }
 
