@@ -62,27 +62,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  if (!document.getElementById("toggle-bottom-bar")) {
-    const toggle = document.createElement("button");
-    toggle.id = "toggle-bottom-bar";
-    toggle.textContent = "⬆️ Toggle Trade Bar";
-    toggle.addEventListener("click", () => {
-      const bar = document.getElementById("trade-bottom-bar");
-      bar.classList.toggle("collapsed");
-    });
-    document.body.appendChild(toggle);
-  }
+  // Toggle buttons
+  document.getElementById("toggle-bottom-bar")?.addEventListener("click", () => {
+    document.getElementById("trade-bottom-bar")?.classList.toggle("collapsed");
+  });
 
-  if (!document.getElementById("toggle-sell-bar")) {
-    const toggle = document.createElement("button");
-    toggle.id = "toggle-sell-bar";
-    toggle.textContent = "⬆️ Toggle Sell Bar";
-    toggle.addEventListener("click", () => {
-      const bar = document.getElementById("sell-bottom-bar");
-      bar.classList.toggle("collapsed");
-    });
-    document.body.appendChild(toggle);
-  }
+  document.getElementById("toggle-sell-bar")?.addEventListener("click", () => {
+    document.getElementById("sell-bottom-bar")?.classList.toggle("collapsed");
+  });
 
   async function getRecentUnlocks() {
     const recentRaw = localStorage.getItem("recentUnlocks");
@@ -91,8 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const res = await fetch("/packReveal");
       if (!res.ok) throw new Error();
-      const data = await res.json();
-      return data;
+      return await res.json();
     } catch {
       try {
         const mock = await fetch("data/mock_pack_reveal.json");
@@ -186,10 +172,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       alert(`✅ Card #${cleanId} x${toAdd} added to trade queue.`);
       tradeButton.classList.add("queued");
       updateBottomBar();
-
-      if (tradeQueue.length === 3) {
-        alert("🎯 You have selected 3 cards for trade. No more can be added.");
-      }
     });
 
     const sellButton = document.createElement('button');
@@ -200,7 +182,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("⚠️ You can only sell up to 5 cards every 24 hours.");
         return;
       }
-
       sellQueue.push({ id: cleanId, filename, rarity: card.rarity });
       updateSellBar();
     });
@@ -214,18 +195,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('cards-container').appendChild(cardContainer);
   });
 
-  // Inject trade bar
+  // Inject bars
   if (!document.getElementById("trade-bottom-bar")) {
     const bar = document.createElement("div");
     bar.id = "trade-bottom-bar";
+    bar.classList.add("collapsed");
     bar.innerHTML = `<strong>🧳 Trade Queue:</strong><div id="bottom-trade-list"></div>`;
     document.body.appendChild(bar);
   }
 
-  // Inject sell bar
   if (!document.getElementById("sell-bottom-bar")) {
     const bar = document.createElement("div");
     bar.id = "sell-bottom-bar";
+    bar.classList.add("collapsed");
     bar.innerHTML = `<strong>🗑 Sell Queue:</strong><div id="bottom-sell-list"></div>`;
     document.body.appendChild(bar);
   }
@@ -247,7 +229,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     warningBanner.style.display = totalOwned >= 247 ? "block" : "none";
   }
 
-  // Highlight new unlocks
   if (fromPack && recentUnlocks.length) {
     const banner = document.createElement("div");
     banner.id = "new-unlocked-banner";
