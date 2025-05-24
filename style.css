@@ -6,6 +6,18 @@ h1 {
   margin: 20px;
 }
 
+.snow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background: url('images/effects/snowfall.gif') center center / cover no-repeat;
+  opacity: 0.3;
+}
+
 .card-grid {
   display: grid;
   grid-template-columns: repeat(10, 1fr); /* ⬅ 10 on desktop */
