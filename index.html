@@ -29,14 +29,10 @@
       background-color: #004d4d;
     }
 
-    #toggle-bottom-bar {
+    #toggle-bottom-bar, #toggle-sell-bar {
       position: fixed;
-      bottom: 65px;
       right: 20px;
-      z-index: 999;
-      background-color: #111;
-      border: 2px solid gold;
-      color: gold;
+      z-index: 1001;
       padding: 6px 12px;
       border-radius: 6px;
       font-weight: bold;
@@ -44,22 +40,35 @@
       cursor: pointer;
     }
 
-    #trade-bottom-bar.collapsed {
+    #toggle-bottom-bar {
+      bottom: 110px;
+      background-color: #111;
+      border: 2px solid gold;
+      color: gold;
+    }
+
+    #toggle-sell-bar {
+      bottom: 160px;
+      background-color: #111;
+      border: 2px solid crimson;
+      color: crimson;
+    }
+
+    #trade-bottom-bar.collapsed,
+    #sell-bottom-bar.collapsed {
       transform: translateY(100%);
       transition: transform 0.4s ease;
     }
 
-    #trade-bottom-bar {
+    #trade-bottom-bar,
+    #sell-bottom-bar {
       position: fixed;
-      bottom: 0;
       left: 0;
       width: 100%;
       background-color: #111;
-      border-top: 2px solid gold;
       color: white;
       padding: 10px 15px;
       font-size: 0.9rem;
-      z-index: 998;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -68,33 +77,52 @@
       overflow-x: auto;
     }
 
-    #bottom-trade-list {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+    #trade-bottom-bar {
+      bottom: 0;
+      border-top: 2px solid gold;
+      z-index: 998;
     }
 
-    .trade-card-entry {
+    #sell-bottom-bar {
+      bottom: 50px;
+      border-top: 2px solid crimson;
+      z-index: 997;
+    }
+
+    .trade-card-entry,
+    .sell-card-entry {
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: #222;
       padding: 6px;
       border-radius: 6px;
-      border: 1px solid gold;
-      box-shadow: 0 0 5px gold;
-      color: gold;
       font-weight: bold;
     }
 
-    .trade-card-entry .thumb {
+    .trade-card-entry {
+      background: #222;
+      border: 1px solid gold;
+      box-shadow: 0 0 5px gold;
+      color: gold;
+    }
+
+    .sell-card-entry {
+      background: #222;
+      border: 1px solid crimson;
+      box-shadow: 0 0 5px crimson;
+      color: crimson;
+    }
+
+    .trade-card-entry .thumb,
+    .sell-card-entry .thumb {
       width: 40px;
       height: auto;
       border-radius: 4px;
       margin-bottom: 4px;
     }
 
-    .trade-card-entry button {
+    .trade-card-entry button,
+    .sell-card-entry button {
       background-color: crimson;
       border: none;
       color: white;
@@ -109,6 +137,9 @@
 <body>
   <div class="snow"></div>
   <a id="return-to-hub" href="https://madv313.github.io/HUB-UI/">← Return to HUB</a>
+
+  <button id="toggle-sell-bar">⬆️ Toggle Sell Queue</button>
+  <button id="toggle-bottom-bar">⬆️ Toggle Trade Queue</button>
 
   <h1>Players Card Collection</h1>
 
