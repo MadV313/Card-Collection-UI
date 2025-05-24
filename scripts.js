@@ -97,10 +97,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const actionsDiv = document.createElement('div');
     actionsDiv.classList.add('card-actions-vertical');
 
-    // [TRADE] button
     const tradeButton = document.createElement('button');
     tradeButton.classList.add('trade');
     tradeButton.textContent = '[TRADE]';
+
     tradeButton.addEventListener('click', () => {
       if (tradeQueue.length >= 3) {
         alert("⚠️ You can only trade up to 3 cards.");
@@ -128,6 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       alert(`✅ Card #${cleanId} x${toAdd} added to trade queue.`);
       updateTradeBadge();
+      tradeButton.classList.add("queued");
 
       if (tradeQueue.length === 3) {
         alert("🎯 You have selected 3 cards for trade. No more can be added.");
@@ -191,6 +192,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 3000);
   }
 
-  // 🔃 Initialize trade queue badge
+  // ✅ Inject badge element if missing
+  if (!document.getElementById("trade-queue-badge")) {
+    const badge = document.createElement("div");
+    badge.id = "trade-queue-badge";
+    document.body.appendChild(badge);
+  }
+
   updateTradeBadge();
 });
