@@ -6,23 +6,25 @@
   <title>ALL DayZ CCG Cards</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    #return-to-hub {
-      position: fixed;
-      top: 70px;
-      right: 20px;
-      z-index: 999;
-      background-color: #333;
-      color: white;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      text-decoration: none;
-      font-family: Arial, sans-serif;
-    }
+    .back-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #008080; /* Teal */
+  border: 2px solid white;
+  border-radius: 4px;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  transition: background 0.3s, transform 0.2s;
+}
 
-    #return-to-hub:hover {
-      background-color: #666;
-    }
+.return-button:hover,
+.back-button:hover {
+  border: 2px solid #00ffff;
+  transform: scale(1.02);
+  box-shadow: 0 0 15px #00ffff, 0 0 5px #00ffff inset;
+  background-color: #004d4d; /* Slight teal dark glow */
+}
   </style>
 </head>
 <body>
