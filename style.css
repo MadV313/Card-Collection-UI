@@ -58,13 +58,7 @@ h1 { margin: 20px; }
 .card-container img { width: 100%; border-radius: 5px; }
 .card-container p { margin: 5px 0; }
 
-.card-container.common-border:hover { box-shadow: 0 0 10px limegreen, 0 0 20px limegreen; }
-.card-container.uncommon-border:hover { box-shadow: 0 0 10px royalblue, 0 0 20px royalblue; }
-.card-container.rare-border:hover { box-shadow: 0 0 10px purple, 0 0 20px purple; }
-.card-container.legendary-border:hover { box-shadow: 0 0 15px gold, 0 0 30px gold; }
-.card-container.unique-border:hover { box-shadow: 0 0 15px crimson, 0 0 30px crimson; }
-
-/* ⬆️ Buttons */
+/* ⬆️ Button Styling */
 button.trade, button.sell {
   background-color: #333;
   border: none;
@@ -90,17 +84,17 @@ button.trade.queued {
 }
 button.trade.queued:hover { background-color: #ffd700; }
 
-@keyframes pulseQueueGlow {
-  0% { box-shadow: 0 0 10px gold; }
-  100% { box-shadow: 0 0 25px gold; }
-}
-
 /* ⬆️ Rarity Borders */
 .common-border { border: 2px solid green; }
 .uncommon-border { border: 2px solid blue; }
 .rare-border { border: 2px solid purple; }
 .legendary-border { border: 2px solid gold; }
 .unique-border { border: 2px solid red; }
+
+@keyframes pulseQueueGlow {
+  0% { box-shadow: 0 0 10px gold; }
+  100% { box-shadow: 0 0 25px gold; }
+}
 
 .legendary-glow {
   animation: glowPulse 2s infinite alternate;
@@ -112,13 +106,12 @@ button.trade.queued:hover { background-color: #ffd700; }
   100% { box-shadow: 0 0 40px gold; }
 }
 
-/* ⬆️ Responsive Card Scaling */
 @media (max-width: 600px) {
   .card-grid { grid-template-columns: repeat(3, 1fr); }
   .card-container { width: 100px; }
 }
 
-/* ⬆️ Text & Extras */
+/* ⬆️ UI & Effects */
 .card-type-emoji {
   position: absolute;
   top: 5px;
@@ -209,6 +202,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   flex-wrap: wrap;
   align-items: center;
 }
+
 .trade-card-entry {
   background: #222;
   padding: 6px 10px;
@@ -221,6 +215,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   align-items: center;
   gap: 6px;
 }
+
 .trade-card-entry img.thumb {
   width: 45px;
   height: auto;
@@ -228,6 +223,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   border: 1px solid #444;
   box-shadow: 0 0 5px gold;
 }
+
 .trade-card-entry button {
   background: crimson;
   color: white;
@@ -265,6 +261,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   flex-wrap: wrap;
   align-items: center;
 }
+
 .sell-card-entry {
   background: #222;
   padding: 6px 10px;
@@ -277,6 +274,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   align-items: center;
   gap: 6px;
 }
+
 .sell-card-entry img.thumb {
   width: 45px;
   height: auto;
@@ -284,6 +282,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   border: 1px solid #444;
   box-shadow: 0 0 5px crimson;
 }
+
 .sell-card-entry button {
   background: crimson;
   color: white;
@@ -294,6 +293,16 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   cursor: pointer;
 }
 .sell-card-entry button:hover { background-color: darkred; }
+
+/* ✅ Limit Reached Flash Effect */
+@keyframes flashLimit {
+  0% { box-shadow: 0 0 5px red, 0 0 10px red; }
+  50% { box-shadow: 0 0 15px red, 0 0 25px red; }
+  100% { box-shadow: 0 0 5px red, 0 0 10px red; }
+}
+.limit-reached {
+  animation: flashLimit 0.8s ease-in-out 3;
+}
 
 /* ✅ Toggle Buttons */
 #toggle-bottom-bar,
