@@ -3,6 +3,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fromPack = urlParams.get('fromPackReveal') === 'true';
   const tradeQueue = [];
 
+  function updateTradeBadge() {
+    const badge = document.getElementById("trade-queue-badge");
+    if (!badge) return;
+    badge.textContent = `🧳 Trade Queue: ${tradeQueue.length} / 3`;
+    badge.classList.toggle("glow", tradeQueue.length >= 3);
+  }
+
   async function getRecentUnlocks() {
     const recentRaw = localStorage.getItem("recentUnlocks");
     if (recentRaw) return JSON.parse(recentRaw);
@@ -108,8 +115,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      tradeQueue.push({ id: cleanId, quantity });
-      alert(`✅ Card #${cleanId} x${quantity} added to trade queue.`);
+      const availableSpots = 3 - tradeQueue.length;
+      const toAdd = Math.min(quantity, availableSpots);
+
+      if (toAdd < quantity) {
+        alert(`⚠️ Only ${toAdd} trade slot(s) remaining.`);
+      }
+
+      for (let i = 0; i < toAdd; i++) {
+        tradeQueue.push({ id: cleanId });
+      }
+
+      alert(`✅ Card #${cleanId} x${toAdd} added to trade queue.`);
+      updateTradeBadge();
 
       if (tradeQueue.length === 3) {
         alert("🎯 You have selected 3 cards for trade. No more can be added.");
@@ -172,4 +190,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       localStorage.removeItem("recentUnlocks");
     }, 3000);
   }
+
+  // 🔃 Initialize trade queue badge
+  updateTradeBadge();
 });
