@@ -43,6 +43,53 @@
   <div id="collection-count" class="collection-header">Cards Collected: 0 / 250</div>
 
   <div class="card-grid">
+
+    <script>
+fetch('mock_deckData.json')
+  .then(res => res.json())
+  .then(cards => {
+    const cardMap = {};
+    cards.forEach(card => {
+      const id = card.card_id.replace(/-DUP\d*$/, '');
+      cardMap[id] = (cardMap[id] || { ...card, count: 0 });
+      cardMap[id].count++;
+    });
+
+    // Loop through ALL existing card containers and update if owned
+    document.querySelectorAll('.card-container').forEach(container => {
+      const number = container.querySelector('p')?.textContent?.replace('#', '');
+      if (!number || !cardMap[number]) return; // Skip if not owned
+
+      const owned = cardMap[number];
+      const img = container.querySelector('img');
+      const span = container.querySelector('.owned-count');
+      const rarity = owned["Card Rarity"];
+
+      // Update front image, border, count
+      img.src = `images/cards/${owned.image}`;
+      img.classList.remove('facedown-card');
+      container.className = `card-container ${getRarityBorder(rarity)}`;
+      container.dataset.rarity = rarity;
+      container.dataset.owned = owned.count;
+      span.textContent = `Owned: ${owned.count}`;
+    });
+
+    // Update collection counter
+    document.getElementById('collection-count').textContent =
+      `Cards Collected: ${Object.keys(cardMap).length} / 250`;
+  });
+
+function getRarityBorder(rarity) {
+  const map = {
+    "Common": "common-border",
+    "Uncommon": "uncommon-border",
+    "Rare": "rare-border",
+    "Legendary": "legendary-border",
+    "Unique": "unique-border"
+  };
+  return map[rarity] || '';
+}
+</script>
     
     <div class="card-container unique-border" data-rarity="Unique" data-owned="0">
       <img class="facedown-card" class="facedown-card" src="images/cards/000_CardBack_Unique.png" alt="WinterLand Death Deck (Face-Down)">
