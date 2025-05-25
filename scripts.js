@@ -198,7 +198,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tradeButton = document.createElement('button');
     tradeButton.classList.add('trade');
     tradeButton.textContent = '[TRADE]';
-    tradeButton.disabled = ownedCount === 0;
+    if (ownedCount === 0) {
+      tradeButton.disabled = true;
+      tradeButton.title = "You don’t own this card";
+    }
+
     tradeButton.addEventListener('click', () => {
       if (ownedCount <= 0) return showToast("❌ You do not own this card.");
       const tradeBar = document.getElementById("trade-bottom-bar");
@@ -233,7 +237,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sellButton = document.createElement('button');
     sellButton.classList.add('sell');
     sellButton.textContent = '[SELL]';
-    sellButton.disabled = ownedCount === 0;
+    if (ownedCount === 0) {
+      sellButton.disabled = true;
+      sellButton.title = "You don’t own this card";
+    }
+
     sellButton.addEventListener('click', () => {
       if (ownedCount <= 0) return showToast("❌ You do not own this card.");
       const sellBar = document.getElementById("sell-bottom-bar");
