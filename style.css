@@ -114,6 +114,56 @@ button.trade.queued.pulse {
   animation: queuedPulse 1.2s infinite ease-in-out;
 }
 
+/* Submit Button Styles */
+.queue-submit-button {
+  background-color: #222;
+  color: white;
+  border: 2px solid;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.queue-submit-button:hover {
+  transform: scale(1.02);
+}
+
+#submit-trade-btn {
+  border-color: gold;
+  color: gold;
+}
+
+#submit-trade-btn:hover {
+  background-color: gold;
+  color: black;
+  box-shadow: 0 0 10px gold;
+}
+
+#submit-sell-btn {
+  border-color: crimson;
+  color: crimson;
+}
+
+#submit-sell-btn:hover {
+  background-color: crimson;
+  color: white;
+  box-shadow: 0 0 10px crimson;
+}
+
+/* Flash Feedback */
+.submit-flash {
+  animation: flashConfirm 0.8s ease-out;
+}
+
+@keyframes flashConfirm {
+  0% { box-shadow: 0 0 5px white; }
+  50% { box-shadow: 0 0 15px white; }
+  100% { box-shadow: 0 0 0px transparent; }
+}
+
 /* ⬆️ Rarity Borders */
 .common-border { border: 2px solid green; }
 .uncommon-border { border: 2px solid blue; }
