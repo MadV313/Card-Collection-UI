@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function updateBottomBar() {
     const container = document.getElementById("bottom-trade-list");
     const bar = document.getElementById("trade-bottom-bar");
-    if (!container) return;
+    if (!container || !bar) return;
 
     container.innerHTML = "";
     tradeQueue.forEach((entry, index) => {
@@ -34,6 +34,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       container.appendChild(div);
     });
 
+    const existingSubmit = document.getElementById("submit-trade-btn");
+    if (!existingSubmit) {
+      const submitBtn = document.createElement("button");
+      submitBtn.id = "submit-trade-btn";
+      submitBtn.className = "queue-submit-button";
+      submitBtn.textContent = "[SUBMIT TRADE]";
+      submitBtn.addEventListener("click", () => {
+        submitBtn.classList.add("submit-flash");
+        setTimeout(() => submitBtn.classList.remove("submit-flash"), 800);
+      });
+      bar.appendChild(submitBtn);
+    }
+
     if (tradeQueue.length >= 3) {
       bar?.classList.add("limit-reached");
     } else {
@@ -44,7 +57,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function updateSellBar() {
     const container = document.getElementById("bottom-sell-list");
     const bar = document.getElementById("sell-bottom-bar");
-    if (!container) return;
+    if (!container || !bar) return;
 
     container.innerHTML = "";
     sellQueue.forEach((entry, index) => {
@@ -71,6 +84,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       container.appendChild(div);
     });
 
+    const existingSubmit = document.getElementById("submit-sell-btn");
+    if (!existingSubmit) {
+      const submitBtn = document.createElement("button");
+      submitBtn.id = "submit-sell-btn";
+      submitBtn.className = "queue-submit-button";
+      submitBtn.textContent = "[SUBMIT SELL]";
+      submitBtn.addEventListener("click", () => {
+        submitBtn.classList.add("submit-flash");
+        setTimeout(() => submitBtn.classList.remove("submit-flash"), 800);
+      });
+      bar.appendChild(submitBtn);
+    }
+
     if (sellQueue.length >= 5) {
       bar?.classList.add("limit-reached");
     } else {
@@ -80,16 +106,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("toggle-bottom-bar")?.addEventListener("click", () => {
     const tradeBar = document.getElementById("trade-bottom-bar");
-    if (tradeBar) {
-      tradeBar.classList.toggle("collapsed");
-    }
+    if (tradeBar) tradeBar.classList.toggle("collapsed");
   });
 
   document.getElementById("toggle-sell-bar")?.addEventListener("click", () => {
     const sellBar = document.getElementById("sell-bottom-bar");
-    if (sellBar) {
-      sellBar.classList.toggle("collapsed");
-    }
+    if (sellBar) sellBar.classList.toggle("collapsed");
   });
 
   async function getRecentUnlocks() {
@@ -223,22 +245,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     cardContainer.append(cardImg, cardInfoDiv, actionsDiv);
     document.getElementById('cards-container').appendChild(cardContainer);
   });
-
-  if (!document.getElementById("trade-bottom-bar")) {
-    const bar = document.createElement("div");
-    bar.id = "trade-bottom-bar";
-    bar.classList.add("collapsed");
-    bar.innerHTML = `<strong>🎴 Trade Queue:</strong><div id="bottom-trade-list"></div>`;
-    document.body.appendChild(bar);
-  }
-
-  if (!document.getElementById("sell-bottom-bar")) {
-    const bar = document.createElement("div");
-    bar.id = "sell-bottom-bar";
-    bar.classList.add("collapsed");
-    bar.innerHTML = `<strong>🪙 Sell Queue:</strong><div id="bottom-sell-list"></div>`;
-    document.body.appendChild(bar);
-  }
 
   const maxCollection = 250;
   document.getElementById("collection-count").textContent = `Cards Collected: ${cards.length} / 127`;
