@@ -183,7 +183,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 /* ✅ Trade Queue Bar */
 #trade-bottom-bar {
   position: fixed;
-  bottom: 50px;
+  bottom: 0;
   left: 0;
   width: 100%;
   background-color: #111;
@@ -242,7 +242,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 /* ✅ Sell Queue Bar */
 #sell-bottom-bar {
   position: fixed;
-  bottom: 0;
+  bottom: -60px;
   left: 0;
   width: 100%;
   background-color: #111;
@@ -259,7 +259,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   transform: translateY(100%);
 }
 #sell-bottom-bar:not(.collapsed) {
-  transform: translateY(0%);
+  transform: translateY(-60px);
 }
 
 #bottom-sell-list {
