@@ -236,10 +236,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.body.appendChild(bar);
   }
 
+  // ✅ Final live counts
   const maxCollection = 250;
   document.getElementById("collection-count").textContent = `Cards Collected: ${cards.length} / 127`;
   document.getElementById("total-owned-count").textContent = `Total Cards Owned: ${totalOwned} / ${maxCollection}`;
-  document.getElementById("coin-balance").textContent = `Coin Balance: 13`;
+  document.getElementById("coin-balance").textContent = "13";
 
   if (totalOwned >= 247) {
     document.getElementById("ownership-warning").style.display = "block";
