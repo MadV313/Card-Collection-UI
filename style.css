@@ -1,4 +1,4 @@
-/* ⬆️ Core Layout & Background */
+/* FULL UPDATED CSS PASTE */
 body {
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)),
               url('images/backgrounds/card_collection_background.png') no-repeat center center fixed;
@@ -22,7 +22,6 @@ h1 { margin: 20px; }
   opacity: 0.3;
 }
 
-/* ⬆️ Grid & Card Containers */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -62,7 +61,6 @@ h1 { margin: 20px; }
 .card-container img { width: 100%; border-radius: 5px; }
 .card-container p { margin: 5px 0; }
 
-/* ⬆️ Button Styling */
 button.trade,
 button.sell {
   background-color: rgba(51, 51, 51, 0.75);
@@ -103,18 +101,15 @@ button.trade.queued:hover {
   box-shadow: 0 0 12px gold, 0 0 15px white inset;
 }
 
-/* Optional: Add back a pulse effect for queued if needed */
 @keyframes queuedPulse {
   0% { box-shadow: 0 0 5px gold; }
   50% { box-shadow: 0 0 15px gold; }
   100% { box-shadow: 0 0 5px gold; }
 }
-
 button.trade.queued.pulse {
   animation: queuedPulse 1.2s infinite ease-in-out;
 }
 
-/* Submit Button Styles */
 .queue-submit-button {
   background-color: #222;
   color: white;
@@ -126,61 +121,47 @@ button.trade.queued.pulse {
   cursor: pointer;
   transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
 }
-
 .queue-submit-button:hover {
   transform: scale(1.02);
 }
-
 #submit-trade-btn {
   border-color: gold;
   color: gold;
 }
-
 #submit-trade-btn:hover {
   background-color: gold;
   color: black;
   box-shadow: 0 0 10px gold;
 }
-
 #submit-sell-btn {
   border-color: crimson;
   color: crimson;
 }
-
 #submit-sell-btn:hover {
   background-color: crimson;
   color: white;
   box-shadow: 0 0 10px crimson;
 }
 
-/* Flash Feedback */
 .submit-flash {
   animation: flashConfirm 0.8s ease-out;
 }
-
 @keyframes flashConfirm {
   0% { box-shadow: 0 0 5px white; }
   50% { box-shadow: 0 0 15px white; }
   100% { box-shadow: 0 0 0px transparent; }
 }
 
-/* ⬆️ Rarity Borders */
 .common-border { border: 2px solid green; }
 .uncommon-border { border: 2px solid blue; }
 .rare-border { border: 2px solid purple; }
 .legendary-border { border: 2px solid gold; }
 .unique-border { border: 2px solid red; }
 
-@keyframes pulseQueueGlow {
-  0% { box-shadow: 0 0 10px gold; }
-  100% { box-shadow: 0 0 25px gold; }
-}
-
 .legendary-glow {
   animation: glowPulse 2s infinite alternate;
   box-shadow: 0 0 10px gold, 0 0 20px gold, 0 0 30px gold;
 }
-
 @keyframes glowPulse {
   0% { box-shadow: 0 0 5px gold; }
   100% { box-shadow: 0 0 40px gold; }
@@ -191,14 +172,12 @@ button.trade.queued.pulse {
   .card-container { width: 100px; }
 }
 
-/* ⬆️ UI & Effects */
 .card-type-emoji {
   position: absolute;
   top: 5px;
   right: 8px;
   font-size: 1.4rem;
 }
-
 body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   color: #ffffff !important;
 }
@@ -219,26 +198,22 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   animation: glowFade 3s ease-out forwards;
   z-index: 9999;
 }
-
 @keyframes glowFade {
   0% { opacity: 0; transform: translateX(-50%) scale(0.9); }
   10% { opacity: 1; transform: translateX(-50%) scale(1); }
   90% { opacity: 1; }
   100% { opacity: 0; transform: translateX(-50%) scale(1); }
 }
-
 .highlight-glow {
   outline: 3px solid #00ffff;
   box-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff;
   animation: shimmer 1.5s infinite alternate;
 }
-
 @keyframes shimmer {
   0% { opacity: 1; }
   100% { opacity: 0.5; }
 }
 
-/* ⬆️ Deck Stats */
 .collection-header {
   font-size: 20px;
   font-weight: bold;
@@ -246,7 +221,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   margin-bottom: 15px;
   text-shadow: 1px 1px 2px black;
 }
-
 .card-actions-vertical {
   display: flex;
   flex-direction: column;
@@ -278,7 +252,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 #trade-bottom-bar:not(.collapsed) {
   transform: translateY(0%);
 }
-
 #bottom-trade-list {
   display: flex;
   gap: 10px;
@@ -315,7 +288,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 }
 .trade-card-entry button:hover { background-color: darkred; }
 
-/* ✅ Sell Queue Bar */
 #sell-bottom-bar {
   position: fixed;
   bottom: 0;
@@ -337,7 +309,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 #sell-bottom-bar:not(.collapsed) {
   transform: translateY(0%);
 }
-
 #bottom-sell-list {
   display: flex;
   gap: 10px;
@@ -374,7 +345,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 }
 .sell-card-entry button:hover { background-color: darkred; }
 
-/* ✅ Limit Reached Flash Effect */
 @keyframes flashLimit {
   0%   { box-shadow: 0 0 5px red, 0 0 10px red; }
   50%  { box-shadow: 0 0 15px red, 0 0 25px red; }
@@ -384,7 +354,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   animation: flashLimit 0.8s ease-in-out 3;
 }
 
-/* ✅ Toggle Buttons */
 #toggle-bottom-bar,
 #toggle-sell-bar {
   position: fixed;
@@ -409,7 +378,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   border: 2px solid crimson;
 }
 
-/* ✅ Toast Notification */
 #mock-toast {
   position: fixed;
   bottom: 80px;
@@ -425,7 +393,6 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   opacity: 0;
   animation: toastFadeIn 0.4s ease forwards;
 }
-
 @keyframes toastFadeIn {
   0% { opacity: 0; transform: translateX(-50%) scale(0.95); }
   100% { opacity: 1; transform: translateX(-50%) scale(1); }
