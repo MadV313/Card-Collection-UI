@@ -78,7 +78,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ✅ Toggle buttons (front-end behavior)
   document.getElementById("toggle-bottom-bar")?.addEventListener("click", () => {
     const tradeBar = document.getElementById("trade-bottom-bar");
     if (tradeBar) {
