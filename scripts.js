@@ -78,7 +78,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Toggle handlers
   document.getElementById("toggle-bottom-bar")?.addEventListener("click", () => {
     const tradeBar = document.getElementById("trade-bottom-bar");
     tradeBar?.classList.toggle("collapsed");
@@ -225,7 +224,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const bar = document.createElement("div");
     bar.id = "trade-bottom-bar";
     bar.classList.add("collapsed");
-    bar.innerHTML = `<strong>🧳 Trade Queue:</strong><div id="bottom-trade-list"></div>`;
+    bar.innerHTML = `<strong>🎴 Trade Queue:</strong><div id="bottom-trade-list"></div>`;
     document.body.appendChild(bar);
   }
 
@@ -233,7 +232,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const bar = document.createElement("div");
     bar.id = "sell-bottom-bar";
     bar.classList.add("collapsed");
-    bar.innerHTML = `<strong>🗑 Sell Queue:</strong><div id="bottom-sell-list"></div>`;
+    bar.innerHTML = `<strong>🪙 Sell Queue:</strong><div id="bottom-sell-list"></div>`;
     document.body.appendChild(bar);
   }
 
@@ -268,4 +267,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   updateBottomBar();
   updateSellBar();
+
+  // ✅ Front-End Testing Mock: Coins + Card Total
+  const coinDisplay = document.createElement("div");
+  coinDisplay.id = "mock-coin-display";
+  coinDisplay.style.cssText = "position: fixed; top: 15px; right: 20px; font-size: 18px; background: rgba(0,0,0,0.6); padding: 6px 12px; border: 2px solid gold; border-radius: 8px; z-index: 999;";
+  coinDisplay.textContent = `🪙 Coins: 13`;
+  document.body.appendChild(coinDisplay);
+
+  const cardDisplay = document.createElement("div");
+  cardDisplay.id = "mock-card-display";
+  cardDisplay.style.cssText = "position: fixed; top: 55px; right: 20px; font-size: 18px; background: rgba(0,0,0,0.6); padding: 6px 12px; border: 2px solid cyan; border-radius: 8px; z-index: 999;";
+  cardDisplay.textContent = `🎴 Total Cards: ${totalOwned}`;
+  document.body.appendChild(cardDisplay);
 });
