@@ -78,14 +78,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // ✅ Toggle buttons (front-end behavior)
   document.getElementById("toggle-bottom-bar")?.addEventListener("click", () => {
     const tradeBar = document.getElementById("trade-bottom-bar");
-    tradeBar?.classList.toggle("collapsed");
+    if (tradeBar) {
+      tradeBar.classList.toggle("collapsed");
+    }
   });
 
   document.getElementById("toggle-sell-bar")?.addEventListener("click", () => {
     const sellBar = document.getElementById("sell-bottom-bar");
-    sellBar?.classList.toggle("collapsed");
+    if (sellBar) {
+      sellBar.classList.toggle("collapsed");
+    }
   });
 
   async function getRecentUnlocks() {
@@ -236,7 +241,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.body.appendChild(bar);
   }
 
-  // ✅ Final live counts
   const maxCollection = 250;
   document.getElementById("collection-count").textContent = `Cards Collected: ${cards.length} / 127`;
   document.getElementById("total-owned-count").textContent = `Total Cards Owned: ${totalOwned} / ${maxCollection}`;
