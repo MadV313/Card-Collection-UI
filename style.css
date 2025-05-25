@@ -63,8 +63,9 @@ h1 { margin: 20px; }
 .card-container p { margin: 5px 0; }
 
 /* ⬆️ Button Styling */
-button.trade, button.sell {
-  background-color: rgba(51, 51, 51, 0.75); /* Semi-transparent */
+button.trade,
+button.sell {
+  background-color: rgba(51, 51, 51, 0.75);
   border: none;
   color: white;
   padding: 5px 10px;
@@ -73,22 +74,45 @@ button.trade, button.sell {
   font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
 }
-button.trade:hover, button.sell:hover {
+
+button.trade:hover,
+button.sell:hover {
   background-color: rgba(85, 85, 85, 0.85);
+  box-shadow: 0 0 5px #00ffff;
 }
-button.trade:active, button.sell:active {
+
+button.trade:active,
+button.sell:active {
+  transform: scale(0.97);
   border: 2px solid gold;
   box-shadow: 0 0 10px gold, 0 0 20px gold inset;
-  transform: scale(0.97);
 }
+
 button.trade.queued {
   background-color: rgba(255, 215, 0, 0.9);
   color: black;
   border: 2px solid white;
   box-shadow: 0 0 8px gold, 0 0 12px white inset;
+  transform: scale(1.03);
 }
-button.trade.queued:hover { background-color: rgba(255, 223, 0, 0.95); }
+
+button.trade.queued:hover {
+  background-color: rgba(255, 223, 0, 0.95);
+  box-shadow: 0 0 12px gold, 0 0 15px white inset;
+}
+
+/* Optional: Add back a pulse effect for queued if needed */
+@keyframes queuedPulse {
+  0% { box-shadow: 0 0 5px gold; }
+  50% { box-shadow: 0 0 15px gold; }
+  100% { box-shadow: 0 0 5px gold; }
+}
+
+button.trade.queued.pulse {
+  animation: queuedPulse 1.2s infinite ease-in-out;
+}
 
 /* ⬆️ Rarity Borders */
 .common-border { border: 2px solid green; }
