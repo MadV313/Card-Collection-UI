@@ -396,6 +396,7 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   font-size: 0.85rem;
   border-radius: 6px;
   cursor: pointer;
+  opacity: 1;
 }
 #toggle-bottom-bar {
   bottom: 110px;
