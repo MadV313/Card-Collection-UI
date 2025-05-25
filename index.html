@@ -141,7 +141,7 @@
   <h1>Players Card Collection</h1>
 
   <div id="coin-balance-display" style="margin-bottom: 20px; font-size: 1.2rem;">
-    🪙 Coin Balance: <span id="coin-balance">0</span>
+    🪙 <span id="coin-balance">13</span>
   </div>
 
   <div id="collection-count" class="collection-header">Cards Collected: 0 / 127</div>
@@ -156,10 +156,13 @@
         .then(res => res.json())
         .then(cards => {
           const cardMap = {};
+          let totalOwned = 0;
+
           cards.forEach(card => {
             const id = card.card_id.replace(/-DUP\d*$/, '');
             cardMap[id] = (cardMap[id] || { ...card, count: 0 });
             cardMap[id].count++;
+            totalOwned++;
           });
 
           document.querySelectorAll('.card-container').forEach(container => {
@@ -181,6 +184,8 @@
 
           document.getElementById('collection-count').textContent =
             `Cards Collected: ${Object.keys(cardMap).length} / 127`;
+          document.getElementById('total-owned-count').textContent =
+            `Total Cards Owned: ${totalOwned} / 250`;
         });
 
       function getRarityBorder(rarity) {
