@@ -239,6 +239,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const maxCollection = 250;
   document.getElementById("collection-count").textContent = `Cards Collected: ${cards.length} / 127`;
   document.getElementById("total-owned-count").textContent = `Total Cards Owned: ${totalOwned} / ${maxCollection}`;
+  document.getElementById("coin-balance").textContent = `Coin Balance: 13`;
 
   if (totalOwned >= 247) {
     document.getElementById("ownership-warning").style.display = "block";
@@ -267,17 +268,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   updateBottomBar();
   updateSellBar();
-
-  // ✅ Front-End Testing Mock: Coins + Card Total
-  const coinDisplay = document.createElement("div");
-  coinDisplay.id = "mock-coin-display";
-  coinDisplay.style.cssText = "position: fixed; top: 15px; right: 20px; font-size: 18px; background: rgba(0,0,0,0.6); padding: 6px 12px; border: 2px solid gold; border-radius: 8px; z-index: 999;";
-  coinDisplay.textContent = `🪙 Coins: 13`;
-  document.body.appendChild(coinDisplay);
-
-  const cardDisplay = document.createElement("div");
-  cardDisplay.id = "mock-card-display";
-  cardDisplay.style.cssText = "position: fixed; top: 55px; right: 20px; font-size: 18px; background: rgba(0,0,0,0.6); padding: 6px 12px; border: 2px solid cyan; border-radius: 8px; z-index: 999;";
-  cardDisplay.textContent = `🎴 Total Cards: ${totalOwned}`;
-  document.body.appendChild(cardDisplay);
 });
