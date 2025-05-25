@@ -4,105 +4,147 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tradeQueue = [];
   const sellQueue = [];
 
+  function showToast(message) {
+  const existing = document.getElementById("mock-toast");
+  if (existing) existing.remove();
+
+  const toast = document.createElement("div");
+  toast.id = "mock-toast";
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    color: #00ffcc;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = 1 }, 100);
+  setTimeout(() => {
+    toast.style.opacity = 0;
+    setTimeout(() => toast.remove(), 800);
+  }, 2000);
+}
+  
   function updateBottomBar() {
-    const container = document.getElementById("bottom-trade-list");
-    const bar = document.getElementById("trade-bottom-bar");
-    if (!container || !bar) return;
+  const container = document.getElementById("bottom-trade-list");
+  const bar = document.getElementById("trade-bottom-bar");
+  if (!container || !bar) return;
 
-    container.innerHTML = "";
-    tradeQueue.forEach((entry, index) => {
-      const div = document.createElement("div");
-      div.classList.add("trade-card-entry");
+  container.innerHTML = "";
+  tradeQueue.forEach((entry, index) => {
+    const div = document.createElement("div");
+    div.classList.add("trade-card-entry");
 
-      const thumb = document.createElement("img");
-      thumb.src = `images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
-      thumb.alt = `#${entry.id}`;
-      thumb.classList.add("thumb");
-      thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
+    const thumb = document.createElement("img");
+    thumb.src = `images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
+    thumb.alt = `#${entry.id}`;
+    thumb.classList.add("thumb");
+    thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
 
-      const removeBtn = document.createElement("button");
-      removeBtn.innerHTML = "🗑";
-      removeBtn.title = "Remove from trade queue";
-      removeBtn.addEventListener("click", () => {
-        tradeQueue.splice(index, 1);
-        updateBottomBar();
-        bar?.classList.remove("limit-reached");
-      });
-
-      div.appendChild(thumb);
-      div.appendChild(removeBtn);
-      container.appendChild(div);
+    const removeBtn = document.createElement("button");
+    removeBtn.innerHTML = "🗑";
+    removeBtn.title = "Remove from trade queue";
+    removeBtn.addEventListener("click", () => {
+      tradeQueue.splice(index, 1);
+      updateBottomBar();
+      bar?.classList.remove("limit-reached");
     });
 
-    const existingSubmit = document.getElementById("submit-trade-btn");
-    if (!existingSubmit) {
-      const submitBtn = document.createElement("button");
-      submitBtn.id = "submit-trade-btn";
-      submitBtn.className = "queue-submit-button";
-      submitBtn.textContent = "[SUBMIT TRADE]";
-      submitBtn.addEventListener("click", () => {
-        submitBtn.classList.add("submit-flash");
-        setTimeout(() => submitBtn.classList.remove("submit-flash"), 800);
-      });
-      bar.appendChild(submitBtn);
-    }
+    div.appendChild(thumb);
+    div.appendChild(removeBtn);
+    container.appendChild(div);
+  });
 
-    if (tradeQueue.length >= 3) {
-      bar?.classList.add("limit-reached");
-    } else {
-      bar?.classList.remove("limit-reached");
-    }
+  let submitBtn = document.getElementById("submit-trade-btn");
+  if (!submitBtn) {
+    submitBtn = document.createElement("button");
+    submitBtn.id = "submit-trade-btn";
+    submitBtn.className = "queue-submit-button";
+    submitBtn.textContent = "[SUBMIT TRADE]";
+    bar.appendChild(submitBtn);
   }
+
+  submitBtn.onclick = () => {
+    if (tradeQueue.length === 0) return;
+    submitBtn.classList.add("submit-flash");
+    setTimeout(() => {
+      showToast("Trade submitted! Stand by for player's response!");
+      tradeQueue.length = 0;
+      updateBottomBar();
+    }, 1200);
+  };
+
+  if (tradeQueue.length >= 3) {
+    bar?.classList.add("limit-reached");
+  } else {
+    bar?.classList.remove("limit-reached");
+  }
+}
 
   function updateSellBar() {
-    const container = document.getElementById("bottom-sell-list");
-    const bar = document.getElementById("sell-bottom-bar");
-    if (!container || !bar) return;
+  const container = document.getElementById("bottom-sell-list");
+  const bar = document.getElementById("sell-bottom-bar");
+  if (!container || !bar) return;
 
-    container.innerHTML = "";
-    sellQueue.forEach((entry, index) => {
-      const div = document.createElement("div");
-      div.classList.add("sell-card-entry");
+  container.innerHTML = "";
+  sellQueue.forEach((entry, index) => {
+    const div = document.createElement("div");
+    div.classList.add("sell-card-entry");
 
-      const thumb = document.createElement("img");
-      thumb.src = `images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
-      thumb.alt = `#${entry.id}`;
-      thumb.classList.add("thumb");
-      thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
+    const thumb = document.createElement("img");
+    thumb.src = `images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
+    thumb.alt = `#${entry.id}`;
+    thumb.classList.add("thumb");
+    thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
 
-      const removeBtn = document.createElement("button");
-      removeBtn.innerHTML = "🗑";
-      removeBtn.title = "Remove from sell queue";
-      removeBtn.addEventListener("click", () => {
-        sellQueue.splice(index, 1);
-        updateSellBar();
-        bar?.classList.remove("limit-reached");
-      });
-
-      div.appendChild(thumb);
-      div.appendChild(removeBtn);
-      container.appendChild(div);
+    const removeBtn = document.createElement("button");
+    removeBtn.innerHTML = "🗑";
+    removeBtn.title = "Remove from sell queue";
+    removeBtn.addEventListener("click", () => {
+      sellQueue.splice(index, 1);
+      updateSellBar();
+      bar?.classList.remove("limit-reached");
     });
 
-    const existingSubmit = document.getElementById("submit-sell-btn");
-    if (!existingSubmit) {
-      const submitBtn = document.createElement("button");
-      submitBtn.id = "submit-sell-btn";
-      submitBtn.className = "queue-submit-button";
-      submitBtn.textContent = "[SUBMIT SELL]";
-      submitBtn.addEventListener("click", () => {
-        submitBtn.classList.add("submit-flash");
-        setTimeout(() => submitBtn.classList.remove("submit-flash"), 800);
-      });
-      bar.appendChild(submitBtn);
-    }
+    div.appendChild(thumb);
+    div.appendChild(removeBtn);
+    container.appendChild(div);
+  });
 
-    if (sellQueue.length >= 5) {
-      bar?.classList.add("limit-reached");
-    } else {
-      bar?.classList.remove("limit-reached");
-    }
+  let submitBtn = document.getElementById("submit-sell-btn");
+  if (!submitBtn) {
+    submitBtn = document.createElement("button");
+    submitBtn.id = "submit-sell-btn";
+    submitBtn.className = "queue-submit-button";
+    submitBtn.textContent = "[SUBMIT SELL]";
+    bar.appendChild(submitBtn);
   }
+
+  submitBtn.onclick = () => {
+    if (sellQueue.length === 0) return;
+    submitBtn.classList.add("submit-flash");
+    setTimeout(() => {
+      showToast("Sale successful!");
+      sellQueue.length = 0;
+      updateSellBar();
+    }, 1200);
+  };
+
+  if (sellQueue.length >= 5) {
+    bar?.classList.add("limit-reached");
+  } else {
+    bar?.classList.remove("limit-reached");
+  }
+}
 
   document.getElementById("toggle-bottom-bar")?.addEventListener("click", () => {
     const tradeBar = document.getElementById("trade-bottom-bar");
