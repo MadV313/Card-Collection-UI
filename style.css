@@ -407,3 +407,25 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   color: crimson;
   border: 2px solid crimson;
 }
+
+/* ✅ Toast Notification */
+#mock-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #00ffcc;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: 2px solid #00ffff;
+  border-radius: 8px;
+  z-index: 9999;
+  opacity: 0;
+  animation: toastFadeIn 0.4s ease forwards;
+}
+
+@keyframes toastFadeIn {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.95); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
