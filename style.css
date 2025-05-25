@@ -101,6 +101,43 @@ button.trade.queued:hover {
   box-shadow: 0 0 12px gold, 0 0 15px white inset;
 }
 
+button.trade:disabled,
+button.sell:disabled {
+  background-color: rgba(70, 70, 70, 0.6);
+  color: #999999;
+  cursor: not-allowed;
+  box-shadow: none;
+  border: 1px solid #444;
+  opacity: 0.5;
+}
+
+button.trade:disabled:hover,
+button.sell:disabled:hover {
+  background-color: rgba(70, 70, 70, 0.6);
+  box-shadow: none;
+}
+
+button.trade:disabled.queued,
+button.sell:disabled.queued {
+  background-color: rgba(100, 100, 100, 0.5);
+  color: #ccc;
+  border: 1px solid #666;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Optional pulse indicator for disabled buttons if needed */
+@keyframes disabledPulse {
+  0% { box-shadow: none; }
+  50% { box-shadow: 0 0 6px #333; }
+  100% { box-shadow: none; }
+}
+
+/* Re-affirm toast stays on top */
+#mock-toast {
+  z-index: 99999;
+}
+
 @keyframes queuedPulse {
   0% { box-shadow: 0 0 5px gold; }
   50% { box-shadow: 0 0 15px gold; }
