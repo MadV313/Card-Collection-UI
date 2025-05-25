@@ -152,6 +152,10 @@
 
   <div class="card-grid">
     <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const mockMode = urlParams.get("mockMode") === "true";
+    
+      if (mockMode) {
       fetch('mock_deckData.json')
         .then(res => res.json())
         .then(cards => {
