@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
   const useMockDeckData = urlParams.get('useMockDeckData') === 'true';
+  if (useMockDeckData) document.getElementById("cards-container").innerHTML = "";
   const tradeQueue = [];
   const sellQueue = [];
 
