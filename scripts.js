@@ -159,13 +159,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const deckData = useMockDeckData ? await fetch("data/mock_deckData.json").then(r => r.json()) : [];
+  const fullCardList = await fetch("data/card_master.json").then(r => r.json());
+  fullCardList.sort((a, b) => parseInt(a.card_id) - parseInt(b.card_id));
+
   const cardMap = {};
   let totalOwned = 0;
-
-  if (useMockDeckData) {
-    const grid = document.getElementById("cards-container");
-    if (grid) grid.innerHTML = ""; // Clear default placeholders
-  }
 
   deckData.forEach(card => {
     const id = card.card_id.replace(/-DUP\d*$/, '');
@@ -174,10 +172,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     totalOwned++;
   });
 
-  Object.keys(cardMap).forEach(id => {
-    const card = cardMap[id];
-    const filename = card.image || "000_CardBack_Unique.png";
-    const ownedCount = card.count;
+  const grid = document.getElementById("cards-container");
+  if (grid) grid.innerHTML = "";
+
+  fullCardList.forEach(card => {
+    const id = card.card_id;
+    const ownedCard = cardMap[id];
+    const ownedCount = ownedCard?.count || 0;
+    const filename = ownedCard?.image || card.image || "000_CardBack_Unique.png";
 
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container", `${card["Card Rarity"].toLowerCase()}-border`);
@@ -188,8 +190,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cardImg = document.createElement("img");
     cardImg.alt = card.name;
     cardImg.loading = "lazy";
-    cardImg.src = `/Card-Collection-UI/images/cards/${filename}`;
-    cardImg.classList.add('facedown-card');
+    cardImg.src = `/Card-Collection-UI/images/cards/${ownedCount > 0 ? filename : '000_CardBack_Unique.png'}`;
+    cardImg.classList.add(ownedCount > 0 ? 'revealed-card' : 'facedown-card');
 
     const cardNumber = document.createElement('p');
     cardNumber.textContent = `#${id}`;
@@ -265,7 +267,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     actionsDiv.append(tradeButton, ownedCountSpan, sellButton);
     cardContainer.append(cardImg, cardNumber, actionsDiv);
-    document.getElementById('cards-container')?.appendChild(cardContainer);
+    grid?.appendChild(cardContainer);
   });
 
   document.getElementById("collection-count").textContent = `Cards Collected: ${Object.keys(cardMap).length} / 127`;
