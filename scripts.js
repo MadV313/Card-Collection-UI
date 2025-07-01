@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cardImg = document.createElement("img");
     cardImg.alt = card.name;
     cardImg.loading = "lazy";
-    cardImg.src = `images/cards/${filename}`;
+    cardImg.src = `/Card-Collection-UI/images/cards/${filename}`;
     cardImg.classList.add('facedown-card');
 
     const cardNumber = document.createElement('p');
