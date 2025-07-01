@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const fromPack = urlParams.get('fromPackReveal') === 'true';
   const useMockDeckData = urlParams.get('useMockDeckData') === 'true';
-  if (useMockDeckData) document.getElementById("cards-container").innerHTML = "";
+
   const tradeQueue = [];
   const sellQueue = [];
 
@@ -161,6 +161,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const deckData = useMockDeckData ? await fetch("data/mock_deckData.json").then(r => r.json()) : [];
   const cardMap = {};
   let totalOwned = 0;
+
+  if (useMockDeckData) {
+    const grid = document.getElementById("cards-container");
+    if (grid) grid.innerHTML = ""; // Clear default placeholders
+  }
 
   deckData.forEach(card => {
     const id = card.card_id.replace(/-DUP\d*$/, '');
