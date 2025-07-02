@@ -161,40 +161,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   const deckData = useMockDeckData ? await fetch("data/mock_deckData.json").then(r => r.json()) : [];
   const allCards = await fetch("data/card_master.json").then(r => r.json());
   allCards.sort((a, b) => parseInt(a.card_id) - parseInt(b.card_id));
-
-  const cardMap = {};
-  let totalOwned = 0;
-
-  deckData.forEach(card => {
-    const id = card.card_id.replace(/-DUP\d*$/, '');
-    cardMap[id] = (cardMap[id] || { ...card, count: 0 });
-    cardMap[id].count++;
-    totalOwned++;
-  });
-
-  const grid = document.getElementById("cards-container");
-  if (grid) grid.innerHTML = "";
   
-  // Prepare card ownership map from mock data
+  // Build ownership map
   const ownershipMap = {};
+  let totalOwned = 0;
+  
   deckData.forEach(card => {
     const baseId = card.card_id.replace(/-DUP\d*$/, '');
     if (!ownershipMap[baseId]) {
-      ownershipMap[baseId] = { count: 0, card };
+      ownershipMap[baseId] = { count: 0, card: card };
     }
     ownershipMap[baseId].count++;
     totalOwned++;
   });
   
-  // Loop full card list
+  const grid = document.getElementById("cards-container");
+  if (grid) grid.innerHTML = "";
+  
   allCards.forEach(card => {
     const id = card.card_id;
     const owned = ownershipMap[id];
     const ownedCount = owned?.count || 0;
   
-    const filename = ownedCount > 0
-    ? card.filename
-    : "000_CardBack_Unique.png";
+    const filename = ownedCount > 0 ? card.image : "000_CardBack_Unique.png";
   
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container", `${card["Card Rarity"].toLowerCase()}-border`);
