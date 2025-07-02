@@ -270,14 +270,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     grid.appendChild(cardContainer);
   });
   
-  document.getElementById("collection-count").textContent = `Cards Collected: ${Object.keys(cardMap).length} / 127`;
+  const ownedCardCount = Object.keys(ownershipMap).length;
+
+  document.getElementById("collection-count").textContent = `Cards Collected: ${ownedCardCount} / 127`;
   document.getElementById("total-owned-count").textContent = `Total Cards Owned: ${totalOwned} / 250`;
   document.getElementById("coin-balance").textContent = "13";
-
+  
   if (totalOwned >= 247) {
-    document.getElementById("ownership-warning").style.display = "block";
+    const warning = document.getElementById("ownership-warning");
+    if (warning) warning.style.display = "block";
   }
 
-  updateBottomBar();
-  updateSellBar();
+updateBottomBar();
+updateSellBar();
 });
