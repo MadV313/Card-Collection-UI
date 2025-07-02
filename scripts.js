@@ -148,144 +148,130 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("sell-bottom-bar")?.classList.toggle("collapsed");
   });
 
-  const emojiByType = {
-    attack: "⚔️", defense: "🛡️", loot: "🎒", tactical: "🧭",
-    trap: "🧨", infected: "☣️", specialty: "✨", special: "✨"
-  };
-
-  const getTypeEmoji = (filename = "") => {
-    const typePart = filename.split("_").pop().split(".")[0].toLowerCase();
-    return emojiByType[typePart] || "";
-  };
-
   const deckData = useMockDeckData
-  ? await fetch("data/mockdata.json").then(r => r.json())
-  : await fetch("data/deckData.json").then(r => r.json());
+    ? await fetch("data/mockdata.json").then(r => r.json())
+    : await fetch("data/deckData.json").then(r => r.json());
+
   const allCards = await fetch("data/card_master.json").then(r => r.json());
   allCards.sort((a, b) => parseInt(a.card_id) - parseInt(b.card_id));
-  
-  // Build ownership map
+
   const ownershipMap = {};
   let totalOwned = 0;
-  
+
   deckData.forEach(card => {
     const baseId = card.card_id.toString().padStart(3, "0").replace(/-DUP\d*$/, '');
     if (!ownershipMap[baseId]) {
-      ownershipMap[baseId] = { count: 0, card: card };
+      ownershipMap[baseId] = { count: 0, card };
     }
     ownershipMap[baseId].count++;
     totalOwned++;
   });
-  
+
   const grid = document.getElementById("cards-container");
   if (grid) grid.innerHTML = "";
-  
+
   allCards.forEach(card => {
     const id = card.card_id.toString().padStart(3, "0");
     const owned = ownershipMap[id];
     const ownedCount = owned?.count || 0;
-  
-    let filename = "000_CardBack_Unique.png";
-    if (ownedCount > 0 && ownershipMap[id]?.card?.image) {
-      filename = ownershipMap[id].card.image;
-    }
-  
+
+    const filename = (ownedCount > 0 && owned?.card?.image) ? owned.card.image : "000_CardBack_Unique.png";
+
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container", `${card["Card Rarity"].toLowerCase()}-border`);
     cardContainer.dataset.rarity = card["Card Rarity"];
     cardContainer.dataset.owned = ownedCount;
     cardContainer.dataset.cardId = id;
-  
+
     const cardImg = document.createElement("img");
-    cardImg.alt = card.name;
+    cardImg.alt = card.name || `Card #${id}`;
     cardImg.loading = "lazy";
     cardImg.src = `/Card-Collection-UI/images/cards/${filename}`;
     cardImg.classList.add('facedown-card');
-  
+
     const cardNumber = document.createElement('p');
     cardNumber.textContent = `#${id}`;
-  
+
     const ownedCountSpan = document.createElement('span');
     ownedCountSpan.classList.add('owned-count');
     ownedCountSpan.textContent = `Owned: ${ownedCount}`;
-  
+
     const actionsDiv = document.createElement('div');
     actionsDiv.classList.add('card-actions-vertical');
-  
-    const tradeButton = document.createElement('button');
-    tradeButton.classList.add('trade');
-    tradeButton.textContent = '[TRADE]';
+
+    const tradeButton = document.createElement("button");
+    tradeButton.classList.add("trade");
+    tradeButton.textContent = "[TRADE]";
     tradeButton.disabled = ownedCount === 0;
     if (ownedCount === 0) tradeButton.title = "You don’t own this card";
-  
-    tradeButton.addEventListener('click', () => {
+
+    tradeButton.addEventListener("click", () => {
       if (ownedCount <= 0) return showToast("❌ You do not own this card.");
       const tradeBar = document.getElementById("trade-bottom-bar");
       tradeBar?.classList.remove("collapsed");
-  
+
       if (tradeQueue.length >= 3) {
         showToast("⚠️ You can only trade up to 3 cards.");
         tradeBar?.classList.add("limit-reached");
         return;
       }
-  
+
       const qty = prompt(`Enter quantity to trade (1–${Math.min(3, ownedCount)}):`, "1");
       const quantity = parseInt(qty);
       if (isNaN(quantity) || quantity < 1 || quantity > Math.min(3, ownedCount)) {
         showToast(`❌ Invalid quantity. Must be between 1 and ${Math.min(3, ownedCount)}.`);
         return;
       }
-  
+
       const availableSpots = 3 - tradeQueue.length;
       const toAdd = Math.min(quantity, availableSpots);
       if (toAdd < quantity) showToast(`⚠️ Only ${toAdd} trade slot(s) remaining.`);
-  
+
       for (let i = 0; i < toAdd; i++) {
         tradeQueue.push({ id, filename, rarity: card["Card Rarity"] });
       }
-  
+
       showToast(`✅ Card #${id} x${toAdd} added to trade queue.`);
       tradeButton.classList.add("queued");
       updateBottomBar();
     });
-  
+
     const sellButton = document.createElement("button");
     sellButton.classList.add("sell");
     sellButton.textContent = "[SELL]";
     sellButton.disabled = ownedCount === 0;
     if (ownedCount === 0) sellButton.title = "You don’t own this card";
-  
+
     sellButton.addEventListener("click", () => {
       if (ownedCount <= 0) return showToast("❌ You do not own this card.");
       const sellBar = document.getElementById("sell-bottom-bar");
       sellBar?.classList.remove("collapsed");
-  
+
       if (sellQueue.length >= 5) {
         showToast("⚠️ You can only sell up to 5 cards every 24 hours.");
         sellBar?.classList.add("limit-reached");
         return;
       }
-  
+
       sellQueue.push({ id, filename, rarity: card["Card Rarity"] });
       updateSellBar();
     });
-  
+
     actionsDiv.append(tradeButton, ownedCountSpan, sellButton);
     cardContainer.append(cardImg, cardNumber, actionsDiv);
     grid.appendChild(cardContainer);
   });
-  
-  const ownedCardCount = Object.keys(ownershipMap).length;
 
+  const ownedCardCount = Object.keys(ownershipMap).length;
   document.getElementById("collection-count").textContent = `Cards Collected: ${ownedCardCount} / 127`;
   document.getElementById("total-owned-count").textContent = `Total Cards Owned: ${totalOwned} / 250`;
   document.getElementById("coin-balance").textContent = "13";
-  
+
   if (totalOwned >= 247) {
     const warning = document.getElementById("ownership-warning");
     if (warning) warning.style.display = "block";
   }
 
-updateBottomBar();
-updateSellBar();
+  updateBottomBar();
+  updateSellBar();
 });
