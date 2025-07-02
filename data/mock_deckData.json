@@ -1,1262 +1,159 @@
 [
-  {
-    "card_id": "000",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "001",
-    "name": "M4-A1",
-    "type": "Attack",
-    "image": "001_M4A1_Attack.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "002",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "003",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "004",
-    "name": "SKS",
-    "type": "Attack",
-    "image": "004_SKS_Attack.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "005",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "006",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "007",
-    "name": "BK-133",
-    "type": "Attack",
-    "image": "007_BK133_Attack.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "008",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "009",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "010",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "011",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "012",
-    "name": "VSS Vintorez",
-    "type": "Attack",
-    "image": "012_VSSVintorez_Attack.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "013",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "014",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "015",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "016",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "017",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "018",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "019",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "020",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "021",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "022",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "023",
-    "name": "AK-74",
-    "type": "Attack",
-    "image": "023_AK74_Attack.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "024",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "025",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "026",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "027",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "028",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "029",
-    "name": "Longhorn",
-    "type": "Attack",
-    "image": "029_Longhorn_Attack.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "030",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "031",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "032",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "033",
-    "name": "Assault Helmet",
-    "type": "Defense",
-    "image": "033_AssaultHelmet_Defense.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "034",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "035",
-    "name": "Plate Carrier",
-    "type": "Defense",
-    "image": "035_PlateCarrier_Defense.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "036",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "037",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "038",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "039",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "040",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "041",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "042",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "043",
-    "name": "Paramedic Jacket",
-    "type": "Defense",
-    "image": "043_ParamedicJacket_Defense.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "044",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "045",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "046",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "047",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "048",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "049",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "050",
-    "name": "Military Boots",
-    "type": "Defense",
-    "image": "050_MilitaryBoots_Defense.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "051",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "052",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "053",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "054",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "055",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "056",
-    "name": "Tactical Backpack",
-    "type": "Defense",
-    "image": "056_TacticalBackpack_Defense.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "057",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "058",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "059",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "060",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "061",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "062",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "063",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "064",
-    "name": "Compass",
-    "type": "Tactical",
-    "image": "064_Compass_Tactical.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "065",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "066",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "067",
-    "name": "Night Vision Goggles",
-    "type": "Tactical",
-    "image": "067_NightVisionGoggles_Tactical.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "068",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "069",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "070",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "071",
-    "name": "Walkie Talkie",
-    "type": "Tactical",
-    "image": "071_WalkieTalkie_Tactical.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "072",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "073",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "074",
-    "name": "Hunting Scope",
-    "type": "Tactical",
-    "image": "074_HuntingScope_Tactical.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "075",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "076",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "077",
-    "name": "MRE",
-    "type": "Loot",
-    "image": "077_MRE_Loot.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "078",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "079",
-    "name": "Box of Nails",
-    "type": "Loot",
-    "image": "079_BoxofNails_Loot.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "080",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "081",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "082",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "083",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "084",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "085",
-    "name": "Lockpick",
-    "type": "Loot",
-    "image": "085_Lockpick_Loot.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "086",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "087",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "088",
-    "name": "Cooking Pot",
-    "type": "Loot",
-    "image": "088_CookingPot_Loot.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "089",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "090",
-    "name": "Gun Cleaning Kit",
-    "type": "Loot",
-    "image": "090_GunCleaningKit_Loot.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "091",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "092",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "093",
-    "name": "Crawler",
-    "type": "Infected",
-    "image": "093_Crawler_Infected.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "094",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "095",
-    "name": "Police Infected",
-    "type": "Infected",
-    "image": "095_PoliceInfected_Infected.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "096",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "097",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "098",
-    "name": "Hunter Infected",
-    "type": "Infected",
-    "image": "098_HunterInfected_Infected.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "099",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "100",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "101",
-    "name": "Spitter (Mutated)",
-    "type": "Infected",
-    "image": "101_Spitter(Mutated)_Infected.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "102",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "103",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "104",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "105",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "106",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "107",
-    "name": "Tripwire Trap",
-    "type": "Trap",
-    "image": "107_TripwireTrap_Trap.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "108",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "109",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "110",
-    "name": "Perimeter Trap",
-    "type": "Trap",
-    "image": "110_PerimeterTrap_Trap.png",
-    "Card Rarity": "Common"
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "111",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "112",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "113",
-    "name": "Spiked Log Trap",
-    "type": "Trap",
-    "image": "113_SpikedLogTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "114",
-    "name": "Explosive Grenade Trap",
-    "type": "Trap",
-    "image": "114_ExplosiveGrenadeTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "115",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "116",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "117",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "118",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "119",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "120",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "121",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "122",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "123",
-    "name": "Jakub Nowak",
-    "type": "Legendary",
-    "image": "123_JakubNowak_Specialty.png",
-    "Card Rarity": "Legendary",
-    "Rarity Color": "Gold"
-  },
-  {
-    "card_id": "124",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "125",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "126",
-    "name": "Lt. Col. Emil Boren",
-    "type": "Legendary",
-    "image": "126_Lt.Col.EmilBoren_Specialty.png",
-    "Card Rarity": "Legendary",
-    "Rarity Color": "Gold"
-  },
-  {
-    "card_id": "127",
-    "name": "WinterLand Death Deck (Face-Down)",
-    "type": "Unique",
-    "image": "000_WinterlandDeathDeck_Back.png",
-    "Card Rarity": "None",
-    "Rarity Color": "Red"
-  },
-  {
-    "card_id": "004-DUP",
-    "name": "SKS",
-    "type": "Attack",
-    "image": "004_SKS_Attack.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "004-DUP1",
-    "name": "SKS",
-    "type": "Attack",
-    "image": "004_SKS_Attack.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "012-DUP",
-    "name": "VSS Vintorez",
-    "type": "Attack",
-    "image": "012_VSSVintorez_Attack.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "029-DUP",
-    "name": "Longhorn",
-    "type": "Attack",
-    "image": "029_Longhorn_Attack.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "035-DUP",
-    "name": "Plate Carrier",
-    "type": "Defense",
-    "image": "035_PlateCarrier_Defense.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "043-DUP",
-    "name": "Paramedic Jacket",
-    "type": "Defense",
-    "image": "043_ParamedicJacket_Defense.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "050-DUP",
-    "name": "Military Boots",
-    "type": "Defense",
-    "image": "050_MilitaryBoots_Defense.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "050-DUP1",
-    "name": "Military Boots",
-    "type": "Defense",
-    "image": "050_MilitaryBoots_Defense.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "050-DUP2",
-    "name": "Military Boots",
-    "type": "Defense",
-    "image": "050_MilitaryBoots_Defense.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "050-DUP3",
-    "name": "Military Boots",
-    "type": "Defense",
-    "image": "050_MilitaryBoots_Defense.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "050-DUP4",
-    "name": "Military Boots",
-    "type": "Defense",
-    "image": "050_MilitaryBoots_Defense.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "064-DUP",
-    "name": "Compass",
-    "type": "Tactical",
-    "image": "064_Compass_Tactical.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "067-DUP",
-    "name": "Night Vision Goggles",
-    "type": "Tactical",
-    "image": "067_NightVisionGoggles_Tactical.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "079-DUP",
-    "name": "Box of Nails",
-    "type": "Loot",
-    "image": "079_BoxofNails_Loot.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "088-DUP",
-    "name": "Cooking Pot",
-    "type": "Loot",
-    "image": "088_CookingPot_Loot.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "088-DUP1",
-    "name": "Cooking Pot",
-    "type": "Loot",
-    "image": "088_CookingPot_Loot.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "093-DUP",
-    "name": "Crawler",
-    "type": "Infected",
-    "image": "093_Crawler_Infected.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "098-DUP",
-    "name": "Hunter Infected",
-    "type": "Infected",
-    "image": "098_HunterInfected_Infected.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "101-DUP",
-    "name": "Spitter (Mutated)",
-    "type": "Infected",
-    "image": "101_Spitter(Mutated)_Infected.png",
-    "Card Rarity": "Rare",
-    "Rarity Color": "Purple"
-  },
-  {
-    "card_id": "107-DUP",
-    "name": "Tripwire Trap",
-    "type": "Trap",
-    "image": "107_TripwireTrap_Trap.png",
-    "Card Rarity": "Uncommon",
-    "Rarity Color": "Blue"
-  },
-  {
-    "card_id": "110-DUP",
-    "name": "Perimeter Trap",
-    "type": "Trap",
-    "image": "110_PerimeterTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "110-DUP1",
-    "name": "Perimeter Trap",
-    "type": "Trap",
-    "image": "110_PerimeterTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "110-DUP2",
-    "name": "Perimeter Trap",
-    "type": "Trap",
-    "image": "110_PerimeterTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "110-DUP3",
-    "name": "Perimeter Trap",
-    "type": "Trap",
-    "image": "110_PerimeterTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "110-DUP4",
-    "name": "Perimeter Trap",
-    "type": "Trap",
-    "image": "110_PerimeterTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "110-DUP5",
-    "name": "Perimeter Trap",
-    "type": "Trap",
-    "image": "110_PerimeterTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "114-DUP",
-    "name": "Explosive Grenade Trap",
-    "type": "Trap",
-    "image": "114_ExplosiveGrenadeTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "114-DUP1",
-    "name": "Explosive Grenade Trap",
-    "type": "Trap",
-    "image": "114_ExplosiveGrenadeTrap_Trap.png",
-    "Card Rarity": "Common",
-    "Rarity Color": "Gray"
-  },
-  {
-    "card_id": "126-DUP",
-    "name": "Lt. Col. Emil Boren",
-    "type": "Legendary",
-    "image": "126_Lt.Col.EmilBoren_Specialty.png",
-    "Card Rarity": "Legendary",
-    "Rarity Color": "Gold"
-  }
-]
-
-
-
-  
+  { "card_id": "000", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "001", "name": "M4-A1", "type": "Attack", "image": "001_M4A1_Attack.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "002", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "003", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "004", "name": "SKS", "type": "Attack", "image": "004_SKS_Attack.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "005", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "006", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "007", "name": "BK-133", "type": "Attack", "image": "007_BK133_Attack.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "008", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "009", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "010", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "011", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "012", "name": "VSS Vintorez", "type": "Attack", "image": "012_VSSVintorez_Attack.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "013", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "014", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "015", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "016", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "017", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "018", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "019", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "020", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "021", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "022", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "023", "name": "AK-74", "type": "Attack", "image": "023_AK74_Attack.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "024", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "025", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "026", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "027", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "028", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "029", "name": "Longhorn", "type": "Attack", "image": "029_Longhorn_Attack.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "030", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "031", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "032", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "033", "name": "Assault Helmet", "type": "Defense", "image": "033_AssaultHelmet_Defense.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "034", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "035", "name": "Plate Carrier", "type": "Defense", "image": "035_PlateCarrier_Defense.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "036", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "037", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "038", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "039", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "040", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "041", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "042", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "043", "name": "Paramedic Jacket", "type": "Defense", "image": "043_ParamedicJacket_Defense.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "044", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "045", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "046", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "047", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "048", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "049", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "050", "name": "Military Boots", "type": "Defense", "image": "050_MilitaryBoots_Defense.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "051", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "052", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "053", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "054", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "055", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "056", "name": "Tactical Backpack", "type": "Defense", "image": "056_TacticalBackpack_Defense.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "057", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "058", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "059", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "060", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "061", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "062", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "063", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png"}
+  { "card_id": "064", "name": "Compass", "type": "Tactical", "image": "064_Compass_Tactical.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "065", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "066", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "067", "name": "Night Vision Goggles", "type": "Tactical", "image": "067_NightVisionGoggles_Tactical.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "068", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "069", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "070", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "071", "name": "Walkie Talkie", "type": "Tactical", "image": "071_WalkieTalkie_Tactical.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "072", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "073", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "074", "name": "Hunting Scope", "type": "Tactical", "image": "074_HuntingScope_Tactical.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "075", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "076", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "077", "name": "MRE", "type": "Loot", "image": "077_MRE_Loot.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "078", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "079", "name": "Box of Nails", "type": "Loot", "image": "079_BoxofNails_Loot.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "080", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "081", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "082", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "083", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "084", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "085", "name": "Lockpick", "type": "Loot", "image": "085_Lockpick_Loot.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "086", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "087", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "088", "name": "Cooking Pot", "type": "Loot", "image": "088_CookingPot_Loot.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "089", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "090", "name": "Gun Cleaning Kit", "type": "Loot", "image": "090_GunCleaningKit_Loot.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "091", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "092", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "093", "name": "Crawler", "type": "Infected", "image": "093_Crawler_Infected.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "094", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "095", "name": "Police Infected", "type": "Infected", "image": "095_PoliceInfected_Infected.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "096", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "097", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "098", "name": "Hunter Infected", "type": "Infected", "image": "098_HunterInfected_Infected.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "099", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "100", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "101", "name": "Spitter (Mutated)", "type": "Infected", "image": "101_Spitter(Mutated)_Infected.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "102", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "103", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "104", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "105", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "106", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "107", "name": "Tripwire Trap", "type": "Trap", "image": "107_TripwireTrap_Trap.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "108", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "109", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "110", "name": "Perimeter Trap", "type": "Trap", "image": "110_PerimeterTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "111", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "112", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "113", "name": "Spiked Log Trap", "type": "Trap", "image": "113_SpikedLogTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "114", "name": "Explosive Grenade Trap", "type": "Trap", "image": "114_ExplosiveGrenadeTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "115", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "116", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "117", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "118", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "119", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "120", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "121", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "122", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "123", "name": "Jakub Nowak", "type": "Legendary", "image": "123_JakubNowak_Specialty.png", "Card Rarity": "Legendary", "Rarity Color": "Gold" },
+  { "card_id": "124", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "125", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "126", "name": "Lt. Col. Emil Boren", "type": "Legendary", "image": "126_Lt.Col.EmilBoren_Specialty.png", "Card Rarity": "Legendary", "Rarity Color": "Gold" },
+  { "card_id": "127", "name":"WinterLand Death Deck (Face-Down)", "type":"Unique", "image":"000_WinterlandDeathDeck_Back.png", "Card Rarity": "None", "Rarity Color": "Red" },
+  { "card_id": "004-DUP", "name": "SKS", "type": "Attack", "image": "004_SKS_Attack.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "004-DUP1", "name": "SKS", "type": "Attack", "image": "004_SKS_Attack.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "012-DUP", "name": "VSS Vintorez", "type": "Attack", "image": "012_VSSVintorez_Attack.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "029-DUP", "name": "Longhorn", "type": "Attack", "image": "029_Longhorn_Attack.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "035-DUP", "name": "Plate Carrier", "type": "Defense", "image": "035_PlateCarrier_Defense.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "043-DUP", "name": "Paramedic Jacket", "type": "Defense", "image": "043_ParamedicJacket_Defense.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "050-DUP", "name": "Military Boots", "type": "Defense", "image": "050_MilitaryBoots_Defense.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "050-DUP1", "name": "Military Boots", "type": "Defense", "image": "050_MilitaryBoots_Defense.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "050-DUP2", "name": "Military Boots", "type": "Defense", "image": "050_MilitaryBoots_Defense.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "050-DUP3", "name": "Military Boots", "type": "Defense", "image": "050_MilitaryBoots_Defense.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "050-DUP4", "name": "Military Boots", "type": "Defense", "image": "050_MilitaryBoots_Defense.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "064-DUP", "name": "Compass", "type": "Tactical", "image": "064_Compass_Tactical.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "067-DUP", "name": "Night Vision Goggles", "type": "Tactical", "image": "067_NightVisionGoggles_Tactical.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "079-DUP", "name": "Box of Nails", "type": "Loot", "image": "079_BoxofNails_Loot.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "088-DUP", "name": "Cooking Pot", "type": "Loot", "image": "088_CookingPot_Loot.png", "Card Rarity": "Common", "Rarity Color": "Gray" }, 
+  { "card_id": "088-DUP1", "name": "Cooking Pot", "type": "Loot", "image": "088_CookingPot_Loot.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "093-DUP", "name": "Crawler", "type": "Infected", "image": "093_Crawler_Infected.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "098-DUP", "name": "Hunter Infected", "type": "Infected", "image": "098_HunterInfected_Infected.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "101-DUP", "name": "Spitter (Mutated)", "type": "Infected", "image": "101_Spitter(Mutated)_Infected.png", "Card Rarity": "Rare", "Rarity Color": "Purple" },
+  { "card_id": "107-DUP", "name": "Tripwire Trap", "type": "Trap", "image": "107_TripwireTrap_Trap.png", "Card Rarity": "Uncommon", "Rarity Color": "Blue" },
+  { "card_id": "110-DUP", "name": "Perimeter Trap", "type": "Trap", "image": "110_PerimeterTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "110-DUP1", "name": "Perimeter Trap", "type": "Trap", "image": "110_PerimeterTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "110-DUP2", "name": "Perimeter Trap", "type": "Trap", "image": "110_PerimeterTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "110-DUP3", "name": "Perimeter Trap", "type": "Trap", "image": "110_PerimeterTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "110-DUP4", "name": "Perimeter Trap", "type": "Trap", "image": "110_PerimeterTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "110-DUP5", "name": "Perimeter Trap", "type": "Trap", "image": "110_PerimeterTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "114-DUP", "name": "Explosive Grenade Trap", "type": "Trap", "image": "114_ExplosiveGrenadeTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "114-DUP1", "name": "Explosive Grenade Trap", "type": "Trap", "image": "114_ExplosiveGrenadeTrap_Trap.png", "Card Rarity": "Common", "Rarity Color": "Gray" },
+  { "card_id": "126-DUP", "name": "Lt. Col. Emil Boren", "type": "Legendary", "image": "126_Lt.Col.EmilBoren_Specialty.png", "Card Rarity": "Legendary", "Rarity Color": "Gold" }
+] 
