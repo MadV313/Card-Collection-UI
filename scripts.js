@@ -158,7 +158,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     return emojiByType[typePart] || "";
   };
 
-  const deckData = useMockDeckData ? await fetch("data/mock_deckData.json").then(r => r.json()) : [];
+  const deckData = useMockDeckData
+  ? await fetch("data/mockdata.json").then(r => r.json())
+  : await fetch("data/deckData.json").then(r => r.json());
   const allCards = await fetch("data/card_master.json").then(r => r.json());
   allCards.sort((a, b) => parseInt(a.card_id) - parseInt(b.card_id));
   
@@ -167,7 +169,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let totalOwned = 0;
   
   deckData.forEach(card => {
-    const baseId = card.card_id.replace(/-DUP\d*$/, '');
+    const baseId = card.card_id.toString().padStart(3, "0").replace(/-DUP\d*$/, '');
     if (!ownershipMap[baseId]) {
       ownershipMap[baseId] = { count: 0, card: card };
     }
@@ -179,11 +181,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (grid) grid.innerHTML = "";
   
   allCards.forEach(card => {
-    const id = card.card_id;
+    const id = card.card_id.toString().padStart(3, "0");
     const owned = ownershipMap[id];
     const ownedCount = owned?.count || 0;
   
-    const filename = ownedCount > 0 ? card.image : "000_CardBack_Unique.png";
+    let filename = "000_CardBack_Unique.png";
+    if (ownedCount > 0 && ownershipMap[id]?.card?.image) {
+      filename = ownershipMap[id].card.image;
+    }
   
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container", `${card["Card Rarity"].toLowerCase()}-border`);
