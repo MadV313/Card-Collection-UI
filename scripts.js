@@ -174,98 +174,113 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const grid = document.getElementById("cards-container");
   if (grid) grid.innerHTML = "";
-
+  
+  // Prepare card ownership map from mock data
+  const ownershipMap = {};
+  deckData.forEach(card => {
+    const baseId = card.card_id.replace(/-DUP\d*$/, '');
+    if (!ownershipMap[baseId]) {
+      ownershipMap[baseId] = { count: 0, card };
+    }
+    ownershipMap[baseId].count++;
+    totalOwned++;
+  });
+  
+  // Loop full card list
   allCards.forEach(card => {
     const id = card.card_id;
-    const owned = cardMap[id];
+    const owned = ownershipMap[id];
     const ownedCount = owned?.count || 0;
-    const filename = owned ? owned.image : "000_CardBack_Unique.png";
-
+  
+    const filename = ownedCount > 0
+      ? card.image // use real image for owned cards
+      : "000_CardBack_Unique.png"; // placeholder for unowned
+  
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container", `${card["Card Rarity"].toLowerCase()}-border`);
     cardContainer.dataset.rarity = card["Card Rarity"];
     cardContainer.dataset.owned = ownedCount;
     cardContainer.dataset.cardId = id;
-
+  
     const cardImg = document.createElement("img");
     cardImg.alt = card.name;
     cardImg.loading = "lazy";
     cardImg.src = `/Card-Collection-UI/images/cards/${filename}`;
     cardImg.classList.add('facedown-card');
-
+  
     const cardNumber = document.createElement('p');
     cardNumber.textContent = `#${id}`;
-
+  
     const ownedCountSpan = document.createElement('span');
     ownedCountSpan.classList.add('owned-count');
     ownedCountSpan.textContent = `Owned: ${ownedCount}`;
-
+  
     const actionsDiv = document.createElement('div');
     actionsDiv.classList.add('card-actions-vertical');
-
+  
     const tradeButton = document.createElement('button');
     tradeButton.classList.add('trade');
     tradeButton.textContent = '[TRADE]';
     tradeButton.disabled = ownedCount === 0;
     if (ownedCount === 0) tradeButton.title = "You don’t own this card";
-
+  
     tradeButton.addEventListener('click', () => {
       if (ownedCount <= 0) return showToast("❌ You do not own this card.");
       const tradeBar = document.getElementById("trade-bottom-bar");
       tradeBar?.classList.remove("collapsed");
-
+  
       if (tradeQueue.length >= 3) {
         showToast("⚠️ You can only trade up to 3 cards.");
         tradeBar?.classList.add("limit-reached");
         return;
       }
-
+  
       const qty = prompt(`Enter quantity to trade (1–${Math.min(3, ownedCount)}):`, "1");
       const quantity = parseInt(qty);
       if (isNaN(quantity) || quantity < 1 || quantity > Math.min(3, ownedCount)) {
         showToast(`❌ Invalid quantity. Must be between 1 and ${Math.min(3, ownedCount)}.`);
         return;
       }
-
+  
       const availableSpots = 3 - tradeQueue.length;
       const toAdd = Math.min(quantity, availableSpots);
       if (toAdd < quantity) showToast(`⚠️ Only ${toAdd} trade slot(s) remaining.`);
-
+  
       for (let i = 0; i < toAdd; i++) {
         tradeQueue.push({ id, filename, rarity: card["Card Rarity"] });
       }
-
+  
       showToast(`✅ Card #${id} x${toAdd} added to trade queue.`);
       tradeButton.classList.add("queued");
       updateBottomBar();
     });
-
+  
     const sellButton = document.createElement("button");
     sellButton.classList.add("sell");
     sellButton.textContent = "[SELL]";
     sellButton.disabled = ownedCount === 0;
     if (ownedCount === 0) sellButton.title = "You don’t own this card";
-
+  
     sellButton.addEventListener("click", () => {
       if (ownedCount <= 0) return showToast("❌ You do not own this card.");
       const sellBar = document.getElementById("sell-bottom-bar");
       sellBar?.classList.remove("collapsed");
-
+  
       if (sellQueue.length >= 5) {
         showToast("⚠️ You can only sell up to 5 cards every 24 hours.");
         sellBar?.classList.add("limit-reached");
         return;
       }
-
+  
       sellQueue.push({ id, filename, rarity: card["Card Rarity"] });
       updateSellBar();
     });
-
+  
     actionsDiv.append(tradeButton, ownedCountSpan, sellButton);
     cardContainer.append(cardImg, cardNumber, actionsDiv);
-    grid?.appendChild(cardContainer);
+    grid.appendChild(cardContainer);
   });
-
+  
   document.getElementById("collection-count").textContent = `Cards Collected: ${Object.keys(cardMap).length} / 127`;
   document.getElementById("total-owned-count").textContent = `Total Cards Owned: ${totalOwned} / 250`;
   document.getElementById("coin-balance").textContent = "13";
