@@ -159,12 +159,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   let totalOwned = 0;
 
   deckData.forEach(card => {
-    const baseId = card.card_id.toString().padStart(3, "0").replace(/-DUP\d*$/, '');
+    const rawId = card.card_id;
+    const baseId = rawId.toString().padStart(3, "0").replace(/-DUP\d*$/, '');
+  
     if (!ownershipMap[baseId]) {
-      ownershipMap[baseId] = { count: 0, card };
+      ownershipMap[baseId] = { count: 0, card: null };
     }
+  
     ownershipMap[baseId].count++;
-    totalOwned++;
+  
+    // Always use the full entry (non-DUP) as reference card if available
+    if (!/-DUP\d*$/.test(rawId) && !ownershipMap[baseId].card) {
+      ownershipMap[baseId].card = card;
+    }
   });
 
   const grid = document.getElementById("cards-container");
