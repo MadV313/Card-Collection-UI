@@ -193,8 +193,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ownedCount = owned?.count || 0;
   
     const filename = ownedCount > 0
-      ? card.image // use real image for owned cards
-      : "000_CardBack_Unique.png"; // placeholder for unowned
+    ? card.filename
+    : "000_CardBack_Unique.png";
   
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container", `${card["Card Rarity"].toLowerCase()}-border`);
