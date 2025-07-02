@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.classList.add("trade-card-entry");
 
       const thumb = document.createElement("img");
-      thumb.src = `images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
+      thumb.src = `/Card-Collection-UI/images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
       thumb.alt = `#${entry.id}`;
       thumb.classList.add("thumb");
       thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.classList.add("sell-card-entry");
 
       const thumb = document.createElement("img");
-      thumb.src = `images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
+      thumb.src = `/Card-Collection-UI/images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
       thumb.alt = `#${entry.id}`;
       thumb.classList.add("thumb");
       thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
@@ -159,8 +159,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const deckData = useMockDeckData ? await fetch("data/mock_deckData.json").then(r => r.json()) : [];
-  const fullCardList = await fetch("data/card_master.json").then(r => r.json());
-  fullCardList.sort((a, b) => parseInt(a.card_id) - parseInt(b.card_id));
+  const allCards = await fetch("data/card_master.json").then(r => r.json());
+  allCards.sort((a, b) => parseInt(a.card_id) - parseInt(b.card_id));
 
   const cardMap = {};
   let totalOwned = 0;
@@ -175,11 +175,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const grid = document.getElementById("cards-container");
   if (grid) grid.innerHTML = "";
 
-  fullCardList.forEach(card => {
+  allCards.forEach(card => {
     const id = card.card_id;
-    const ownedCard = cardMap[id];
-    const ownedCount = ownedCard?.count || 0;
-    const filename = ownedCard?.image || card.image || "000_CardBack_Unique.png";
+    const owned = cardMap[id];
+    const ownedCount = owned?.count || 0;
+    const filename = owned ? owned.image : "000_CardBack_Unique.png";
 
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container", `${card["Card Rarity"].toLowerCase()}-border`);
@@ -190,8 +190,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cardImg = document.createElement("img");
     cardImg.alt = card.name;
     cardImg.loading = "lazy";
-    cardImg.src = `/Card-Collection-UI/images/cards/${ownedCount > 0 ? filename : '000_CardBack_Unique.png'}`;
-    cardImg.classList.add(ownedCount > 0 ? 'revealed-card' : 'facedown-card');
+    cardImg.src = `/Card-Collection-UI/images/cards/${filename}`;
+    cardImg.classList.add('facedown-card');
 
     const cardNumber = document.createElement('p');
     cardNumber.textContent = `#${id}`;
@@ -206,10 +206,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tradeButton = document.createElement('button');
     tradeButton.classList.add('trade');
     tradeButton.textContent = '[TRADE]';
-    if (ownedCount === 0) {
-      tradeButton.disabled = true;
-      tradeButton.title = "You don’t own this card";
-    }
+    tradeButton.disabled = ownedCount === 0;
+    if (ownedCount === 0) tradeButton.title = "You don’t own this card";
 
     tradeButton.addEventListener('click', () => {
       if (ownedCount <= 0) return showToast("❌ You do not own this card.");
@@ -242,15 +240,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       updateBottomBar();
     });
 
-    const sellButton = document.createElement('button');
-    sellButton.classList.add('sell');
-    sellButton.textContent = '[SELL]';
-    if (ownedCount === 0) {
-      sellButton.disabled = true;
-      sellButton.title = "You don’t own this card";
-    }
+    const sellButton = document.createElement("button");
+    sellButton.classList.add("sell");
+    sellButton.textContent = "[SELL]";
+    sellButton.disabled = ownedCount === 0;
+    if (ownedCount === 0) sellButton.title = "You don’t own this card";
 
-    sellButton.addEventListener('click', () => {
+    sellButton.addEventListener("click", () => {
       if (ownedCount <= 0) return showToast("❌ You do not own this card.");
       const sellBar = document.getElementById("sell-bottom-bar");
       sellBar?.classList.remove("collapsed");
