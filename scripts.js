@@ -1,39 +1,164 @@
+// scripts.js — Token-aware Card Collection UI (supports ?token= or ?uid=, API/IMG bases, and mocks)
 document.addEventListener("DOMContentLoaded", async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const fromPack = urlParams.get('fromPackReveal') === 'true';
-  const useMockDeckData = urlParams.get('useMockDeckData') === 'true';
+  /* ---------------- URL params & config ---------------- */
+  const qs = new URLSearchParams(window.location.search);
+  const TOKEN   = qs.get("token") || "";
+  const UID     = qs.get("uid")   || "";
+  const FROM_PACK = qs.get("fromPackReveal") === "true";
+  const USE_MOCK  = qs.get("useMockDeckData") === "true";
 
+  // Allow overriding API and image bases via query params
+  const API_BASE = (qs.get("api") || "").replace(/\/+$/, "");     // e.g. https://your-bot.app
+  const IMG_BASE = (qs.get("imgbase") || "images/cards").replace(/\/+$/, ""); // default local folder
+
+  /* ---------------- helpers ---------------- */
+  function pad3(id) { return String(id).padStart(3, "0"); }
+  function safe(s)  { return String(s || "").replace(/[^a-zA-Z0-9._-]/g, ""); }
+
+  async function fetchJSON(url) {
+    try {
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+      return await r.json();
+    } catch (e) {
+      console.warn(`[ccui] fetch failed ${url}: ${e?.message}`);
+      return null;
+    }
+  }
+
+  async function loadMaster() {
+    // Prefer bot master list (has `image` filenames)
+    const p1 = API_BASE ? `${API_BASE}/logic/CoreMasterReference.json` : "/logic/CoreMasterReference.json";
+    let master = await fetchJSON(p1);
+
+    if (!Array.isArray(master) || !master.length) {
+      // Fallback: minimal local stub if needed (will synthesize filenames)
+      console.warn("[ccui] Falling back to minimal master (no remote CoreMasterReference.json)");
+      master = Array.from({ length: 127 }, (_, i) => {
+        const id = pad3(i + 1);
+        return {
+          card_id: id,
+          name: `Card ${id}`,
+          type: "Unknown",
+          rarity: "Common",
+          image: `${id}_Card_${"Unknown"}.png`
+        };
+      });
+    }
+
+    // Always sort by numeric card_id and skip #000 (back)
+    master.sort((a, b) => parseInt(a.card_id) - parseInt(b.card_id));
+    master = master.filter(c => String(c.card_id) !== "000");
+    return master;
+  }
+
+  // Convert any backend/mocked shapes into { [###]: count }
+  function toOwnershipMap(data) {
+    const map = {};
+    if (!data) return map;
+
+    // Case A: array of { number, owned } or { card_id, owned }
+    if (Array.isArray(data) && data.length && (("owned" in data[0]) || ("quantity" in data[0]))) {
+      for (const row of data) {
+        const id = pad3(row.number ?? row.card_id ?? row.id ?? row.numberStr);
+        const qty = Number(row.owned ?? row.quantity ?? 0);
+        if (!id || !Number.isFinite(qty)) continue;
+        map[id] = (map[id] || 0) + qty;
+      }
+      return map;
+    }
+
+    // Case B: array of items with duplicates (mock deck)
+    if (Array.isArray(data)) {
+      for (const row of data) {
+        const id = pad3(row.card_id ?? row.number ?? row.id);
+        if (!id) continue;
+        map[id] = (map[id] || 0) + 1;
+      }
+      return map;
+    }
+
+    // Case C: already a map
+    if (typeof data === "object") {
+      for (const [k, v] of Object.entries(data)) {
+        const id = pad3(k);
+        const qty = Number(v);
+        if (!Number.isFinite(qty)) continue;
+        map[id] = qty;
+      }
+      return map;
+    }
+
+    return map;
+  }
+
+  async function loadCollection() {
+    // Preferred: token routes (you’ll add these to the bot)
+    if (TOKEN) {
+      // 1) /me/:token/collection
+      let d = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/collection`);
+      if (d) return { map: toOwnershipMap(d), src: "token" };
+
+      // 2) /collection?token=... (fallback if you choose that shape)
+      d = await fetchJSON(`${API_BASE}/collection?token=${encodeURIComponent(TOKEN)}`);
+      if (d) return { map: toOwnershipMap(d), src: "token-query" };
+    }
+
+    // Secondary: uid routes that already exist in your repo
+    if (UID) {
+      let d = await fetchJSON(`${API_BASE}/collection?userId=${encodeURIComponent(UID)}`);
+      if (d) return { map: toOwnershipMap(d), src: "uid" };
+    }
+
+    // Mock fallback
+    if (USE_MOCK) {
+      const d = await fetchJSON("data/mock_deckData.json");
+      return { map: toOwnershipMap(d), src: "mock" };
+    }
+
+    console.warn("[ccui] No token/uid/mocks provided — rendering as unowned.");
+    return { map: {}, src: "empty" };
+  }
+
+  async function loadStats() {
+    if (TOKEN) {
+      let s = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/stats`);
+      if (s) return s;
+      s = await fetchJSON(`${API_BASE}/userStatsToken?token=${encodeURIComponent(TOKEN)}`);
+      if (s) return s;
+    }
+    if (UID) {
+      const s = await fetchJSON(`${API_BASE}/userStats/${encodeURIComponent(UID)}`);
+      if (s) return s;
+    }
+    return { coins: 0, wins: 0, losses: 0, discordName: "" };
+  }
+
+  function imageURL(card) {
+    // Prefer master-provided filename; otherwise synthesize
+    const file = card.image
+      ? safe(card.image)
+      : `${pad3(card.card_id)}_${safe(card.name)}_${safe(card.type)}.png`;
+    return `${IMG_BASE}/${file}`;
+  }
+
+  /* ---------------- UI helpers you already had ---------------- */
   const tradeQueue = [];
-  const sellQueue = [];
+  const sellQueue  = [];
 
   function showToast(message) {
     const existing = document.getElementById("mock-toast");
     if (existing) existing.remove();
-
     const toast = document.createElement("div");
     toast.id = "mock-toast";
     toast.textContent = message;
     toast.style.cssText = `
-      position: fixed;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.85);
-      color: #00ffcc;
-      padding: 10px 20px;
-      font-size: 1rem;
-      border: 2px solid #00ffff;
-      border-radius: 8px;
-      z-index: 9999;
-      opacity: 0;
-      transition: opacity 0.4s ease;
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.8); color: #fff; padding: 10px 14px; border-radius: 8px;
+      z-index: 9999; font-family: system-ui, sans-serif; font-size: 14px; transition: opacity .25s ease;
     `;
     document.body.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = 1 }, 100);
-    setTimeout(() => {
-      toast.style.opacity = 0;
-      setTimeout(() => toast.remove(), 800);
-    }, 2000);
+    setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 250); }, 1800);
   }
 
   function updateBottomBar() {
@@ -47,7 +172,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.classList.add("trade-card-entry");
 
       const thumb = document.createElement("img");
-      thumb.src = `/Card-Collection-UI/images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
+      thumb.src = `${IMG_BASE}/${safe(entry.filename || "000_CardBack_Unique.png")}`;
       thumb.alt = `#${entry.id}`;
       thumb.classList.add("thumb");
       thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
@@ -72,20 +197,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       submitBtn.id = "submit-trade-btn";
       submitBtn.className = "queue-submit-button";
       submitBtn.textContent = "[SUBMIT TRADE]";
+      submitBtn.addEventListener("click", () => {
+        if (!tradeQueue.length) return showToast("⚠️ Trade queue is empty.");
+        showToast("📦 Trade submitted (mock).");
+      });
       bar.appendChild(submitBtn);
     }
 
-    submitBtn.onclick = () => {
-      if (tradeQueue.length === 0) return;
-      submitBtn.classList.add("submit-flash");
-      setTimeout(() => {
-        showToast("Trade submitted! Stand by for player's response!");
-        tradeQueue.length = 0;
-        updateBottomBar();
-      }, 1200);
-    };
-
-    bar?.classList.toggle("limit-reached", tradeQueue.length >= 3);
+    bar.classList.toggle("limit-reached", tradeQueue.length >= 30);
   }
 
   function updateSellBar() {
@@ -99,14 +218,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.classList.add("sell-card-entry");
 
       const thumb = document.createElement("img");
-      thumb.src = `/Card-Collection-UI/images/cards/${entry.filename || '000_CardBack_Unique.png'}`;
+      thumb.src = `${IMG_BASE}/${safe(entry.filename || "000_CardBack_Unique.png")}`;
       thumb.alt = `#${entry.id}`;
       thumb.classList.add("thumb");
       thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
 
       const removeBtn = document.createElement("button");
       removeBtn.innerHTML = "🗑";
-      removeBtn.title = "Remove from sell queue";
+      removeBtn.title = "Remove from sell list";
       removeBtn.addEventListener("click", () => {
         sellQueue.splice(index, 1);
         updateSellBar();
@@ -124,161 +243,108 @@ document.addEventListener("DOMContentLoaded", async () => {
       submitBtn.id = "submit-sell-btn";
       submitBtn.className = "queue-submit-button";
       submitBtn.textContent = "[SUBMIT SELL]";
+      submitBtn.addEventListener("click", () => {
+        if (!sellQueue.length) return showToast("⚠️ Sell list is empty.");
+        showToast("💰 Sell submitted (mock). Limit 5 per 24h enforced in backend.");
+      });
       bar.appendChild(submitBtn);
     }
 
-    submitBtn.onclick = () => {
-      if (sellQueue.length === 0) return;
-      submitBtn.classList.add("submit-flash");
-      setTimeout(() => {
-        showToast("Sale successful!");
-        sellQueue.length = 0;
-        updateSellBar();
-      }, 1200);
-    };
-
-    bar?.classList.toggle("limit-reached", sellQueue.length >= 5);
+    bar.classList.toggle("limit-reached", sellQueue.length >= 5);
   }
 
-  document.getElementById("toggle-bottom-bar")?.addEventListener("click", () => {
-    document.getElementById("trade-bottom-bar")?.classList.toggle("collapsed");
-  });
+  /* ---------------- Load data ---------------- */
+  const [master, { map: ownedMap }, stats] = await Promise.all([
+    loadMaster(),
+    loadCollection(),
+    loadStats()
+  ]);
 
-  document.getElementById("toggle-sell-bar")?.addEventListener("click", () => {
-    document.getElementById("sell-bottom-bar")?.classList.toggle("collapsed");
-  });
+  /* ---------------- Build grid ---------------- */
+  const grid = document.getElementById("card-grid");
+  if (!grid) {
+    console.error("[ccui] Missing #card-grid container in HTML");
+    return;
+  }
+  grid.innerHTML = "";
 
-  const deckData = useMockDeckData
-    ? await fetch("data/mockdata.json").then(r => r.json())
-    : await fetch("data/deckData.json").then(r => r.json());
+  let totalOwnedCopies = 0;
+  let ownedUniqueCount = 0;
 
-  const allCards = await fetch("data/card_master.json").then(r => r.json());
-  allCards.sort((a, b) => parseInt(a.card_id) - parseInt(b.card_id));
-
-  const ownershipMap = {};
-  let totalOwned = 0;
-
-  deckData.forEach(card => {
-    const rawId = card.card_id;
-    const baseId = rawId.toString().padStart(3, "0").replace(/-DUP\d*$/, '');
-  
-    if (!ownershipMap[baseId]) {
-      ownershipMap[baseId] = { count: 0, card: null };
-    }
-  
-    ownershipMap[baseId].count++;
-  
-    // Always use the full entry (non-DUP) as reference card if available
-    if (!/-DUP\d*$/.test(rawId) && !ownershipMap[baseId].card) {
-      ownershipMap[baseId].card = card;
-    }
-  });
-
-  const grid = document.getElementById("cards-container");
-  if (grid) grid.innerHTML = "";
-
-  allCards.forEach(card => {
-    const id = card.card_id.toString().padStart(3, "0");
-    const owned = ownershipMap[id];
-    const ownedCount = owned?.count || 0;
-
-    const filename = (ownedCount > 0 && owned?.card?.image) ? owned.card.image : "000_CardBack_Unique.png";
+  for (const card of master) {
+    const id = pad3(card.card_id);
+    const qty = Number(ownedMap[id] || 0);
+    if (qty > 0) ownedUniqueCount += 1;
+    totalOwnedCopies += qty;
 
     const cardContainer = document.createElement("div");
-    cardContainer.classList.add("card-container", `${card["Card Rarity"].toLowerCase()}-border`);
-    cardContainer.dataset.rarity = card["Card Rarity"];
-    cardContainer.dataset.owned = ownedCount;
-    cardContainer.dataset.cardId = id;
+    cardContainer.className = `card-container ${safe((card.rarity || "Common").toLowerCase())}-border`;
+    cardContainer.dataset.rarity = card.rarity || "Common";
+    cardContainer.dataset.owned = String(qty);
 
-    const cardImg = document.createElement("img");
-    cardImg.alt = card.name || `Card #${id}`;
-    cardImg.loading = "lazy";
-    cardImg.src = `/Card-Collection-UI/images/cards/${filename}`;
-    cardImg.classList.add('facedown-card');
+    const img = document.createElement("img");
+    img.alt = card.name || `#${id}`;
+    img.className = qty > 0 ? "card-img" : "facedown-card";
+    img.src = qty > 0 ? imageURL(card) : `${IMG_BASE}/000_WinterlandDeathDeck_Back.png`;
 
-    const cardNumber = document.createElement('p');
-    cardNumber.textContent = `#${id}`;
+    const num = document.createElement("p");
+    num.textContent = `#${id}`;
 
-    const ownedCountSpan = document.createElement('span');
-    ownedCountSpan.classList.add('owned-count');
-    ownedCountSpan.textContent = `Owned: ${ownedCount}`;
+    const actions = document.createElement("div");
+    actions.className = "card-actions-vertical";
 
-    const actionsDiv = document.createElement('div');
-    actionsDiv.classList.add('card-actions-vertical');
-
-    const tradeButton = document.createElement("button");
-    tradeButton.classList.add("trade");
-    tradeButton.textContent = "[TRADE]";
-    tradeButton.disabled = ownedCount === 0;
-    if (ownedCount === 0) tradeButton.title = "You don’t own this card";
-
-    tradeButton.addEventListener("click", () => {
-      if (ownedCount <= 0) return showToast("❌ You do not own this card.");
-      const tradeBar = document.getElementById("trade-bottom-bar");
-      tradeBar?.classList.remove("collapsed");
-
-      if (tradeQueue.length >= 3) {
-        showToast("⚠️ You can only trade up to 3 cards.");
-        tradeBar?.classList.add("limit-reached");
-        return;
-      }
-
-      const qty = prompt(`Enter quantity to trade (1–${Math.min(3, ownedCount)}):`, "1");
-      const quantity = parseInt(qty);
-      if (isNaN(quantity) || quantity < 1 || quantity > Math.min(3, ownedCount)) {
-        showToast(`❌ Invalid quantity. Must be between 1 and ${Math.min(3, ownedCount)}.`);
-        return;
-      }
-
-      const availableSpots = 3 - tradeQueue.length;
-      const toAdd = Math.min(quantity, availableSpots);
-      if (toAdd < quantity) showToast(`⚠️ Only ${toAdd} trade slot(s) remaining.`);
-
-      for (let i = 0; i < toAdd; i++) {
-        tradeQueue.push({ id, filename, rarity: card["Card Rarity"] });
-      }
-
-      showToast(`✅ Card #${id} x${toAdd} added to trade queue.`);
-      tradeButton.classList.add("queued");
+    const tradeBtn = document.createElement("button");
+    tradeBtn.className = "trade";
+    tradeBtn.textContent = "[TRADE]";
+    tradeBtn.addEventListener("click", () => {
+      if (qty <= 0) return showToast("❌ You do not own this card.");
+      if (tradeQueue.length >= 30) return showToast("⚠️ Trade queue is full (30).");
+      tradeQueue.push({ id, filename: card.image, rarity: card.rarity });
+      tradeBtn.classList.add("queued");
+      showToast(`✅ Card #${id} added to trade queue.`);
       updateBottomBar();
     });
 
-    const sellButton = document.createElement("button");
-    sellButton.classList.add("sell");
-    sellButton.textContent = "[SELL]";
-    sellButton.disabled = ownedCount === 0;
-    if (ownedCount === 0) sellButton.title = "You don’t own this card";
+    const ownedSpan = document.createElement("span");
+    ownedSpan.className = "owned-count";
+    ownedSpan.textContent = `Owned: ${qty}`;
 
-    sellButton.addEventListener("click", () => {
-      if (ownedCount <= 0) return showToast("❌ You do not own this card.");
-      const sellBar = document.getElementById("sell-bottom-bar");
-      sellBar?.classList.remove("collapsed");
-
+    const sellBtn = document.createElement("button");
+    sellBtn.className = "sell";
+    sellBtn.textContent = "[SELL]";
+    sellBtn.disabled = qty <= 0;
+    sellBtn.title = qty <= 0 ? "You don’t own this card" : "Add to sell list";
+    sellBtn.addEventListener("click", () => {
+      if (qty <= 0) return showToast("❌ You do not own this card.");
       if (sellQueue.length >= 5) {
         showToast("⚠️ You can only sell up to 5 cards every 24 hours.");
-        sellBar?.classList.add("limit-reached");
         return;
       }
-
-      sellQueue.push({ id, filename, rarity: card["Card Rarity"] });
+      sellQueue.push({ id, filename: card.image, rarity: card.rarity });
       updateSellBar();
+      showToast(`🪙 Card #${id} added to sell list.`);
     });
 
-    actionsDiv.append(tradeButton, ownedCountSpan, sellButton);
-    cardContainer.append(cardImg, cardNumber, actionsDiv);
+    actions.append(tradeBtn, ownedSpan, sellBtn);
+    cardContainer.append(img, num, actions);
     grid.appendChild(cardContainer);
-  });
-
-  const ownedCardCount = Object.keys(ownershipMap).length;
-  document.getElementById("collection-count").textContent = `Cards Collected: ${ownedCardCount} / 127`;
-  document.getElementById("total-owned-count").textContent = `Total Cards Owned: ${totalOwned} / 250`;
-  document.getElementById("coin-balance").textContent = "13";
-
-  if (totalOwned >= 247) {
-    const warning = document.getElementById("ownership-warning");
-    if (warning) warning.style.display = "block";
   }
+
+  /* ---------------- Header stats ---------------- */
+  const collectionCountEl = document.getElementById("collection-count");
+  const totalOwnedEl      = document.getElementById("total-owned-count");
+  const coinBalanceEl     = document.getElementById("coin-balance");
+  const ownershipWarning  = document.getElementById("ownership-warning");
+
+  if (collectionCountEl) collectionCountEl.textContent = `Cards Collected: ${ownedUniqueCount} / 127`;
+  if (totalOwnedEl)      totalOwnedEl.textContent      = `Total Cards Owned: ${totalOwnedCopies} / 250`;
+  if (coinBalanceEl)     coinBalanceEl.textContent     = String(stats?.coins ?? 0);
+  if (ownershipWarning)  ownershipWarning.style.display = totalOwnedCopies >= 247 ? "block" : "none";
 
   updateBottomBar();
   updateSellBar();
+
+  if (FROM_PACK) {
+    showToast("✨ New cards added from Pack Reveal!");
+  }
 });
