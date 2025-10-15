@@ -28,6 +28,26 @@
       background-color: #004d4d;
     }
 
+    /* ── NEW: music toggle button ───────────────────────────────────────── */
+    #music-toggle {
+      position: fixed;
+      right: 20px;
+      bottom: 210px;           /* stacked above the other two toggles */
+      z-index: 1001;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background-color: #111;
+      border: 2px solid #7dd3fc; /* cyan-ish */
+      color: #7dd3fc;
+    }
+    #music-toggle:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 10px #7dd3fc;
+    }
+
     #toggle-bottom-bar, #toggle-sell-bar {
       position: fixed;
       right: 20px;
@@ -154,6 +174,11 @@
 </head>
 <body>
   <div class="snow"></div>
+
+  <!-- NEW: audio elements (scripts.js can also control these) -->
+  <audio id="bg-music" src="audio/bg/Follow the Trail.mp3" preload="auto" loop></audio>
+  <audio id="sfx-sale" src="audio/effects/sale.mp3" preload="auto"></audio>
+
   <!-- sticky banner placeholder; scripts.js will populate if mode=trade -->
   <div id="trade-banner">
     <div id="trade-banner-text" style="font-weight:600"></div>
@@ -162,6 +187,9 @@
   </div>
 
   <a id="return-to-hub" href="https://madv313.github.io/HUB-UI/">← Return to HUB</a>
+
+  <!-- NEW: music toggle button -->
+  <button id="music-toggle" title="Music: Off">🔇 Music</button>
 
   <button id="toggle-sell-bar">⬆️ Toggle Sell Queue</button>
   <button id="toggle-bottom-bar">⬆️ Toggle Trade Queue</button>
@@ -194,6 +222,56 @@
       const tradeBar = document.getElementById('trade-bottom-bar');
       sellBtn?.addEventListener('click', () => sellBar?.classList.toggle('collapsed'));
       tradeBtn?.addEventListener('click', () => tradeBar?.classList.toggle('collapsed'));
+    })();
+
+    // ── NEW: minimal music bootstrap (scripts.js can also control #bg-music/#sfx-sale)
+    (function () {
+      const audio = document.getElementById('bg-music');
+      const toggle = document.getElementById('music-toggle');
+      if (!audio || !toggle) return;
+
+      const KEY = 'ccui:bgm:on';
+      const saved = localStorage.getItem(KEY);
+      let wantOn = saved !== '0'; // default ON unless explicitly off
+
+      function reflect() {
+        if (audio.paused) {
+          toggle.textContent = '🔇 Music';
+          toggle.title = 'Music: Off';
+        } else {
+          toggle.textContent = '🔊 Music';
+          toggle.title = 'Music: On';
+        }
+      }
+
+      // attempt to start on first user gesture if desired
+      function primeAutoplayOnce() {
+        const handler = () => {
+          document.removeEventListener('click', handler, { capture: true });
+          if (!wantOn) return reflect();
+          audio.volume = 0.6;
+          audio.play().catch(() => {/* ignored: user can toggle manually */});
+          reflect();
+        };
+        document.addEventListener('click', handler, { capture: true, once: true });
+      }
+
+      toggle.addEventListener('click', async () => {
+        if (audio.paused) {
+          try { await audio.play(); } catch {}
+          localStorage.setItem(KEY, '1');
+          wantOn = true;
+        } else {
+          audio.pause();
+          localStorage.setItem(KEY, '0');
+          wantOn = false;
+        }
+        reflect();
+      });
+
+      // initial state
+      primeAutoplayOnce();
+      reflect();
     })();
   </script>
 
