@@ -12,17 +12,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   const IMG_BASE  = (qs.get("imgbase") || "images/cards").replace(/\/+$/, ""); // primary image base (front-end repo)
   const IMG_ALT_Q = (qs.get("imgalt")  || "").replace(/\/+$/, "");             // optional alt host via URL
 
-  // Built-in secondary fallbacks (back-end + raw GitHub)
-  const BUILTIN_IMG_FALLBACKS = [
-    "https://madv313.github.io/images/cards",
-    "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/images/cards"
-  ];
-
   /* ---------------- helpers ---------------- */
   const trimSlash = (s="") => String(s).replace(/\/+$/, "");
   function pad3(id) { return String(id).padStart(3, "0"); }
   function safe(s)  { return String(s || "").replace(/[^a-zA-Z0-9._-]/g, ""); }
   const isAbsoluteUrl = (u) => /^https?:\/\//i.test(String(u || ""));
+
+  // derive an absolute path to this repo’s images/cards, regardless of how index.html is served
+  function deriveSelfImagesAbs() {
+    const url = new URL(location.href);
+    // directory containing index.html (or repo root if already a directory)
+    const dir = url.pathname.replace(/\/index\.html?$/i, "").replace(/\/$/, "");
+    // e.g. https://madv313.github.io/Card-Collection-UI/images/cards
+    return `${url.origin}${dir}/images/cards`;
+  }
+
+  // Built-in secondary fallbacks (✅ fixed: include Card-Collection-UI path)
+  const BUILTIN_IMG_FALLBACKS = [
+    deriveSelfImagesAbs(), // absolute to this UI’s /images/cards
+    "https://madv313.github.io/Card-Collection-UI/images/cards",
+    "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/images/cards"
+  ];
 
   // Map rarity → CSS class used in your styles
   function rarityClass(r) {
@@ -36,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     })[key] || "common-border";
   }
 
-  // TitleCase utility (ATTACK → Attack, attack → Attack, aTTaCk → Attack)
+  // TitleCase utility (ATTACK → Attack, etc.)
   function titleCase(word = "") {
     const s = String(word || "");
     if (!s) return s;
@@ -277,10 +287,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.classList.add("trade-card-entry");
 
       const thumb = document.createElement("img");
-      // try same fallback logic for thumbnails; if filename is absolute, use directly
       const fakeCard = { card_id: entry.id, name: "", type: "", image: entry.filename };
       setImageWithFallback(thumb, fakeCard, {
-        onFailToAll: () => { thumb.src = `${IMG_BASE}/000_CardBack_Unique.png`; }
+        onFailToAll: () => { thumb.src = `${deriveSelfImagesAbs()}/000_CardBack_Unique.png`; }
       });
 
       thumb.alt = `#${entry.id}`;
@@ -330,7 +339,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const thumb = document.createElement("img");
       const fakeCard = { card_id: entry.id, name: "", type: "", image: entry.filename };
       setImageWithFallback(thumb, fakeCard, {
-        onFailToAll: () => { thumb.src = `${IMG_BASE}/000_CardBack_Unique.png`; }
+        onFailToAll: () => { thumb.src = `${deriveSelfImagesAbs()}/000_CardBack_Unique.png`; }
       });
 
       thumb.alt = `#${entry.id}`;
@@ -408,15 +417,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         totalOwnedCopies += qty;
         if (masterCard) {
           setImageWithFallback(img, masterCard, {
-            onFailToAll: () => { img.src = `${IMG_BASE}/000_CardBack_Unique.png`; }
+            onFailToAll: () => { img.src = `${deriveSelfImagesAbs()}/000_CardBack_Unique.png`; }
           });
           img.classList.remove("facedown-card");
+          img.classList.add("card-img"); // ✅ ensure proper owned styling
           container.className = `card-container ${rarityClass(masterCard.rarity)}`;
           container.dataset.rarity = masterCard.rarity || "Common";
         }
       } else {
         // keep face-down if unowned
-        img.src = `${IMG_BASE}/000_CardBack_Unique.png`;
+        img.src = `${deriveSelfImagesAbs()}/000_CardBack_Unique.png`;
         img.classList.add("facedown-card");
         if (masterCard) container.dataset.rarity = masterCard.rarity || "Common";
       }
@@ -459,10 +469,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (qty > 0) {
         setImageWithFallback(img, card, {
-          onFailToAll: () => { img.src = `${IMG_BASE}/000_CardBack_Unique.png`; }
+          onFailToAll: () => { img.src = `${deriveSelfImagesAbs()}/000_CardBack_Unique.png`; }
         });
       } else {
-        img.src = `${IMG_BASE}/000_CardBack_Unique.png`;
+        img.src = `${deriveSelfImagesAbs()}/000_CardBack_Unique.png`;
       }
 
       const num = document.createElement("p");
