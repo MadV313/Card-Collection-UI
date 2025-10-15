@@ -129,10 +129,38 @@
       cursor: pointer;
       margin-top: 4px;
     }
+
+    /* small helper for the trade bar title (scripts will create if missing) */
+    .bar-title {
+      font-weight: 700;
+      margin-right: 10px;
+      white-space: nowrap;
+    }
+
+    /* optional: initial placeholder banner (scripts will control visibility/content) */
+    #trade-banner {
+      position: sticky;
+      top: 0;
+      z-index: 1002;
+      width: 100%;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-bottom: 1px solid #334155;
+      padding: 10px 12px;
+      font-family: system-ui, sans-serif;
+      display: none; /* scripts will show/hide */
+    }
   </style>
 </head>
 <body>
   <div class="snow"></div>
+  <!-- sticky banner placeholder; scripts.js will populate if mode=trade -->
+  <div id="trade-banner">
+    <div id="trade-banner-text" style="font-weight:600"></div>
+    <div id="trade-banner-summary" style="margin-top:8px; display:none;"></div>
+    <div id="trade-banner-actions" style="margin-top:10px; display:none;"></div>
+  </div>
+
   <a id="return-to-hub" href="https://madv313.github.io/HUB-UI/">← Return to HUB</a>
 
   <button id="toggle-sell-bar">⬆️ Toggle Sell Queue</button>
@@ -210,7 +238,7 @@
 
               const owned  = cardMap[number];
               const img    = container.querySelector('img');
-              const span   = container.querySelector('.owned-count');
+              const span   = container.querySelector('span.owned-count') || container.querySelector('.owned-count');
               const rarity = owned["Card Rarity"];
 
               img.src = `images/cards/${owned.image}`;
@@ -218,7 +246,7 @@
               container.className = `card-container ${getRarityBorder(rarity)}`;
               container.dataset.rarity = rarity;
               container.dataset.owned  = owned.count;
-              span.textContent = `Owned: ${owned.count}`;
+              if (span) span.textContent = `Owned: ${owned.count}`;
             });
 
             document.getElementById('collection-count').textContent  =
