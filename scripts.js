@@ -12,9 +12,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const API_BASE = (qs.get("api") || "").replace(/\/+$/, "");                 // e.g. https://duel-bot-production.up.railway.app
   const IMG_BASE = (qs.get("imgbase") || "images/cards").replace(/\/+$/, ""); // default to this repo's images/cards
 
+  // Known-good fallbacks (deduped, in priority order)
+  const CANDIDATE_IMG_BASES = Array.from(new Set([
+    IMG_BASE,                                                      // explicit ?imgbase= or default
+    "images/cards",                                                // this repo
+    "https://madv313.github.io/Card-Collection-UI/images/cards",   // GH Pages (frontend)
+    "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/images/cards" // backend (raw)
+  ].filter(Boolean)));
+
   /* ---------------- helpers ---------------- */
   function pad3(id) { return String(id).padStart(3, "0"); }
   function safe(s)  { return String(s || "").replace(/[^a-zA-Z0-9._-]/g, ""); }
+  function isAbsoluteUrl(u) { return /^https?:\/\//i.test(String(u || "")); }
 
   // Map rarity → CSS class used in your styles (e.g., common-border, rare-border, etc.)
   function rarityClass(r) {
@@ -47,10 +56,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Normalize: ensure card_id is 3-digit string; accept "image" or "filename"
     if (Array.isArray(master)) {
       master = master.map(c => {
-        const id    = pad3(c.card_id ?? c.number ?? c.id);
-        const img   = c.image || c.filename || "";
-        const name  = c.name || `Card ${id}`;
-        const type  = c.type || "Unknown";
+        const id     = pad3(c.card_id ?? c.number ?? c.id);
+        const img    = c.image || c.filename || "";
+        const name   = c.name || `Card ${id}`;
+        const type   = c.type || "Unknown";
         const rarity = c.rarity || "Common";
         return { ...c, card_id: id, image: img, name, type, rarity };
       });
@@ -161,21 +170,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     return { coins: 0, wins: 0, losses: 0, discordName: "" };
   }
 
-  function isAbsoluteUrl(u) {
-    return /^https?:\/\//i.test(String(u || ""));
+  // Build a filename from card meta: prefers image/filename then synthesizes
+  function filenameFromCard(card) {
+    const file = card.image || card.filename ||
+      `${pad3(card.card_id)}_${safe(card.name)}_${safe(card.type)}.png`;
+    return safe(file);
+  }
+
+  // Set an <img> src with multi-base fallback (tries next base on error)
+  function setImgWithFallback(imgEl, fileOrUrl) {
+    if (isAbsoluteUrl(fileOrUrl)) {
+      imgEl.src = fileOrUrl;
+      return;
+    }
+    const bases = CANDIDATE_IMG_BASES.slice(); // copy
+    imgEl.onerror = () => {
+      const next = bases.shift();
+      if (!next) return; // out of options
+      imgEl.src = `${next}/${fileOrUrl}`;
+    };
+    imgEl.src = `${bases.shift()}/${fileOrUrl}`;
   }
 
   function imageURL(card) {
-    // Prefer master-provided filename; otherwise synthesize
-    const file = card.image
-      ? String(card.image)
-      : `${pad3(card.card_id)}_${safe(card.name)}_${safe(card.type)}.png`;
-
-    // If the master contained a full URL, use it as-is
+    // Kept for backward-compat usage elsewhere; first/primary base only
+    const file = filenameFromCard(card);
     if (isAbsoluteUrl(file)) return file;
-
-    // Otherwise, serve from the configured image base
-    return `${IMG_BASE}/${safe(file)}`;
+    return `${IMG_BASE}/${file}`;
   }
 
   /* ---------------- UI helpers you already had ---------------- */
@@ -208,9 +229,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.classList.add("trade-card-entry");
 
       const thumb = document.createElement("img");
-      thumb.src = isAbsoluteUrl(entry.filename)
-        ? entry.filename
-        : `${IMG_BASE}/${safe(entry.filename || "000_CardBack_Unique.png")}`;
+      setImgWithFallback(thumb, entry.filename || "000_CardBack_Unique.png");
       thumb.alt = `#${entry.id}`;
       thumb.classList.add("thumb");
       thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
@@ -256,9 +275,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.classList.add("sell-card-entry");
 
       const thumb = document.createElement("img");
-      thumb.src = isAbsoluteUrl(entry.filename)
-        ? entry.filename
-        : `${IMG_BASE}/${safe(entry.filename || "000_CardBack_Unique.png")}`;
+      setImgWithFallback(thumb, entry.filename || "000_CardBack_Unique.png");
       thumb.alt = `#${entry.id}`;
       thumb.classList.add("thumb");
       thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
@@ -333,14 +350,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         ownedUniqueCount++;
         totalOwnedCopies += qty;
         if (masterCard) {
-          img.src = imageURL(masterCard);
+          const file = filenameFromCard(masterCard);
+          setImgWithFallback(img, file);
           img.classList.remove("facedown-card");
           container.className = `card-container ${rarityClass(masterCard.rarity)}`;
           container.dataset.rarity = masterCard.rarity || "Common";
         }
       } else {
         // keep face-down if unowned
-        img.src = `${IMG_BASE}/000_CardBack_Unique.png`;
+        setImgWithFallback(img, "000_CardBack_Unique.png");
         img.classList.add("facedown-card");
         container.dataset.rarity = masterCard?.rarity || "Common";
       }
@@ -380,7 +398,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const img = document.createElement("img");
       img.alt = card.name || `#${id}`;
       img.className = qty > 0 ? "card-img" : "facedown-card";
-      img.src = qty > 0 ? imageURL(card) : `${IMG_BASE}/000_CardBack_Unique.png`;
+      if (qty > 0) {
+        setImgWithFallback(img, filenameFromCard(card));
+      } else {
+        setImgWithFallback(img, "000_CardBack_Unique.png");
+      }
 
       const num = document.createElement("p");
       num.textContent = `#${id}`;
@@ -394,7 +416,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       tradeBtn.addEventListener("click", () => {
         if (qty <= 0) return showToast("❌ You do not own this card.");
         if (tradeQueue.length >= 30) return showToast("⚠️ Trade queue is full (30).");
-        tradeQueue.push({ id, filename: card.image, rarity: card.rarity });
+        tradeQueue.push({ id, filename: filenameFromCard(card), rarity: card.rarity });
         tradeBtn.classList.add("queued");
         showToast(`✅ Card #${id} added to trade queue.`);
         updateBottomBar();
@@ -415,7 +437,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           showToast("⚠️ You can only sell up to 5 cards every 24 hours.");
           return;
         }
-        sellQueue.push({ id, filename: card.image, rarity: card.rarity });
+        sellQueue.push({ id, filename: filenameFromCard(card), rarity: card.rarity });
         updateSellBar();
         showToast(`🪙 Card #${id} added to sell list.`);
       });
