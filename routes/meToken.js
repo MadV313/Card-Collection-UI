@@ -19,6 +19,8 @@ const router = express.Router();
  */
 router.get('/me/:token/collection', async (req, res) => {
   try {
+    res.set('Cache-Control', 'no-store');
+
     const { token } = req.params;
     const userId = await resolveUserIdByToken(token);
     if (!userId) return res.status(404).json({ error: 'Invalid token' });
@@ -45,7 +47,7 @@ router.get('/me/:token/collection', async (req, res) => {
           } : {})
         };
       })
-      .sort((a, b) => parseInt(a.number) - parseInt(b.number));
+      .sort((a, b) => parseInt(a.number, 10) - parseInt(b.number, 10));
 
     return res.json(out);
   } catch (e) {
@@ -60,6 +62,8 @@ router.get('/me/:token/collection', async (req, res) => {
  */
 router.get('/me/:token/stats', async (req, res) => {
   try {
+    res.set('Cache-Control', 'no-store');
+
     const { token } = req.params;
     const userId = await resolveUserIdByToken(token);
     if (!userId) return res.status(404).json({ error: 'Invalid token' });
@@ -88,6 +92,8 @@ router.get('/me/:token/stats', async (req, res) => {
  */
 router.get('/userStatsToken', async (req, res) => {
   try {
+    res.set('Cache-Control', 'no-store');
+
     const { token } = req.query;
     if (!token) return res.status(400).json({ error: 'Missing token' });
 
