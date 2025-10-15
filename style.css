@@ -219,7 +219,7 @@ button.trade.queued.pulse {
 
 .common-border { border: 2px solid green; }
 .uncommon-border { border: 2px solid blue; }
-.rare-border { border: 2px solid purple; }
+.rare-border   { border: 2px solid purple; }
 .legendary-border { border: 2px solid gold; }
 .unique-border { border: 2px solid red; }
 
@@ -455,6 +455,27 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   bottom: 160px;
   color: crimson;
   border: 2px solid crimson;
+}
+
+/* NEW: Music toggle button (matches the two queue toggles) */
+#music-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 210px;            /* sits above the sell/trade toggles */
+  z-index: 1001;
+  padding: 6px 10px;
+  background-color: #111;
+  border: 2px solid #7dd3fc;
+  color: #7dd3fc;
+  font-weight: bold;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+#music-toggle:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 10px #7dd3fc;
 }
 
 #mock-toast {
