@@ -61,6 +61,12 @@ h1 { margin: 20px; }
 .card-container img { width: 100%; border-radius: 5px; }
 .card-container p { margin: 5px 0; }
 
+/* Owned (face-up) card image */
+.card-img {
+  border: 2px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+}
+
 button.trade,
 button.sell {
   background-color: rgba(51, 51, 51, 0.75);
@@ -433,4 +439,30 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 @keyframes toastFadeIn {
   0% { opacity: 0; transform: translateX(-50%) scale(0.95); }
   100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+/* ─────────────────────── NEW CARD HIGHLIGHT ─────────────────────── */
+.is-new {
+  box-shadow: 0 0 12px #00fff3, 0 0 28px #00fff3;
+  animation: newPulse 1.2s ease-in-out infinite;
+}
+@keyframes newPulse {
+  0%   { box-shadow: 0 0 8px #00fff3, 0 0 18px #00fff3; }
+  50%  { box-shadow: 0 0 18px #00fff3, 0 0 48px #00fff3; }
+  100% { box-shadow: 0 0 8px #00fff3, 0 0 18px #00fff3; }
+}
+.new-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #ffd400;
+  color: #111;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  text-shadow: none;
+  box-shadow: 0 0 8px rgba(0,0,0,0.6);
+  z-index: 3;
 }
