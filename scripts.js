@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Trade session params
   const MODE         = (qs.get("mode") || "").toLowerCase(); // 'trade' to enable session UI
   const TRADE_MODE   = MODE === "trade";
-  const TRADE_SESSION_ID = (qs.get("session") || "").trim();
+  const TRADE_SESSION_ID = (qs.get("tradeSession") || qs.get("session") || "").trim();
   let   TRADE_STAGE  = (qs.get("stage") || "").toLowerCase(); // 'pickmine' | 'picktheirs' | 'decision' (server wins)
-  let   TRADE_ROLE   = "";  // 'initiator' | 'partner' (from server)
-  let   PARTNER_NAME = "";  // from server
-  let   INITIATOR_NAME = ""; // from server
+  let   TRADE_ROLE   = (qs.get("role")  || "").toLowerCase(); // 'initiator' | 'partner' (prefer server calc below)
+  let   PARTNER_NAME = qs.get("partner") || "";               // optional hint
+  let   INITIATOR_NAME = ""; // filled from server
   let   TRADE_LIMITS = { remaining: 3 };
 
   // Mocks OFF by default (only on if explicitly requested)
@@ -394,9 +394,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Partner decision (accept/deny)
   async function submitTradeDecision(decision) {
     if (!API_BASE || !TOKEN || !TRADE_MODE || !TRADE_SESSION_ID) return null;
+    // Backend accepts {decision: "accept"|"deny"} or {accept: true|false}
+    const body = typeof decision === "string" ? { token: TOKEN, decision } : { token: TOKEN, accept: !!decision };
     return postJson(
       `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/decision`,
-      { token: TOKEN, decision }
+      body
     );
   }
 
@@ -467,6 +469,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- UI helpers ---------------- */
   const tradeQueue = [];
   const sellQueue  = []; // unit entries: [{ id, filename, rarity }, ...]
+  let coinBalanceEl = null;
 
   function showToast(message) {
     const existing = document.getElementById("mock-toast");
@@ -541,11 +544,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         accept.onclick = async () => {
           const res = await submitTradeDecision("accept");
           if (res?.ok) {
-            if (res.collection) {
-              patchOwnedMapWithServer(res.collection);
-              const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
-              Object.keys(res.touched || {}).forEach(id => refreshTileFor(pad3(id), masterById));
-            }
             showToast(res.message || "✅ Trade accepted.");
             // lock UI
             TRADE_STAGE = "closed";
@@ -590,40 +588,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- Trade state fetch ---------------- */
   async function loadTradeState() {
     if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE) return null;
-    const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/state${TOKEN ? `?token=${encodeURIComponent(TOKEN)}` : ""}`;
+    const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/state`;
     const state = await fetchJSON(url);
     if (!state) return null;
 
-    // Normalize key fields
+    // Server canonical stage
     TRADE_STAGE = (state.stage || TRADE_STAGE || "pickmine").toLowerCase();
-    TRADE_ROLE  = (state.role  || TRADE_ROLE  || "").toLowerCase();
-    PARTNER_NAME = state.partnerName || PARTNER_NAME || "";
-    INITIATOR_NAME = state.initiatorName || INITIATOR_NAME || "";
-    TRADE_LIMITS = state.limits || TRADE_LIMITS;
-
-    // Optionally hydrate preselected (server could send existing picks)
-    if (Array.isArray(state.selectedMine) && TRADE_STAGE !== "decision") {
-      // Only show if these are mine in the current stage
-      // We won’t duplicate entries if already queued
-      const present = new Set(tradeQueue.map(e => e.id));
-      const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
-      state.selectedMine.forEach(id => {
-        const id3 = pad3(id);
-        if (!present.has(id3) && tradeQueue.length < 3) {
-          const mc = masterById[id3];
-          tradeQueue.push({ id: id3, filename: mc?.image || "", rarity: mc?.rarity || "Common" });
-        }
-      });
-      updateBottomBar();
+    // Infer role from stats.userId if available
+    if (stats?.userId) {
+      if (String(stats.userId) === String(state.initiator?.userId)) TRADE_ROLE = "initiator";
+      else if (String(stats.userId) === String(state.partner?.userId)) TRADE_ROLE = "partner";
     }
+    INITIATOR_NAME = state.initiator?.name || INITIATOR_NAME;
+    PARTNER_NAME   = (TRADE_ROLE === "initiator" ? state.partner?.name : state.initiator?.name) || PARTNER_NAME;
+    TRADE_LIMITS   = state.limits || TRADE_LIMITS;
 
-    // Decision summary (what I give/get)
+    // Decision summary
     let summary = null;
-    if (TRADE_STAGE === "decision" && state.summary) {
-      summary = {
-        youGive: (state.summary.youGive || []).map(pad3),
-        youGet:  (state.summary.youGet  || []).map(pad3)
-      };
+    if (TRADE_STAGE === "decision") {
+      const offer = state.initiator?.selection || [];
+      const reqst = state.partner?.selection || [];
+      summary = (TRADE_ROLE === "partner")
+        ? { youGive: reqst, youGet: offer }
+        : { youGive: offer, youGet: reqst };
     }
 
     renderTradeBanner({
@@ -692,12 +679,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       title.style.cssText = "font-weight:700;margin-bottom:6px;";
       bar.prepend(title);
     }
-    title.textContent = TRADE_MODE ? "Trade Offer" : "Trade Queue";
+    title.textContent = TRADE_MODE ? (TRADE_ROLE === "partner" ? "Trade Response" : "Trade Offer") : "Trade Queue";
 
     // Submit label adjusts by stage
     const stageLabel = (TRADE_MODE && TRADE_STAGE === "picktheirs")
-      ? "[SEND TRADE PROPOSAL]"
-      : (TRADE_MODE ? "[CONTINUE → Choose Partner’s Cards]" : "[SUBMIT TRADE]");
+      ? (TRADE_ROLE === "partner" ? "[SUBMIT YOUR PICKS]" : "[SEND TRADE PROPOSAL]")
+      : (TRADE_MODE ? "[SAVE YOUR OFFER]" : "[SUBMIT TRADE]");
 
     container.innerHTML = "";
     tradeQueue.forEach((entry, index) => {
@@ -764,15 +751,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (res?.ok) {
         // Stage transition handled by server; re-pull state
         const state = await loadTradeState();
-        // On step switch, don’t flush queue automatically; UX depends on server echo.
-        if (state?.stage === "picktheirs" && TRADE_ROLE === "initiator") {
-          showToast("📤 Offer saved. Now pick up to 3 from your partner.");
-          // Typically we clear my queue before picking theirs
-          tradeQueue.length = 0;
-          updateBottomBar();
+        if (state?.stage === "pickTheirs".toLowerCase() || state?.stage === "picktheirs") {
+          // If I’m initiator, move to partner picks
+          if (TRADE_ROLE === "initiator") {
+            showToast("📤 Offer saved. Now pick up to 3 from your partner.");
+            tradeQueue.length = 0;
+            updateBottomBar();
+          } else {
+            showToast("✅ Your picks saved.");
+          }
         } else if (state?.stage === "decision") {
-          // Partner will see Accept/Deny. If I’m partner, banner shows decision UI.
           showToast(res.message || "📨 Trade proposal sent.");
+        } else {
+          showToast(res.message || "✅ Selection saved.");
         }
       } else {
         showToast(res?.message || res?.error || "⚠️ Failed to submit selection.");
@@ -833,12 +824,15 @@ document.addEventListener("DOMContentLoaded", async () => {
           // refresh only IDs that changed
           const changedIds = Object.keys((buildSellItems()).items.reduce((m, it) => (m[it.number]=1,m), {}));
           changedIds.forEach(id => refreshTileFor(id, masterById));
-          if (coinBalanceEl && res.stats?.coins != null) coinBalanceEl.textContent = String(res.stats.coins);
+          if (coinBalanceEl && res.balance != null) coinBalanceEl.textContent = String(res.balance);
           sellQueue.length = 0;
           updateSellBar();
-          showToast(res.message || "🪙 Sell submitted!");
+          showToast(res.message || `🪙 Sold! +${res.credited ?? 0} coins`);
         } else if (res && (res.message || res.error)) {
           showToast(`⚠️ ${res.message || res.error}`);
+          if (String(res.error || "").toLowerCase().includes("limit")) {
+            bar?.classList.add("limit-reached");
+          }
         }
       });
       bar.appendChild(submitBtn);
@@ -1046,7 +1040,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- Header stats ---------------- */
   const collectionCountEl = document.getElementById("collection-count");
   const totalOwnedEl      = document.getElementById("total-owned-count");
-  const coinBalanceEl     = document.getElementById("coin-balance");
+  coinBalanceEl           = document.getElementById("coin-balance");
   const ownershipWarning  = document.getElementById("ownership-warning");
 
   if (collectionCountEl) collectionCountEl.textContent = `Cards Collected: ${ownedUniqueCount} / 127`;
@@ -1076,23 +1070,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  /* ---------------- Return to HUB: keep token/api ---------------- */
+  /* ---------------- Return to HUB: keep token/api + trade session ---------------- */
   const hubLink = document.getElementById("return-to-hub");
   if (hubLink) {
     try {
       const u = new URL(hubLink.href);
       if (TOKEN) u.searchParams.set("token", TOKEN);
       if (API_BASE) u.searchParams.set("api", API_BASE);
+      if (TRADE_MODE && TRADE_SESSION_ID) {
+        u.searchParams.set("mode", "trade");
+        u.searchParams.set("tradeSession", TRADE_SESSION_ID);
+        if (TRADE_ROLE) u.searchParams.set("role", TRADE_ROLE);
+      }
       hubLink.href = u.toString();
     } catch {
       // If original was a relative without protocol, build safely
       let base = hubLink.getAttribute("href") || "https://madv313.github.io/HUB-UI/";
+      const params = [];
+      if (TOKEN) params.push(`token=${encodeURIComponent(TOKEN)}`);
+      if (API_BASE) params.push(`api=${encodeURIComponent(API_BASE)}`);
+      if (TRADE_MODE && TRADE_SESSION_ID) {
+        params.push(`mode=trade`, `tradeSession=${encodeURIComponent(TRADE_SESSION_ID)}`);
+        if (TRADE_ROLE) params.push(`role=${encodeURIComponent(TRADE_ROLE)}`);
+      }
       const sep = base.includes("?") ? "&" : "?";
-      const qp  = [
-        TOKEN ? `token=${encodeURIComponent(TOKEN)}` : "",
-        API_BASE ? `api=${encodeURIComponent(API_BASE)}` : ""
-      ].filter(Boolean).join("&");
-      hubLink.setAttribute("href", qp ? `${base}${sep}${qp}` : base);
+      hubLink.setAttribute("href", params.length ? `${base}${sep}${params.join("&")}` : base);
     }
   }
 });
