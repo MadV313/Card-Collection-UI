@@ -1,5 +1,4 @@
-<!-- scripts.js — Token-aware Card Collection UI (prefers local master JSON, has robust IMG fallbacks) -->
-<script>
+// scripts.js — Token-aware Card Collection UI (prefers local master JSON, robust IMG fallbacks)
 document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- URL params & config ---------------- */
   const qs = new URLSearchParams(window.location.search);
@@ -29,7 +28,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // derive an absolute path to this repo’s images/cards, regardless of how index.html is served
   function deriveSelfImagesAbs() {
     const url = new URL(location.href);
-    // directory containing index.html (or repo root if already a directory)
     const dir = url.pathname.replace(/\/index\.html?$/i, "").replace(/\/$/, "");
     // e.g. https://madv313.github.io/Card-Collection-UI/images/cards
     return `${url.origin}${dir}/images/cards`;
@@ -81,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/logic/CoreMasterReference.json",
     "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/CoreMasterReference.json"
   ].filter(Boolean));
-  
+
   async function fetchJSON(url) {
     try {
       const r = await fetch(url, { cache: "no-store" });
@@ -94,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function loadMaster() {
-    // 🔁 NEW: Try local copies FIRST (several common paths), then the API if needed
+    // Try local copies FIRST (common paths), then the API if needed
     const localCandidates = [
       "data/CoreMasterReference.json",
       "logic/CoreMasterReference.json",
@@ -103,7 +101,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let master = null;
 
-    // Try local paths in order
     for (const p of localCandidates) {
       master = await fetchJSON(p);
       if (Array.isArray(master) && master.length) {
@@ -112,7 +109,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    // If no local worked and API provided, try the API variants
     if ((!Array.isArray(master) || !master.length) && API_BASE) {
       const apiCandidates = [
         `${API_BASE}/logic/CoreMasterReference.json`,
@@ -127,7 +123,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-     // Built-in hosted fallbacks ensure we always land on the real master data when available
     if (!Array.isArray(master) || !master.length) {
       for (const url of BUILTIN_MASTER_FALLBACKS) {
         master = await fetchJSON(url);
@@ -137,8 +132,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       }
     }
-    
-    // Normalize a bit (handles either "image" or "filename"; fills name/type/rarity)
+
+    // Normalize (handles either "image" or "filename"; fills name/type/rarity)
     if (Array.isArray(master)) {
       master = master.map(c => {
         const id     = pad3(c.card_id ?? c.number ?? c.id);
@@ -150,7 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
-    // Final fallback (minimal stub) — should rarely trigger now
+    // Final fallback (minimal stub)
     if (!Array.isArray(master) || !master.length) {
       console.warn("[ccui] Falling back to minimal master (no local/API CoreMasterReference.json)");
       master = Array.from({ length: 127 }, (_, i) => {
@@ -216,11 +211,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function loadCollection() {
     // Preferred: token routes on your backend
     if (TOKEN && API_BASE) {
-      // 1) /me/:token/collection
       let d = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/collection`);
       if (d) return { map: toOwnershipMap(d), src: "token" };
 
-      // 2) /collection?token=...
       d = await fetchJSON(`${API_BASE}/collection?token=${encodeURIComponent(TOKEN)}`);
       if (d) return { map: toOwnershipMap(d), src: "token-query" };
     }
@@ -262,7 +255,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const type = safe(card.type || "Unknown");
 
     const explicit = card.image || card.filename || "";
-    
+
+    // Additional robustness: if type is missing/wrong, try common buckets
+    const COMMON_TYPES = ["Attack", "Specialty", "Trap", "Support", "Unknown"];
+
     const rawType = card.type || "Unknown";
     const typeVariants = uniq([
       type,
@@ -270,7 +266,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       safe(String(rawType).toLowerCase()),
       safe(String(rawType).toUpperCase()),
       type.replace(/[-]+/g, "_"),
-      type.replace(/_+/g, "-")
+      type.replace(/_+/g, "-"),
+      ...COMMON_TYPES.map(safe)
     ].filter(Boolean));
 
     const rawName = card.name || "";
@@ -292,8 +289,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (explicit && !isAbsoluteUrl(explicit)) {
       const trimmed = explicit.trim();
       if (trimmed) {
-        explicitVariants.push(trimmed);
         const sanitized = safe(trimmed);
+        explicitVariants.push(trimmed);
         if (sanitized) {
           explicitVariants.push(sanitized);
           explicitVariants.push(sanitized.replace(/[-]+/g, ""));
@@ -324,11 +321,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const candidates = filenameCandidates(card);
     const bases = imageBases();
 
-    // If any candidate is an absolute URL, try it as its own attempt.
     const absolutes = candidates.filter(isAbsoluteUrl);
     const relatives = candidates.filter(c => !isAbsoluteUrl(c));
 
-    // Build the ordered attempt list
     const attempts = [
       ...absolutes,
       ...bases.flatMap(base => relatives.map(file => `${base}/${file}`))
@@ -476,24 +471,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ownedMap = collectionResult.map || {};
 
   /* ---------------- Build OR Hydrate grid ---------------- */
-  // Support either #card-grid (programmatic build) OR #cards-container (pre-rendered tiles)
   const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
   if (!grid) {
     console.error("[ccui] Missing #card-grid or #cards-container container in HTML");
     return;
   }
 
-  // If the grid already has tiles, HYDRATE them; otherwise BUILD them.
   const hasPreRenderedTiles = !!grid.querySelector(".card-container");
 
   let totalOwnedCopies = 0;
   let ownedUniqueCount = 0;
 
   if (hasPreRenderedTiles) {
-    // Build lookup for master by card_id
     const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
 
-    // Hydrate existing tiles
     grid.querySelectorAll(".card-container").forEach(container => {
       const numEl = container.querySelector("p");
       const img   = container.querySelector("img");
@@ -511,12 +502,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             onFailToAll: () => { img.src = `${deriveSelfImagesAbs()}/000_CardBack_Unique.png`; }
           });
           img.classList.remove("facedown-card");
-          img.classList.add("card-img"); // ensure proper owned styling
+          img.classList.add("card-img");
           container.className = `card-container ${rarityClass(masterCard.rarity)}`;
           container.dataset.rarity = masterCard.rarity || "Common";
         }
       } else {
-        // keep face-down if unowned
         img.src = `${deriveSelfImagesAbs()}/000_CardBack_Unique.png`;
         img.classList.add("facedown-card");
         if (masterCard) container.dataset.rarity = masterCard.rarity || "Common";
@@ -532,7 +522,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       span.textContent = `Owned: ${qty}`;
       container.dataset.owned = String(qty);
 
-      // Enable/disable SELL button based on ownership
       const sellBtn = container.querySelector(".sell");
       if (sellBtn) {
         sellBtn.disabled = qty <= 0;
@@ -540,7 +529,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   } else {
-    // Build grid from master list
     grid.innerHTML = "";
 
     for (const card of master) {
@@ -628,4 +616,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     showToast("✨ New cards added from Pack Reveal!");
   }
 });
-</script>
