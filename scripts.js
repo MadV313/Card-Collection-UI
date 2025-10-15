@@ -1,11 +1,21 @@
-// scripts.js — Token-aware Card Collection UI (prefers local master JSON, robust IMG fallbacks + NEW highlight + real Trade/Sell submit)
+// scripts.js — Token-aware Card Collection UI (prefers local master JSON, robust IMG fallbacks + NEW highlight + real Trade/Sell submit + trade-session wiring)
 document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- URL params & config ---------------- */
   const qs = new URLSearchParams(window.location.search);
   const TOKEN     = qs.get("token") || "";
   const UID       = qs.get("uid")   || "";
   const FROM_PACK = qs.get("fromPackReveal") === "true";
-  const MODE      = (qs.get("mode") || "").toLowerCase(); // e.g. 'trade' (optional gating prep)
+
+  // Trade session params
+  const MODE         = (qs.get("mode") || "").toLowerCase(); // 'trade' to enable session UI
+  const TRADE_MODE   = MODE === "trade";
+  const TRADE_SESSION_ID = (qs.get("session") || "").trim();
+  let   TRADE_STAGE  = (qs.get("stage") || "").toLowerCase(); // 'pickmine' | 'picktheirs' | 'decision' (server wins)
+  let   TRADE_ROLE   = "";  // 'initiator' | 'partner' (from server)
+  let   PARTNER_NAME = "";  // from server
+  let   INITIATOR_NAME = ""; // from server
+  let   TRADE_LIMITS = { remaining: 3 };
+
   // Mocks OFF by default (only on if explicitly requested)
   const USE_MOCK  = qs.get("useMockDeckData") === "true" || qs.get("mockMode") === "true" || qs.get("mock") === "1";
 
@@ -360,7 +370,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  async function submitTrade(cards) {
+  // Legacy single-endpoint trade (kept for non-session mode)
+  async function submitTradeLegacy(cards) {
     if (!API_BASE || !TOKEN) {
       showToast("⚠️ Trading requires a valid API and token.");
       return null;
@@ -368,7 +379,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     return postJson(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/trade`, { cards });
   }
 
-  // Build `{ items: [{ number, qty }, ...] }` from the current sellQueue (unit entries)
+  // Sessionized trade selection
+  async function submitTradeSelection(cards) {
+    if (!API_BASE || !TOKEN || !TRADE_MODE || !TRADE_SESSION_ID) {
+      showToast("⚠️ Trade session not active. Start with /trade.");
+      return null;
+    }
+    return postJson(
+      `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select`,
+      { token: TOKEN, cards }
+    );
+  }
+
+  // Partner decision (accept/deny)
+  async function submitTradeDecision(decision) {
+    if (!API_BASE || !TOKEN || !TRADE_MODE || !TRADE_SESSION_ID) return null;
+    return postJson(
+      `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/decision`,
+      { token: TOKEN, decision }
+    );
+  }
+
+  // Sell payload: `{ items: [{ number, qty }, ...] }` from unit queue
   function buildSellItems() {
     const counts = {};
     for (const e of sellQueue) {
@@ -451,6 +483,160 @@ document.addEventListener("DOMContentLoaded", async () => {
     setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 250); }, 1800);
   }
 
+  function ensureTradeBanner() {
+    let b = document.getElementById("trade-banner");
+    if (!b) {
+      b = document.createElement("div");
+      b.id = "trade-banner";
+      b.style.cssText = `
+        position: sticky; top: 0; z-index: 1002; width: 100%;
+        background: #0f172a; color: #e2e8f0; border-bottom: 1px solid #334155;
+        padding: 10px 12px; font-family: system-ui, sans-serif; display: none;
+      `;
+      // content containers
+      b.innerHTML = `
+        <div id="trade-banner-text" style="font-weight:600"></div>
+        <div id="trade-banner-summary" style="margin-top:8px; display:none;"></div>
+        <div id="trade-banner-actions" style="margin-top:10px; display:none;"></div>
+      `;
+      const root = document.body;
+      root.insertBefore(b, root.firstChild);
+    }
+    return b;
+  }
+
+  function renderTradeBanner({ stage, role, partnerName, initiatorName, summary }) {
+    const b = ensureTradeBanner();
+    const text = b.querySelector("#trade-banner-text");
+    const summaryBox = b.querySelector("#trade-banner-summary");
+    const actions = b.querySelector("#trade-banner-actions");
+    b.style.display = TRADE_MODE ? "block" : "none";
+
+    actions.innerHTML = "";
+    summaryBox.style.display = "none";
+    actions.style.display = "none";
+
+    if (!TRADE_MODE || !TRADE_SESSION_ID) {
+      text.textContent = "Start a trade with /trade";
+      return;
+    }
+
+    if (stage === "decision") {
+      if (role === "partner") {
+        text.textContent = `Trade Offer from ${initiatorName || "player"}`;
+        // summary thumbnails (if provided)
+        if (summary?.youGive || summary?.youGet) {
+          summaryBox.style.display = "block";
+          summaryBox.innerHTML = `
+            <div><strong>You’ll receive:</strong> ${renderThumbRow(summary.youGet || [])}</div>
+            <div style="margin-top:4px;"><strong>You’ll give:</strong> ${renderThumbRow(summary.youGive || [])}</div>
+          `;
+        }
+        // Accept / Deny
+        const accept = document.createElement("button");
+        accept.textContent = "✅ Accept Trade";
+        accept.style.marginRight = "8px";
+        const deny = document.createElement("button");
+        deny.textContent = "❌ Deny Trade";
+        accept.onclick = async () => {
+          const res = await submitTradeDecision("accept");
+          if (res?.ok) {
+            if (res.collection) {
+              patchOwnedMapWithServer(res.collection);
+              const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
+              Object.keys(res.touched || {}).forEach(id => refreshTileFor(pad3(id), masterById));
+            }
+            showToast(res.message || "✅ Trade accepted.");
+            // lock UI
+            TRADE_STAGE = "closed";
+            renderTradeBanner({ stage: "closed", role, partnerName, initiatorName });
+          } else {
+            showToast(res?.message || res?.error || "⚠️ Failed to accept trade.");
+          }
+        };
+        deny.onclick = async () => {
+          const res = await submitTradeDecision("deny");
+          if (res?.ok) {
+            showToast(res.message || "❌ Trade denied.");
+            TRADE_STAGE = "closed";
+            renderTradeBanner({ stage: "closed", role, partnerName, initiatorName });
+          } else {
+            showToast(res?.message || res?.error || "⚠️ Failed to deny trade.");
+          }
+        };
+        actions.style.display = "block";
+        actions.appendChild(accept);
+        actions.appendChild(deny);
+      } else {
+        text.textContent = `Waiting for ${partnerName || "partner"} to accept/deny…`;
+      }
+      return;
+    }
+
+    if (stage === "picktheirs") {
+      text.textContent = `Step 2 of 2 — select up to 3 from ${partnerName || "partner"}`;
+      return;
+    }
+
+    // default = pickmine
+    text.textContent = `Step 1 of 2 — select up to 3 cards to offer`;
+  }
+
+  function renderThumbRow(list) {
+    if (!Array.isArray(list) || !list.length) return "(none)";
+    return list.map(id => `<span style="display:inline-block;border:1px solid #475569;border-radius:4px;padding:2px 6px;margin-right:4px;background:#1f2937;">#${pad3(id)}</span>`).join("");
+  }
+
+  /* ---------------- Trade state fetch ---------------- */
+  async function loadTradeState() {
+    if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE) return null;
+    const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/state${TOKEN ? `?token=${encodeURIComponent(TOKEN)}` : ""}`;
+    const state = await fetchJSON(url);
+    if (!state) return null;
+
+    // Normalize key fields
+    TRADE_STAGE = (state.stage || TRADE_STAGE || "pickmine").toLowerCase();
+    TRADE_ROLE  = (state.role  || TRADE_ROLE  || "").toLowerCase();
+    PARTNER_NAME = state.partnerName || PARTNER_NAME || "";
+    INITIATOR_NAME = state.initiatorName || INITIATOR_NAME || "";
+    TRADE_LIMITS = state.limits || TRADE_LIMITS;
+
+    // Optionally hydrate preselected (server could send existing picks)
+    if (Array.isArray(state.selectedMine) && TRADE_STAGE !== "decision") {
+      // Only show if these are mine in the current stage
+      // We won’t duplicate entries if already queued
+      const present = new Set(tradeQueue.map(e => e.id));
+      const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
+      state.selectedMine.forEach(id => {
+        const id3 = pad3(id);
+        if (!present.has(id3) && tradeQueue.length < 3) {
+          const mc = masterById[id3];
+          tradeQueue.push({ id: id3, filename: mc?.image || "", rarity: mc?.rarity || "Common" });
+        }
+      });
+      updateBottomBar();
+    }
+
+    // Decision summary (what I give/get)
+    let summary = null;
+    if (TRADE_STAGE === "decision" && state.summary) {
+      summary = {
+        youGive: (state.summary.youGive || []).map(pad3),
+        youGet:  (state.summary.youGet  || []).map(pad3)
+      };
+    }
+
+    renderTradeBanner({
+      stage: TRADE_STAGE,
+      role: TRADE_ROLE,
+      partnerName: PARTNER_NAME,
+      initiatorName: INITIATOR_NAME,
+      summary
+    });
+
+    return state;
+  }
+
   function countQueuedSellById(id) {
     const id3 = pad3(id);
     return sellQueue.reduce((n, e) => n + (pad3(e.id) === id3 ? 1 : 0), 0);
@@ -498,6 +684,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     const bar = document.getElementById("trade-bottom-bar");
     if (!container || !bar) return;
 
+    // Title swap in trade mode
+    let title = bar.querySelector(".bar-title");
+    if (!title) {
+      title = document.createElement("div");
+      title.className = "bar-title";
+      title.style.cssText = "font-weight:700;margin-bottom:6px;";
+      bar.prepend(title);
+    }
+    title.textContent = TRADE_MODE ? "Trade Offer" : "Trade Queue";
+
+    // Submit label adjusts by stage
+    const stageLabel = (TRADE_MODE && TRADE_STAGE === "picktheirs")
+      ? "[SEND TRADE PROPOSAL]"
+      : (TRADE_MODE ? "[CONTINUE → Choose Partner’s Cards]" : "[SUBMIT TRADE]");
+
     container.innerHTML = "";
     tradeQueue.forEach((entry, index) => {
       const div = document.createElement("div");
@@ -532,11 +733,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       submitBtn = document.createElement("button");
       submitBtn.id = "submit-trade-btn";
       submitBtn.className = "queue-submit-button";
-      submitBtn.textContent = "[SUBMIT TRADE]";
-      submitBtn.addEventListener("click", async () => {
-        if (!tradeQueue.length) return showToast("⚠️ Trade queue is empty.");
-        const cards = tradeQueue.map(e => pad3(e.id));
-        const res = await submitTrade(cards);
+      bar.appendChild(submitBtn);
+    }
+    submitBtn.textContent = stageLabel;
+
+    submitBtn.onclick = async () => {
+      if (!tradeQueue.length) return showToast("⚠️ Trade queue is empty.");
+      const cards = tradeQueue.map(e => pad3(e.id));
+
+      // Not in session: fall back to legacy endpoint (or nudge)
+      if (!TRADE_MODE || !TRADE_SESSION_ID) {
+        showToast("ℹ️ Start a trade with /trade.");
+        const res = await submitTradeLegacy(cards);
         if (res?.ok) {
           patchOwnedMapWithServer(res.collection);
           const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
@@ -548,12 +756,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else if (res && (res.message || res.error)) {
           showToast(`⚠️ ${res.message || res.error}`);
         }
-      });
-      bar.appendChild(submitBtn);
-    }
+        return;
+      }
 
-    // Optional prep: when actually in trade mode, cap to 3
-    const cap = (MODE === "trade") ? 3 : 30;
+      // In session: use select endpoint
+      const res = await submitTradeSelection(cards);
+      if (res?.ok) {
+        // Stage transition handled by server; re-pull state
+        const state = await loadTradeState();
+        // On step switch, don’t flush queue automatically; UX depends on server echo.
+        if (state?.stage === "picktheirs" && TRADE_ROLE === "initiator") {
+          showToast("📤 Offer saved. Now pick up to 3 from your partner.");
+          // Typically we clear my queue before picking theirs
+          tradeQueue.length = 0;
+          updateBottomBar();
+        } else if (state?.stage === "decision") {
+          // Partner will see Accept/Deny. If I’m partner, banner shows decision UI.
+          showToast(res.message || "📨 Trade proposal sent.");
+        }
+      } else {
+        showToast(res?.message || res?.error || "⚠️ Failed to submit selection.");
+      }
+    };
+
+    // Cap changes in trade mode (3) vs legacy (30)
+    const cap = (TRADE_MODE ? 3 : 30);
     bar.classList.toggle("limit-reached", tradeQueue.length >= cap);
   }
 
@@ -717,12 +944,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
       }
 
-      // Keep existing trade button behavior (prep: optional cap if in MODE=trade)
+      // TRADE handler — gated by session mode
       const tradeBtn = container.querySelector(".trade");
       if (tradeBtn) {
         tradeBtn.addEventListener("click", () => {
           if (qty <= 0) return showToast("❌ You do not own this card.");
-          const cap = (MODE === "trade") ? 3 : 30;
+          if (!TRADE_MODE || !TRADE_SESSION_ID) {
+            return showToast("ℹ️ Start a trade with /trade.");
+          }
+          if (TRADE_STAGE === "decision") {
+            return showToast("ℹ️ Waiting for decision — cannot modify picks now.");
+          }
+          const cap = 3;
           if (tradeQueue.length >= cap) return showToast(`⚠️ Trade queue is full (${cap}).`);
           tradeQueue.push({ id, filename: masterCard?.image || "", rarity: masterCard?.rarity || "Common" });
           tradeBtn.classList.add("queued");
@@ -769,7 +1002,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       tradeBtn.textContent = "[TRADE]";
       tradeBtn.addEventListener("click", () => {
         if (qty <= 0) return showToast("❌ You do not own this card.");
-        const cap = (MODE === "trade") ? 3 : 30;
+        if (!TRADE_MODE || !TRADE_SESSION_ID) {
+          return showToast("ℹ️ Start a trade with /trade.");
+        }
+        if (TRADE_STAGE === "decision") {
+          return showToast("ℹ️ Waiting for decision — cannot modify picks now.");
+        }
+        const cap = 3;
         if (tradeQueue.length >= cap) return showToast(`⚠️ Trade queue is full (${cap}).`);
         tradeQueue.push({ id, filename: card.image, rarity: card.rarity });
         tradeBtn.classList.add("queued");
@@ -820,6 +1059,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (FROM_PACK) {
     showToast("✨ New cards added from Pack Reveal!");
+  }
+
+  // If we’re in a trade session, hydrate state & banner
+  if (TRADE_MODE) {
+    if (!TRADE_SESSION_ID) {
+      ensureTradeBanner();
+      renderTradeBanner({ stage: "invalid", role: "", partnerName: "" });
+      showToast("⚠️ Invalid trade session link.");
+    } else if (!API_BASE || !TOKEN) {
+      ensureTradeBanner();
+      renderTradeBanner({ stage: "invalid", role: "", partnerName: "" });
+      showToast("⚠️ Trading requires a valid API & token.");
+    } else {
+      await loadTradeState();
+    }
   }
 
   /* ---------------- Return to HUB: keep token/api ---------------- */
