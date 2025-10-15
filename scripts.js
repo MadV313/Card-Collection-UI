@@ -2,18 +2,30 @@
 document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- URL params & config ---------------- */
   const qs = new URLSearchParams(window.location.search);
-  const TOKEN   = qs.get("token") || "";
-  const UID     = qs.get("uid")   || "";
+  const TOKEN     = qs.get("token") || "";
+  const UID       = qs.get("uid")   || "";
   const FROM_PACK = qs.get("fromPackReveal") === "true";
-  const USE_MOCK  = qs.get("useMockDeckData") === "true";
+  const USE_MOCK  = qs.get("useMockDeckData") === "true" || qs.get("mockMode") === "true";
 
   // Allow overriding API and image bases via query params
-  const API_BASE = (qs.get("api") || "").replace(/\/+$/, "");     // e.g. https://your-bot.app
-  const IMG_BASE = (qs.get("imgbase") || "images/cards").replace(/\/+$/, ""); // default local folder
+  const API_BASE = (qs.get("api") || "").replace(/\/+$/, "");                        // e.g. https://your-bot.app
+  const IMG_BASE = (qs.get("imgbase") || "images/cards").replace(/\/+$/, "");        // default local folder
 
   /* ---------------- helpers ---------------- */
   function pad3(id) { return String(id).padStart(3, "0"); }
   function safe(s)  { return String(s || "").replace(/[^a-zA-Z0-9._-]/g, ""); }
+
+  // Map rarity → CSS class used in your styles (e.g., common-border, rare-border, etc.)
+  function rarityClass(r) {
+    const key = String(r || "Common").toLowerCase();
+    return ({
+      common: "common-border",
+      uncommon: "uncommon-border",
+      rare: "rare-border",
+      legendary: "legendary-border",
+      unique: "unique-border"
+    })[key] || "common-border";
+  }
 
   async function fetchJSON(url) {
     try {
@@ -27,9 +39,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function loadMaster() {
-    // Prefer bot master list (has `image` filenames)
-    const p1 = API_BASE ? `${API_BASE}/logic/CoreMasterReference.json` : "/logic/CoreMasterReference.json";
-    let master = await fetchJSON(p1);
+    // Prefer bot master list (has `image` filenames) if API_BASE provided
+    const primary = API_BASE ? `${API_BASE}/logic/CoreMasterReference.json` : "logic/CoreMasterReference.json";
+    let master = await fetchJSON(primary);
 
     if (!Array.isArray(master) || !master.length) {
       // Fallback: minimal local stub if needed (will synthesize filenames)
@@ -41,14 +53,16 @@ document.addEventListener("DOMContentLoaded", async () => {
           name: `Card ${id}`,
           type: "Unknown",
           rarity: "Common",
-          image: `${id}_Card_${"Unknown"}.png`
+          image: `${id}_Card_Unknown.png`
         };
       });
     }
 
     // Always sort by numeric card_id and skip #000 (back)
-    master.sort((a, b) => parseInt(a.card_id) - parseInt(b.card_id));
-    master = master.filter(c => String(c.card_id) !== "000");
+    master = master
+      .filter(c => String(c.card_id) !== "000")
+      .sort((a, b) => (parseInt(a.card_id) || 0) - (parseInt(b.card_id) || 0));
+
     return master;
   }
 
@@ -93,41 +107,41 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function loadCollection() {
-    // Preferred: token routes (you’ll add these to the bot)
-    if (TOKEN) {
+    // Preferred: token routes on your backend
+    if (TOKEN && API_BASE) {
       // 1) /me/:token/collection
       let d = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/collection`);
       if (d) return { map: toOwnershipMap(d), src: "token" };
 
-      // 2) /collection?token=... (fallback if you choose that shape)
+      // 2) /collection?token=... (fallback if you also support this)
       d = await fetchJSON(`${API_BASE}/collection?token=${encodeURIComponent(TOKEN)}`);
       if (d) return { map: toOwnershipMap(d), src: "token-query" };
     }
 
-    // Secondary: uid routes that already exist in your repo
-    if (UID) {
+    // Secondary: uid routes that may exist in your repo (requires API_BASE too)
+    if (UID && API_BASE) {
       let d = await fetchJSON(`${API_BASE}/collection?userId=${encodeURIComponent(UID)}`);
       if (d) return { map: toOwnershipMap(d), src: "uid" };
     }
 
-    // Mock fallback
+    // Mock fallback (local file in this UI repo)
     if (USE_MOCK) {
       const d = await fetchJSON("data/mock_deckData.json");
       return { map: toOwnershipMap(d), src: "mock" };
     }
 
-    console.warn("[ccui] No token/uid/mocks provided — rendering as unowned.");
+    console.warn("[ccui] No token/uid/API provided — rendering as unowned.");
     return { map: {}, src: "empty" };
   }
 
   async function loadStats() {
-    if (TOKEN) {
+    if (TOKEN && API_BASE) {
       let s = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/stats`);
       if (s) return s;
       s = await fetchJSON(`${API_BASE}/userStatsToken?token=${encodeURIComponent(TOKEN)}`);
       if (s) return s;
     }
-    if (UID) {
+    if (UID && API_BASE) {
       const s = await fetchJSON(`${API_BASE}/userStats/${encodeURIComponent(UID)}`);
       if (s) return s;
     }
@@ -254,80 +268,132 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   /* ---------------- Load data ---------------- */
-  const [master, { map: ownedMap }, stats] = await Promise.all([
+  const [master, collectionResult, stats] = await Promise.all([
     loadMaster(),
     loadCollection(),
     loadStats()
   ]);
+  const ownedMap = collectionResult.map || {};
 
-  /* ---------------- Build grid ---------------- */
-  const grid = document.getElementById("card-grid");
+  /* ---------------- Build OR Hydrate grid ---------------- */
+  // Support either #card-grid (programmatic build) OR #cards-container (pre-rendered tiles)
+  const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
   if (!grid) {
-    console.error("[ccui] Missing #card-grid container in HTML");
+    console.error("[ccui] Missing #card-grid or #cards-container container in HTML");
     return;
   }
-  grid.innerHTML = "";
+
+  // If the grid already has tiles, HYDRATE them; otherwise BUILD them.
+  const hasPreRenderedTiles = !!grid.querySelector(".card-container");
 
   let totalOwnedCopies = 0;
   let ownedUniqueCount = 0;
 
-  for (const card of master) {
-    const id = pad3(card.card_id);
-    const qty = Number(ownedMap[id] || 0);
-    if (qty > 0) ownedUniqueCount += 1;
-    totalOwnedCopies += qty;
+  if (hasPreRenderedTiles) {
+    // Build lookup for master by card_id
+    const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
 
-    const cardContainer = document.createElement("div");
-    cardContainer.className = `card-container ${safe((card.rarity || "Common").toLowerCase())}-border`;
-    cardContainer.dataset.rarity = card.rarity || "Common";
-    cardContainer.dataset.owned = String(qty);
+    // Hydrate existing tiles
+    grid.querySelectorAll(".card-container").forEach(container => {
+      const numEl = container.querySelector("p");
+      const img   = container.querySelector("img");
+      if (!numEl || !img) return;
 
-    const img = document.createElement("img");
-    img.alt = card.name || `#${id}`;
-    img.className = qty > 0 ? "card-img" : "facedown-card";
-    img.src = qty > 0 ? imageURL(card) : `${IMG_BASE}/000_WinterlandDeathDeck_Back.png`;
+      const id     = (numEl.textContent || "").replace("#", "");
+      const qty    = Number(ownedMap[id] || 0);
+      const masterCard = masterById[id];
 
-    const num = document.createElement("p");
-    num.textContent = `#${id}`;
-
-    const actions = document.createElement("div");
-    actions.className = "card-actions-vertical";
-
-    const tradeBtn = document.createElement("button");
-    tradeBtn.className = "trade";
-    tradeBtn.textContent = "[TRADE]";
-    tradeBtn.addEventListener("click", () => {
-      if (qty <= 0) return showToast("❌ You do not own this card.");
-      if (tradeQueue.length >= 30) return showToast("⚠️ Trade queue is full (30).");
-      tradeQueue.push({ id, filename: card.image, rarity: card.rarity });
-      tradeBtn.classList.add("queued");
-      showToast(`✅ Card #${id} added to trade queue.`);
-      updateBottomBar();
-    });
-
-    const ownedSpan = document.createElement("span");
-    ownedSpan.className = "owned-count";
-    ownedSpan.textContent = `Owned: ${qty}`;
-
-    const sellBtn = document.createElement("button");
-    sellBtn.className = "sell";
-    sellBtn.textContent = "[SELL]";
-    sellBtn.disabled = qty <= 0;
-    sellBtn.title = qty <= 0 ? "You don’t own this card" : "Add to sell list";
-    sellBtn.addEventListener("click", () => {
-      if (qty <= 0) return showToast("❌ You do not own this card.");
-      if (sellQueue.length >= 5) {
-        showToast("⚠️ You can only sell up to 5 cards every 24 hours.");
-        return;
+      if (qty > 0) {
+        ownedUniqueCount++;
+        totalOwnedCopies += qty;
+        if (masterCard) {
+          img.src = imageURL(masterCard);
+          img.classList.remove("facedown-card");
+          container.className = `card-container ${rarityClass(masterCard.rarity)}`;
+          container.dataset.rarity = masterCard.rarity || "Common";
+        }
       }
-      sellQueue.push({ id, filename: card.image, rarity: card.rarity });
-      updateSellBar();
-      showToast(`🪙 Card #${id} added to sell list.`);
-    });
 
-    actions.append(tradeBtn, ownedSpan, sellBtn);
-    cardContainer.append(img, num, actions);
-    grid.appendChild(cardContainer);
+      const span = container.querySelector(".owned-count") || (() => {
+        const s = document.createElement("span");
+        s.className = "owned-count";
+        container.appendChild(s);
+        return s;
+      })();
+
+      span.textContent = `Owned: ${qty}`;
+      container.dataset.owned = String(qty);
+
+      // Enable/disable SELL button based on ownership
+      const sellBtn = container.querySelector(".sell");
+      if (sellBtn) {
+        sellBtn.disabled = qty <= 0;
+        sellBtn.title = qty <= 0 ? "You don’t own this card" : "Add to sell list";
+      }
+    });
+  } else {
+    // Build grid from master list
+    grid.innerHTML = "";
+
+    for (const card of master) {
+      const id  = pad3(card.card_id);
+      const qty = Number(ownedMap[id] || 0);
+      if (qty > 0) ownedUniqueCount += 1;
+      totalOwnedCopies += qty;
+
+      const cardContainer = document.createElement("div");
+      cardContainer.className = `card-container ${rarityClass(card.rarity)}`;
+      cardContainer.dataset.rarity = card.rarity || "Common";
+      cardContainer.dataset.owned  = String(qty);
+
+      const img = document.createElement("img");
+      img.alt = card.name || `#${id}`;
+      img.className = qty > 0 ? "card-img" : "facedown-card";
+      // Use your preferred back image name as in your other UIs
+      img.src = qty > 0 ? imageURL(card) : `${IMG_BASE}/000_CardBack_Unique.png`;
+
+      const num = document.createElement("p");
+      num.textContent = `#${id}`;
+
+      const actions = document.createElement("div");
+      actions.className = "card-actions-vertical";
+
+      const tradeBtn = document.createElement("button");
+      tradeBtn.className = "trade";
+      tradeBtn.textContent = "[TRADE]";
+      tradeBtn.addEventListener("click", () => {
+        if (qty <= 0) return showToast("❌ You do not own this card.");
+        if (tradeQueue.length >= 30) return showToast("⚠️ Trade queue is full (30).");
+        tradeQueue.push({ id, filename: card.image, rarity: card.rarity });
+        tradeBtn.classList.add("queued");
+        showToast(`✅ Card #${id} added to trade queue.`);
+        updateBottomBar();
+      });
+
+      const ownedSpan = document.createElement("span");
+      ownedSpan.className = "owned-count";
+      ownedSpan.textContent = `Owned: ${qty}`;
+
+      const sellBtn = document.createElement("button");
+      sellBtn.className = "sell";
+      sellBtn.textContent = "[SELL]";
+      sellBtn.disabled = qty <= 0;
+      sellBtn.title = qty <= 0 ? "You don’t own this card" : "Add to sell list";
+      sellBtn.addEventListener("click", () => {
+        if (qty <= 0) return showToast("❌ You do not own this card.");
+        if (sellQueue.length >= 5) {
+          showToast("⚠️ You can only sell up to 5 cards every 24 hours.");
+          return;
+        }
+        sellQueue.push({ id, filename: card.image, rarity: card.rarity });
+        updateSellBar();
+        showToast(`🪙 Card #${id} added to sell list.`);
+      });
+
+      actions.append(tradeBtn, ownedSpan, sellBtn);
+      cardContainer.append(img, num, actions);
+      grid.appendChild(cardContainer);
+    }
   }
 
   /* ---------------- Header stats ---------------- */
