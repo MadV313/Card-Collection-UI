@@ -150,6 +150,25 @@
     ⚠️ You must sell at least 3 cards before opening a new pack!
   </div>
 
+  <!-- bottom queue bars (JS fills these) -->
+  <div id="sell-bottom-bar" class="collapsed">
+    <div id="bottom-sell-list"></div>
+  </div>
+  <div id="trade-bottom-bar" class="collapsed">
+    <div id="bottom-trade-list"></div>
+  </div>
+  <script>
+    // wire the toggle buttons (no other logic touched)
+    (function () {
+      const sellBtn = document.getElementById('toggle-sell-bar');
+      const tradeBtn = document.getElementById('toggle-bottom-bar');
+      const sellBar = document.getElementById('sell-bottom-bar');
+      const tradeBar = document.getElementById('trade-bottom-bar');
+      sellBtn?.addEventListener('click', () => sellBar?.classList.toggle('collapsed'));
+      tradeBtn?.addEventListener('click', () => tradeBar?.classList.toggle('collapsed'));
+    })();
+  </script>
+
   <div id="cards-container" class="card-grid">
     <!-- Helper shared by both loaders -->
     <script>
