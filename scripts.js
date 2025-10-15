@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const TOKEN     = qs.get("token") || "";
   const UID       = qs.get("uid")   || "";
   const FROM_PACK = qs.get("fromPackReveal") === "true";
+  const MODE      = (qs.get("mode") || "").toLowerCase(); // e.g. 'trade' (optional gating prep)
   // Mocks OFF by default (only on if explicitly requested)
   const USE_MOCK  = qs.get("useMockDeckData") === "true" || qs.get("mockMode") === "true" || qs.get("mock") === "1";
 
@@ -367,12 +368,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     return postJson(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/trade`, { cards });
   }
 
-  async function submitSell(cards) {
+  // Build `{ items: [{ number, qty }, ...] }` from the current sellQueue (unit entries)
+  function buildSellItems() {
+    const counts = {};
+    for (const e of sellQueue) {
+      const id = pad3(e.id);
+      counts[id] = (counts[id] || 0) + 1;
+    }
+    return { items: Object.entries(counts).map(([number, qty]) => ({ number, qty })) };
+  }
+
+  async function submitSell() {
     if (!API_BASE || !TOKEN) {
       showToast("⚠️ Selling requires a valid API and token.");
       return null;
     }
-    return postJson(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/sell`, { cards });
+    const body = buildSellItems();
+    return postJson(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/sell`, body);
   }
 
   function patchOwnedMapWithServer(collection) {
@@ -422,7 +434,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   /* ---------------- UI helpers ---------------- */
   const tradeQueue = [];
-  const sellQueue  = [];
+  const sellQueue  = []; // unit entries: [{ id, filename, rarity }, ...]
 
   function showToast(message) {
     const existing = document.getElementById("mock-toast");
@@ -437,6 +449,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
     document.body.appendChild(toast);
     setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 250); }, 1800);
+  }
+
+  function countQueuedSellById(id) {
+    const id3 = pad3(id);
+    return sellQueue.reduce((n, e) => n + (pad3(e.id) === id3 ? 1 : 0), 0);
+  }
+
+  function totalSellUnits() { return sellQueue.length; }
+
+  function addToSellQueueWithPrompt({ id, filename, rarity, owned }) {
+    const alreadyQueued = countQueuedSellById(id);
+    const remaining = Math.max(0, owned - alreadyQueued);
+    if (remaining <= 0) {
+      showToast("⚠️ You’ve already queued the maximum you own for this card.");
+      return;
+    }
+    const roomLeft = Math.max(0, 5 - totalSellUnits());
+    if (roomLeft <= 0) {
+      showToast("⚠️ You can only sell up to 5 cards every 24 hours.");
+      const bar = document.getElementById("sell-bottom-bar");
+      bar?.classList.add("limit-reached");
+      return;
+    }
+
+    const maxQty = Math.min(remaining, roomLeft);
+    let qty = prompt(`How many #${id} would you like to sell? (1–${maxQty})`, "1");
+    if (qty == null) return; // cancelled
+    qty = parseInt(qty, 10);
+    if (!Number.isFinite(qty) || qty < 1) {
+      showToast("⚠️ Invalid quantity.");
+      return;
+    }
+    if (qty > maxQty) {
+      showToast(`⚠️ You can sell at most ${maxQty} right now.`);
+      return;
+    }
+
+    for (let i = 0; i < qty; i++) {
+      sellQueue.push({ id: pad3(id), filename, rarity });
+    }
+    updateSellBar();
+    showToast(`🪙 Queued ${qty} × #${id} for selling.`);
   }
 
   function updateBottomBar() {
@@ -486,19 +540,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (res?.ok) {
           patchOwnedMapWithServer(res.collection);
           const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
-          cards.forEach(id => refreshTileFor(id, masterById));
+          [...new Set(cards)].forEach(id => refreshTileFor(id, masterById));
           if (coinBalanceEl && res.stats?.coins != null) coinBalanceEl.textContent = String(res.stats.coins);
           tradeQueue.length = 0;
           updateBottomBar();
           showToast(res.message || "📦 Trade submitted!");
-        } else if (res && res.message) {
-          showToast(`⚠️ ${res.message}`);
+        } else if (res && (res.message || res.error)) {
+          showToast(`⚠️ ${res.message || res.error}`);
         }
       });
       bar.appendChild(submitBtn);
     }
 
-    bar.classList.toggle("limit-reached", tradeQueue.length >= 30);
+    // Optional prep: when actually in trade mode, cap to 3
+    const cap = (MODE === "trade") ? 3 : 30;
+    bar.classList.toggle("limit-reached", tradeQueue.length >= cap);
   }
 
   function updateSellBar() {
@@ -523,9 +579,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const removeBtn = document.createElement("button");
       removeBtn.innerHTML = "🗑";
-      removeBtn.title = "Remove from sell list";
+      removeBtn.title = "Remove one from sell list";
       removeBtn.addEventListener("click", () => {
-        sellQueue.splice(index, 1);
+        sellQueue.splice(index, 1); // remove single unit
         updateSellBar();
         bar?.classList.remove("limit-reached");
       });
@@ -543,18 +599,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       submitBtn.textContent = "[SUBMIT SELL]";
       submitBtn.addEventListener("click", async () => {
         if (!sellQueue.length) return showToast("⚠️ Sell list is empty.");
-        const cards = sellQueue.map(e => pad3(e.id));
-        const res = await submitSell(cards);
+        const res = await submitSell();
         if (res?.ok) {
           patchOwnedMapWithServer(res.collection);
           const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
-          cards.forEach(id => refreshTileFor(id, masterById));
+          // refresh only IDs that changed
+          const changedIds = Object.keys((buildSellItems()).items.reduce((m, it) => (m[it.number]=1,m), {}));
+          changedIds.forEach(id => refreshTileFor(id, masterById));
           if (coinBalanceEl && res.stats?.coins != null) coinBalanceEl.textContent = String(res.stats.coins);
           sellQueue.length = 0;
           updateSellBar();
           showToast(res.message || "🪙 Sell submitted!");
-        } else if (res && res.message) {
-          showToast(`⚠️ ${res.message}`);
+        } else if (res && (res.message || res.error)) {
+          showToast(`⚠️ ${res.message || res.error}`);
         }
       });
       bar.appendChild(submitBtn);
@@ -647,10 +704,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       span.textContent = `Owned: ${qty}`;
       container.dataset.owned = String(qty);
 
+      // Wire SELL handler (quantity prompt + cap 5 / respect owned)
       const sellBtn = container.querySelector(".sell");
       if (sellBtn) {
         sellBtn.disabled = qty <= 0;
         sellBtn.title = qty <= 0 ? "You don’t own this card" : "Add to sell list";
+        sellBtn.addEventListener("click", () => {
+          if (qty <= 0) return showToast("❌ You do not own this card.");
+          const filename = masterCard?.image || "";
+          const rarity = masterCard?.rarity || "Common";
+          addToSellQueueWithPrompt({ id, filename, rarity, owned: qty });
+        });
+      }
+
+      // Keep existing trade button behavior (prep: optional cap if in MODE=trade)
+      const tradeBtn = container.querySelector(".trade");
+      if (tradeBtn) {
+        tradeBtn.addEventListener("click", () => {
+          if (qty <= 0) return showToast("❌ You do not own this card.");
+          const cap = (MODE === "trade") ? 3 : 30;
+          if (tradeQueue.length >= cap) return showToast(`⚠️ Trade queue is full (${cap}).`);
+          tradeQueue.push({ id, filename: masterCard?.image || "", rarity: masterCard?.rarity || "Common" });
+          tradeBtn.classList.add("queued");
+          showToast(`✅ Card #${id} added to trade queue.`);
+          updateBottomBar();
+        });
       }
     });
   } else {
@@ -691,7 +769,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       tradeBtn.textContent = "[TRADE]";
       tradeBtn.addEventListener("click", () => {
         if (qty <= 0) return showToast("❌ You do not own this card.");
-        if (tradeQueue.length >= 30) return showToast("⚠️ Trade queue is full (30).");
+        const cap = (MODE === "trade") ? 3 : 30;
+        if (tradeQueue.length >= cap) return showToast(`⚠️ Trade queue is full (${cap}).`);
         tradeQueue.push({ id, filename: card.image, rarity: card.rarity });
         tradeBtn.classList.add("queued");
         showToast(`✅ Card #${id} added to trade queue.`);
@@ -709,13 +788,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       sellBtn.title = qty <= 0 ? "You don’t own this card" : "Add to sell list";
       sellBtn.addEventListener("click", () => {
         if (qty <= 0) return showToast("❌ You do not own this card.");
-        if (sellQueue.length >= 5) {
-          showToast("⚠️ You can only sell up to 5 cards every 24 hours.");
-          return;
-        }
-        sellQueue.push({ id, filename: card.image, rarity: card.rarity });
-        updateSellBar();
-        showToast(`🪙 Card #${id} added to sell list.`);
+        addToSellQueueWithPrompt({ id, filename: card.image, rarity: card.rarity, owned: qty });
       });
 
       actions.append(tradeBtn, ownedSpan, sellBtn);
@@ -747,5 +820,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (FROM_PACK) {
     showToast("✨ New cards added from Pack Reveal!");
+  }
+
+  /* ---------------- Return to HUB: keep token/api ---------------- */
+  const hubLink = document.getElementById("return-to-hub");
+  if (hubLink) {
+    try {
+      const u = new URL(hubLink.href);
+      if (TOKEN) u.searchParams.set("token", TOKEN);
+      if (API_BASE) u.searchParams.set("api", API_BASE);
+      hubLink.href = u.toString();
+    } catch {
+      // If original was a relative without protocol, build safely
+      let base = hubLink.getAttribute("href") || "https://madv313.github.io/HUB-UI/";
+      const sep = base.includes("?") ? "&" : "?";
+      const qp  = [
+        TOKEN ? `token=${encodeURIComponent(TOKEN)}` : "",
+        API_BASE ? `api=${encodeURIComponent(API_BASE)}` : ""
+      ].filter(Boolean).join("&");
+      hubLink.setAttribute("href", qp ? `${base}${sep}${qp}` : base);
+    }
   }
 });
