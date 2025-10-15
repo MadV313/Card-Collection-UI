@@ -8,8 +8,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const USE_MOCK  = qs.get("useMockDeckData") === "true" || qs.get("mockMode") === "true";
 
   // Allow overriding API and image bases via query params
-  const API_BASE = (qs.get("api") || "").replace(/\/+$/, "");                        // e.g. https://your-bot.app
-  const IMG_BASE = (qs.get("imgbase") || "images/cards").replace(/\/+$/, "");        // default local folder
+  // API_BASE is only needed for dynamic data; images can be served from this repo by default.
+  const API_BASE = (qs.get("api") || "").replace(/\/+$/, "");                 // e.g. https://duel-bot-production.up.railway.app
+  const IMG_BASE = (qs.get("imgbase") || "images/cards").replace(/\/+$/, ""); // default to this repo's images/cards
 
   /* ---------------- helpers ---------------- */
   function pad3(id) { return String(id).padStart(3, "0"); }
@@ -39,9 +40,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function loadMaster() {
-    // Prefer bot master list (has `image` filenames) if API_BASE provided
+    // Prefer bot master list (has filenames) if API_BASE provided; otherwise try local copy in this UI
     const primary = API_BASE ? `${API_BASE}/logic/CoreMasterReference.json` : "logic/CoreMasterReference.json";
     let master = await fetchJSON(primary);
+
+    // Normalize: ensure card_id is 3-digit string; accept "image" or "filename"
+    if (Array.isArray(master)) {
+      master = master.map(c => {
+        const id    = pad3(c.card_id ?? c.number ?? c.id);
+        const img   = c.image || c.filename || "";
+        const name  = c.name || `Card ${id}`;
+        const type  = c.type || "Unknown";
+        const rarity = c.rarity || "Common";
+        return { ...c, card_id: id, image: img, name, type, rarity };
+      });
+    }
 
     if (!Array.isArray(master) || !master.length) {
       // Fallback: minimal local stub if needed (will synthesize filenames)
@@ -148,12 +161,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     return { coins: 0, wins: 0, losses: 0, discordName: "" };
   }
 
+  function isAbsoluteUrl(u) {
+    return /^https?:\/\//i.test(String(u || ""));
+  }
+
   function imageURL(card) {
     // Prefer master-provided filename; otherwise synthesize
     const file = card.image
-      ? safe(card.image)
+      ? String(card.image)
       : `${pad3(card.card_id)}_${safe(card.name)}_${safe(card.type)}.png`;
-    return `${IMG_BASE}/${file}`;
+
+    // If the master contained a full URL, use it as-is
+    if (isAbsoluteUrl(file)) return file;
+
+    // Otherwise, serve from the configured image base
+    return `${IMG_BASE}/${safe(file)}`;
   }
 
   /* ---------------- UI helpers you already had ---------------- */
@@ -186,7 +208,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.classList.add("trade-card-entry");
 
       const thumb = document.createElement("img");
-      thumb.src = `${IMG_BASE}/${safe(entry.filename || "000_CardBack_Unique.png")}`;
+      thumb.src = isAbsoluteUrl(entry.filename)
+        ? entry.filename
+        : `${IMG_BASE}/${safe(entry.filename || "000_CardBack_Unique.png")}`;
       thumb.alt = `#${entry.id}`;
       thumb.classList.add("thumb");
       thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
@@ -232,7 +256,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.classList.add("sell-card-entry");
 
       const thumb = document.createElement("img");
-      thumb.src = `${IMG_BASE}/${safe(entry.filename || "000_CardBack_Unique.png")}`;
+      thumb.src = isAbsoluteUrl(entry.filename)
+        ? entry.filename
+        : `${IMG_BASE}/${safe(entry.filename || "000_CardBack_Unique.png")}`;
       thumb.alt = `#${entry.id}`;
       thumb.classList.add("thumb");
       thumb.title = `Card #${entry.id} (${entry.rarity || "Unknown"})`;
@@ -312,6 +338,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           container.className = `card-container ${rarityClass(masterCard.rarity)}`;
           container.dataset.rarity = masterCard.rarity || "Common";
         }
+      } else {
+        // keep face-down if unowned
+        img.src = `${IMG_BASE}/000_CardBack_Unique.png`;
+        img.classList.add("facedown-card");
+        container.dataset.rarity = masterCard?.rarity || "Common";
       }
 
       const span = container.querySelector(".owned-count") || (() => {
@@ -349,7 +380,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const img = document.createElement("img");
       img.alt = card.name || `#${id}`;
       img.className = qty > 0 ? "card-img" : "facedown-card";
-      // Use your preferred back image name as in your other UIs
       img.src = qty > 0 ? imageURL(card) : `${IMG_BASE}/000_CardBack_Unique.png`;
 
       const num = document.createElement("p");
