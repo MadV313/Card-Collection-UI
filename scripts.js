@@ -16,7 +16,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- helpers ---------------- */
   const trimSlash = (s="") => String(s).replace(/\/+$/, "");
   function pad3(id) { return String(id).padStart(3, "0"); }
-  function safe(s)  { return String(s || "").replace(/[^a-zA-Z0-9._-]/g, ""); }
+  function safe(s)  {
+    return String(s || "")
+      .normalize("NFKD")
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9._-]/g, "")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "");
+  }
   const isAbsoluteUrl = (u) => /^https?:\/\//i.test(String(u || ""));
 
   // derive an absolute path to this repo’s images/cards, regardless of how index.html is served
@@ -120,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    // Built-in hosted fallbacks ensure we always land on the real master data when available
+     // Built-in hosted fallbacks ensure we always land on the real master data when available
     if (!Array.isArray(master) || !master.length) {
       for (const url of BUILTIN_MASTER_FALLBACKS) {
         master = await fetchJSON(url);
@@ -252,35 +259,49 @@ document.addEventListener("DOMContentLoaded", async () => {
   function filenameCandidates(card) {
     const id   = pad3(card.card_id);
     const name = safe(card.name);
-    const type = String(card.type || "Unknown");
+    const type = safe(card.type || "Unknown");
 
     const explicit = card.image || card.filename || "";
-    const explicitSan = explicit && !isAbsoluteUrl(explicit) ? safe(explicit) : explicit;
-
+    
+    const rawType = card.type || "Unknown";
     const typeVariants = uniq([
-      safe(type),
-      safe(titleCase(type)),
-      safe(type.toLowerCase()),
-      safe(type.toUpperCase())
-    ]);
+      type,
+      safe(titleCase(rawType)),
+      safe(String(rawType).toLowerCase()),
+      safe(String(rawType).toUpperCase()),
+      type.replace(/[-]+/g, "_"),
+      type.replace(/_+/g, "-")
+    ].filter(Boolean));
 
+    const rawName = card.name || "";
     const nameVariants = uniq([
       name,
+      safe(rawName),
+      safe(rawName.replace(/\s+/g, "-")),
       name.replace(/[-]+/g, ""),
       name.replace(/_+/g, ""),
       name.replace(/[-]+/g, "_"),
-      name.replace(/_+/g, "-")
+      name.replace(/_+/g, "-"),
+      name.replace(/[-_]+/g, ""),
+      name.replace(/__+/g, "_")
     ].filter(Boolean));
 
     const synths = nameVariants.flatMap(n => typeVariants.map(t => `${id}_${n}_${t}.png`));
 
     const explicitVariants = [];
-    if (explicitSan && !isAbsoluteUrl(explicitSan)) {
-      explicitVariants.push(explicitSan);
-      explicitVariants.push(explicitSan.replace(/[-]+/g, ""));
-      explicitVariants.push(explicitSan.replace(/_+/g, ""));
-    } else if (explicitSan) {
-      explicitVariants.push(explicitSan);
+    if (explicit && !isAbsoluteUrl(explicit)) {
+      const trimmed = explicit.trim();
+      if (trimmed) {
+        explicitVariants.push(trimmed);
+        const sanitized = safe(trimmed);
+        if (sanitized) {
+          explicitVariants.push(sanitized);
+          explicitVariants.push(sanitized.replace(/[-]+/g, ""));
+          explicitVariants.push(sanitized.replace(/_+/g, ""));
+        }
+      }
+    } else if (explicit) {
+      explicitVariants.push(explicit);
     }
 
     const list = [];
