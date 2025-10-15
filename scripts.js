@@ -64,6 +64,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     return out;
   }
 
+  const SELF_REPO_ROOT = deriveSelfImagesAbs().replace(/\/images\/cards$/i, "");
+  const BUILTIN_MASTER_FALLBACKS = uniq([
+    `${trimSlash(SELF_REPO_ROOT)}/logic/CoreMasterReference.json`,
+    `${trimSlash(SELF_REPO_ROOT)}/CoreMasterReference.json`,
+    "https://madv313.github.io/Card-Collection-UI/logic/CoreMasterReference.json",
+    "https://madv313.github.io/Card-Collection-UI/CoreMasterReference.json",
+    "https://madv313.github.io/Duel-Bot/logic/CoreMasterReference.json",
+    "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/logic/CoreMasterReference.json",
+    "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/CoreMasterReference.json"
+  ].filter(Boolean));
+  
   async function fetchJSON(url) {
     try {
       const r = await fetch(url, { cache: "no-store" });
@@ -109,6 +120,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
+    // Built-in hosted fallbacks ensure we always land on the real master data when available
+    if (!Array.isArray(master) || !master.length) {
+      for (const url of BUILTIN_MASTER_FALLBACKS) {
+        master = await fetchJSON(url);
+        if (Array.isArray(master) && master.length) {
+          console.log(`[ccui] Using built-in master: ${url}`);
+          break;
+        }
+      }
+    }
+    
     // Normalize a bit (handles either "image" or "filename"; fills name/type/rarity)
     if (Array.isArray(master)) {
       master = master.map(c => {
@@ -242,10 +264,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       safe(type.toUpperCase())
     ]);
 
-    const synths = typeVariants.map(t => `${id}_${name}_${t}.png`);
+    const nameVariants = uniq([
+      name,
+      name.replace(/[-]+/g, ""),
+      name.replace(/_+/g, ""),
+      name.replace(/[-]+/g, "_"),
+      name.replace(/_+/g, "-")
+    ].filter(Boolean));
+
+    const synths = nameVariants.flatMap(n => typeVariants.map(t => `${id}_${n}_${t}.png`));
+
+    const explicitVariants = [];
+    if (explicitSan && !isAbsoluteUrl(explicitSan)) {
+      explicitVariants.push(explicitSan);
+      explicitVariants.push(explicitSan.replace(/[-]+/g, ""));
+      explicitVariants.push(explicitSan.replace(/_+/g, ""));
+    } else if (explicitSan) {
+      explicitVariants.push(explicitSan);
+    }
 
     const list = [];
-    if (explicitSan) list.push(explicitSan);
+    list.push(...explicitVariants);
     list.push(...synths);
 
     return uniq(list.filter(Boolean));
