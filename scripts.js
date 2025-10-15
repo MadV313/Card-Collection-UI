@@ -1,4 +1,5 @@
-// scripts.js — Token-aware Card Collection UI (supports ?token= or ?uid=, API/IMG bases, and mocks)
+<!-- scripts.js — Token-aware Card Collection UI (prefers local master JSON, has robust IMG fallbacks) -->
+<script>
 document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- URL params & config ---------------- */
   const qs = new URLSearchParams(window.location.search);
@@ -27,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `${url.origin}${dir}/images/cards`;
   }
 
-  // Built-in secondary fallbacks (✅ fixed: include Card-Collection-UI path)
+  // Built-in secondary fallbacks
   const BUILTIN_IMG_FALLBACKS = [
     deriveSelfImagesAbs(), // absolute to this UI’s /images/cards
     "https://madv313.github.io/Card-Collection-UI/images/cards",
@@ -75,11 +76,40 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function loadMaster() {
-    // Prefer bot master (has filenames) if API_BASE provided; else local copy
-    const primary = API_BASE ? `${API_BASE}/logic/CoreMasterReference.json` : "logic/CoreMasterReference.json";
-    let master = await fetchJSON(primary);
+    // 🔁 NEW: Try local copies FIRST (several common paths), then the API if needed
+    const localCandidates = [
+      "data/CoreMasterReference.json",
+      "logic/CoreMasterReference.json",
+      "CoreMasterReference.json"
+    ];
 
-    // Normalize a bit
+    let master = null;
+
+    // Try local paths in order
+    for (const p of localCandidates) {
+      master = await fetchJSON(p);
+      if (Array.isArray(master) && master.length) {
+        console.log(`[ccui] Using local master: ${p}`);
+        break;
+      }
+    }
+
+    // If no local worked and API provided, try the API variants
+    if ((!Array.isArray(master) || !master.length) && API_BASE) {
+      const apiCandidates = [
+        `${API_BASE}/logic/CoreMasterReference.json`,
+        `${API_BASE}/CoreMasterReference.json`
+      ];
+      for (const p of apiCandidates) {
+        master = await fetchJSON(p);
+        if (Array.isArray(master) && master.length) {
+          console.log(`[ccui] Using API master: ${p}`);
+          break;
+        }
+      }
+    }
+
+    // Normalize a bit (handles either "image" or "filename"; fills name/type/rarity)
     if (Array.isArray(master)) {
       master = master.map(c => {
         const id     = pad3(c.card_id ?? c.number ?? c.id);
@@ -91,8 +121,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
+    // Final fallback (minimal stub) — should rarely trigger now
     if (!Array.isArray(master) || !master.length) {
-      console.warn("[ccui] Falling back to minimal master (no remote CoreMasterReference.json)");
+      console.warn("[ccui] Falling back to minimal master (no local/API CoreMasterReference.json)");
       master = Array.from({ length: 127 }, (_, i) => {
         const id = pad3(i + 1);
         return {
@@ -420,7 +451,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             onFailToAll: () => { img.src = `${deriveSelfImagesAbs()}/000_CardBack_Unique.png`; }
           });
           img.classList.remove("facedown-card");
-          img.classList.add("card-img"); // ✅ ensure proper owned styling
+          img.classList.add("card-img"); // ensure proper owned styling
           container.className = `card-container ${rarityClass(masterCard.rarity)}`;
           container.dataset.rarity = masterCard.rarity || "Common";
         }
@@ -537,3 +568,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     showToast("✨ New cards added from Pack Reveal!");
   }
 });
+</script>
