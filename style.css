@@ -67,6 +67,28 @@ h1 { margin: 20px; }
   border-radius: 6px;
 }
 
+/* Generic disabled overlay (for gating trade UI when not in session) */
+.is-disabled {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.5;
+  filter: grayscale(70%);
+}
+.is-disabled::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.15);
+  border-radius: inherit;
+}
+
+/* Optional label used by scripts on bottom bars */
+.bar-title {
+  font-weight: 700;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
 button.trade,
 button.sell {
   background-color: rgba(51, 51, 51, 0.75);
@@ -227,6 +249,20 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
 
 .facedown-card {
   border: 3px solid red !important;
+}
+
+/* Sticky decision/phase banner (JS toggles visibility) */
+#trade-banner {
+  position: sticky;
+  top: 0;
+  z-index: 1002;
+  width: 100%;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-bottom: 1px solid #334155;
+  padding: 10px 12px;
+  font-family: system-ui, sans-serif;
+  display: none;
 }
 
 #new-unlocked-banner {
