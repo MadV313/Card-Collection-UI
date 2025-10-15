@@ -69,7 +69,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 -2px 10px rgba(255, 215, 0, 0.5);
+      box-shadow: 0 - 2px 10px rgba(255, 215, 0, 0.5);
       transition: transform 0.4s ease;
       overflow-x: auto;
     }
@@ -273,7 +273,7 @@
             // Load collection via token
             const collRes = await fetch(`${base}/me/${encodeURIComponent(token)}/collection`, { cache: "no-store" });
             if (!collRes.ok) throw new Error(`collection ${collRes.status}`);
-            const coll = await collRes.json(); // [{ number, owned, name, rarity, type, filename }, ...]
+            const coll = await collRes.json(); // [{ number, owned, name, rarity, type, filename }, ... ]
 
             // Build quick lookup and counters
             const byNum = Object.create(null);
