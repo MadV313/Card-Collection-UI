@@ -151,47 +151,8 @@
   </div>
 
   <div id="cards-container" class="card-grid">
+    <!-- Helper shared by both loaders -->
     <script>
-      const urlParams = new URLSearchParams(window.location.search);
-      const mockMode = urlParams.get("mockMode") === "true";
-    
-      if (mockMode) {
-      fetch('mock_deckData.json')
-        .then(res => res.json())
-        .then(cards => {
-          const cardMap = {};
-          let totalOwned = 0;
-
-          cards.forEach(card => {
-            const id = card.card_id.replace(/-DUP\d*$/, '');
-            cardMap[id] = (cardMap[id] || { ...card, count: 0 });
-            cardMap[id].count++;
-            totalOwned++;
-          });
-
-          document.querySelectorAll('.card-container').forEach(container => {
-            const number = container.querySelector('p')?.textContent?.replace('#', '');
-            if (!number || !cardMap[number]) return;
-
-            const owned = cardMap[number];
-            const img = container.querySelector('img');
-            const span = container.querySelector('.owned-count');
-            const rarity = owned["Card Rarity"];
-
-            img.src = `images/cards/${owned.image}`;
-            img.classList.remove('facedown-card');
-            container.className = `card-container ${getRarityBorder(rarity)}`;
-            container.dataset.rarity = rarity;
-            container.dataset.owned = owned.count;
-            span.textContent = `Owned: ${owned.count}`;
-          });
-
-          document.getElementById('collection-count').textContent =
-            `Cards Collected: ${Object.keys(cardMap).length} / 127`;
-          document.getElementById('total-owned-count').textContent =
-            `Total Cards Owned: ${totalOwned} / 250`;
-        });
-
       function getRarityBorder(rarity) {
         const map = {
           "Common": "common-border",
@@ -202,6 +163,132 @@
         };
         return map[rarity] || '';
       }
+    </script>
+
+    <!-- 1) MOCK loader (unchanged behavior, properly scoped) -->
+    <script>
+      (function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const mockMode  = urlParams.get("mockMode") === "true";
+        if (!mockMode) return;
+
+        fetch('mock_deckData.json')
+          .then(res => res.json())
+          .then(cards => {
+            const cardMap = {};
+            let totalOwned = 0;
+
+            cards.forEach(card => {
+              const id = card.card_id.replace(/-DUP\d*$/, '');
+              cardMap[id] = (cardMap[id] || { ...card, count: 0 });
+              cardMap[id].count++;
+              totalOwned++;
+            });
+
+            document.querySelectorAll('.card-container').forEach(container => {
+              const number = container.querySelector('p')?.textContent?.replace('#', '');
+              if (!number || !cardMap[number]) return;
+
+              const owned  = cardMap[number];
+              const img    = container.querySelector('img');
+              const span   = container.querySelector('.owned-count');
+              const rarity = owned["Card Rarity"];
+
+              img.src = `images/cards/${owned.image}`;
+              img.classList.remove('facedown-card');
+              container.className = `card-container ${getRarityBorder(rarity)}`;
+              container.dataset.rarity = rarity;
+              container.dataset.owned  = owned.count;
+              span.textContent = `Owned: ${owned.count}`;
+            });
+
+            document.getElementById('collection-count').textContent  =
+              `Cards Collected: ${Object.keys(cardMap).length} / 127`;
+            document.getElementById('total-owned-count').textContent =
+              `Total Cards Owned: ${totalOwned} / 250`;
+          });
+      })();
+    </script>
+
+    <!-- 2) TOKEN/API loader (runs only when ?token= & ?api= are present) -->
+    <script>
+      (function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const mockMode  = urlParams.get("mockMode") === "true";
+        const token     = urlParams.get("token");
+        const apiBase   = urlParams.get("api");
+        if (mockMode || !token || !apiBase) return; // keep mock behavior if requested
+
+        const base = apiBase.replace(/\/+$/, "");
+
+        (async () => {
+          try {
+            // Load collection via token
+            const collRes = await fetch(`${base}/me/${encodeURIComponent(token)}/collection`, { cache: "no-store" });
+            if (!collRes.ok) throw new Error(`collection ${collRes.status}`);
+            const coll = await collRes.json(); // [{ number, owned, name, rarity, type, filename }, ...]
+
+            // Build quick lookup and counters
+            const byNum = Object.create(null);
+            let collected = 0;
+            let totalOwned = 0;
+
+            for (const c of coll) {
+              const num   = String(c.number).padStart(3, "0");
+              const count = Number(c.owned || 0);
+              byNum[num]  = { ...c, count };
+              if (count > 0) {
+                collected += 1;
+                totalOwned += count;
+              }
+            }
+
+            // Update each pre-rendered tile
+            document.querySelectorAll(".card-container").forEach(container => {
+              const numEl = container.querySelector("p");
+              const img   = container.querySelector("img");
+              const span  = container.querySelector(".owned-count");
+              if (!numEl || !img || !span) return;
+
+              const number = (numEl.textContent || "").replace("#", "");
+              const info   = byNum[number];
+
+              if (info && info.count > 0) {
+                img.src = `images/cards/${info.filename}`;
+                img.classList.remove("facedown-card");
+                container.className = `card-container ${getRarityBorder(info.rarity)}`;
+                container.dataset.rarity = info.rarity || "";
+                container.dataset.owned  = String(info.count);
+                span.textContent = `Owned: ${info.count}`;
+              } else {
+                span.textContent = "Owned: 0";
+              }
+            });
+
+            // Totals header
+            const collHdr  = document.getElementById("collection-count");
+            const totalHdr = document.getElementById("total-owned-count");
+            if (collHdr)  collHdr.textContent  = `Cards Collected: ${collected} / 127`;
+            if (totalHdr) totalHdr.textContent = `Total Cards Owned: ${totalOwned} / 250`;
+
+            // Coins/stats (optional)
+            try {
+              const statRes = await fetch(`${base}/me/${encodeURIComponent(token)}/stats`, { cache: "no-store" });
+              if (statRes.ok) {
+                const stats = await statRes.json();
+                const coinEl = document.getElementById("coin-balance");
+                if (coinEl && typeof stats?.coins !== "undefined") {
+                  coinEl.textContent = String(Number(stats.coins) || 0);
+                }
+              }
+            } catch (e) {
+              console.warn("Stats fetch failed:", e?.message || e);
+            }
+          } catch (err) {
+            console.error("Failed to load collection via API:", err?.message || err);
+          }
+        })();
+      })();
     </script>
     
     <div class="card-container unique-border" data-rarity="Unique" data-owned="0">
