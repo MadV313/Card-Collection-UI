@@ -31,6 +31,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const SEEN_KEY  = `ccui:newSeen:${TOKEN || UID}:${NEW_TS || "0"}`;
   const alreadySeenThisBatch = sessionStorage.getItem(SEEN_KEY) === "1";
 
+  // Audio paths
+  const BG_MUSIC_SRC  = "audio/bg/Follow the Trail.mp3";
+  const SALE_SFX_SRC  = "audio/effects/sale.mp3";
+
   /* ---------------- helpers ---------------- */
   const trimSlash = (s="") => String(s).replace(/\/+$/, "");
   function pad3(id) { return String(id).padStart(3, "0"); }
@@ -486,6 +490,96 @@ document.addEventListener("DOMContentLoaded", async () => {
     setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 250); }, 1800);
   }
 
+  // ---- Audio: background music + SFX (auto-injected toggle) ----
+  const MUSIC_MUTED_KEY = "ccui:musicMuted";
+  let bgAudio = null;
+  let saleSfx = null;
+
+  function initAudio() {
+    try {
+      // Background music
+      bgAudio = new Audio(BG_MUSIC_SRC);
+      bgAudio.loop = true;
+      bgAudio.preload = "auto";
+      bgAudio.volume = 0.35;         // gentle by default
+      // SFX
+      saleSfx = new Audio(SALE_SFX_SRC);
+      saleSfx.preload = "auto";
+      saleSfx.volume = 0.9;
+
+      // Create a toggle button if it doesn't exist
+      let btn = document.getElementById("music-toggle");
+      if (!btn) {
+        btn = document.createElement("button");
+        btn.id = "music-toggle";
+        btn.textContent = "♫ Music: Off";
+        document.body.appendChild(btn);
+      }
+
+      const isMuted = localStorage.getItem(MUSIC_MUTED_KEY) === "1";
+      const desiredOn = !isMuted;
+
+      const updateLabel = (playing) => {
+        btn.textContent = playing ? "♫ Music: On" : "♫ Music: Off";
+      };
+
+      const playIfAllowed = async () => {
+        try {
+          await bgAudio.play();
+          updateLabel(true);
+        } catch {
+          // Autoplay blocked; will require a user gesture
+          updateLabel(false);
+        }
+      };
+
+      // Try to start if not muted (will silently fail without gesture)
+      if (desiredOn) playIfAllowed(); else updateLabel(false);
+
+      // First user interaction → try to play if desired
+      const oneShotStart = () => {
+        if (desiredOn && bgAudio.paused) playIfAllowed();
+        window.removeEventListener("pointerdown", oneShotStart);
+        window.removeEventListener("keydown", oneShotStart);
+      };
+      window.addEventListener("pointerdown", oneShotStart, { once: true });
+      window.addEventListener("keydown", oneShotStart, { once: true });
+
+      // Toggle handler
+      btn.addEventListener("click", async () => {
+        if (!bgAudio) return;
+        if (bgAudio.paused) {
+          try {
+            await bgAudio.play();
+            localStorage.setItem(MUSIC_MUTED_KEY, "0");
+            updateLabel(true);
+            showToast("🎵 Music On");
+          } catch {
+            updateLabel(false);
+            showToast("⚠️ Tap again to allow audio.");
+          }
+        } else {
+          bgAudio.pause();
+          localStorage.setItem(MUSIC_MUTED_KEY, "1");
+          updateLabel(false);
+          showToast("🔇 Music Off");
+        }
+      });
+    } catch (e) {
+      console.warn("[ccui] audio init failed:", e?.message || e);
+    }
+  }
+
+  function playSaleSfx() {
+    try {
+      if (!saleSfx) return;
+      saleSfx.currentTime = 0;
+      // Do not play if user muted bg music (treat as global mute signal)
+      if (localStorage.getItem(MUSIC_MUTED_KEY) === "1") return;
+      saleSfx.play().catch(() => {});
+    } catch {}
+  }
+
   function ensureTradeBanner() {
     let b = document.getElementById("trade-banner");
     if (!b) {
@@ -827,6 +921,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (coinBalanceEl && res.balance != null) coinBalanceEl.textContent = String(res.balance);
           sellQueue.length = 0;
           updateSellBar();
+          playSaleSfx(); // 🔊 play sale sound
           showToast(res.message || `🪙 Sold! +${res.credited ?? 0} coins`);
         } else if (res && (res.message || res.error)) {
           showToast(`⚠️ ${res.message || res.error}`);
@@ -1054,6 +1149,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (FROM_PACK) {
     showToast("✨ New cards added from Pack Reveal!");
   }
+
+  // Start audio (creates toggle & handles autoplay policy)
+  initAudio();
 
   // If we’re in a trade session, hydrate state & banner
   if (TRADE_MODE) {
