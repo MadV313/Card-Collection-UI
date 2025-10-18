@@ -425,22 +425,67 @@ document.addEventListener("DOMContentLoaded", async () => {
     return postJson(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/sell`, body);
   }
 
+  /* ---------------- NEW: trade collections & summary helpers ---------------- */
+  async function loadTradeCollections() {
+    if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) return null;
+    const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/collections?token=${encodeURIComponent(TOKEN)}`;
+    const data = await fetchJSON(url);
+    if (!data?.ok) return null;
+    // Normalize to maps
+    const toMap = (arr) => {
+      const m = {};
+      if (Array.isArray(arr)) {
+        for (const row of arr) {
+          const id = pad3(row.id || row.card_id || row.number);
+          const qty = Number(row.qty ?? row.owned ?? 0);
+          if (!id || !Number.isFinite(qty)) continue;
+          m[id] = qty;
+        }
+      }
+      return m;
+    };
+    return {
+      role: String(data.role || "").toLowerCase(),
+      stage: String(data.stage || "").toLowerCase(),
+      myMap: toMap(data.me || []),
+      partnerMap: toMap(data.partner || [])
+    };
+  }
+
+  async function loadTradeSummary() {
+    if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) return null;
+    const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/summary?token=${encodeURIComponent(TOKEN)}`;
+    return await fetchJSON(url);
+  }
+
   function patchOwnedMapWithServer(collection) {
-    if (!collection || typeof collection !== "object") return;
+    if (!collection || typeof collection !== "object" || !ownedMap) return;
     // Clear then patch to match server truth
     for (const k of Object.keys(ownedMap)) delete ownedMap[k];
     for (const [k, v] of Object.entries(collection)) ownedMap[pad3(k)] = Number(v) || 0;
   }
 
+  // Refresh the entire grid based on the *current* ownedMap pointer
+  function applyOwnedMapToGrid(masterById) {
+    const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
+    if (!grid) return;
+    grid.querySelectorAll(".card-container").forEach(container => {
+      const numEl = container.querySelector("p");
+      if (!numEl) return;
+      const id = (numEl.textContent || "").replace("#", "");
+      refreshTileFor(id, masterById);
+    });
+  }
+
   function refreshTileFor(id, masterById) {
     const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
-    const tile = [...grid.querySelectorAll(".card-container")].find(div => {
+    const tile = [...(grid?.querySelectorAll(".card-container") || [])].find(div => {
       const p = div.querySelector("p");
       return p && p.textContent.replace("#","") === id;
     });
     if (!tile) return;
 
-    const qty = Number(ownedMap[id] || 0);
+    const qty = Number(ownedMap?.[id] || 0);
     const img = tile.querySelector("img");
     const masterCard = masterById[id];
 
@@ -697,7 +742,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     PARTNER_NAME   = (TRADE_ROLE === "initiator" ? state.partner?.name : state.initiator?.name) || PARTNER_NAME;
     TRADE_LIMITS   = state.limits || TRADE_LIMITS;
 
-    // Decision summary
+    // Decision summary (basic id pills; detailed summary available via loadTradeSummary if desired)
     let summary = null;
     if (TRADE_STAGE === "decision") {
       const offer = state.initiator?.selection || [];
@@ -845,6 +890,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (res?.ok) {
         // Stage transition handled by server; re-pull state
         const state = await loadTradeState();
+
+        // NEW: hydrate collections and switch the view/grid when needed
+        await hydrateTradeCollectionsAndSwitchView();
+
         if (state?.stage === "pickTheirs".toLowerCase() || state?.stage === "picktheirs") {
           // If I’m initiator, move to partner picks
           if (TRADE_ROLE === "initiator") {
@@ -942,7 +991,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadCollection(),
     loadStats()
   ]);
-  const ownedMap = collectionResult.map || {};
+
+  // NEW: maintain separate ownership maps and a pointer to the one currently displayed
+  let myOwnedMap = collectionResult.map || {};
+  let partnerOwnedMap = {}; // filled in trade mode via /trade/:session/collections
+  let ownedMap = myOwnedMap; // pointer that can flip to partner view in trade mode
 
   /* ---------------- Build OR Hydrate grid ---------------- */
   const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
@@ -952,6 +1005,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const hasPreRenderedTiles = !!grid.querySelector(".card-container");
+  const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
 
   let totalOwnedCopies = 0;
   let ownedUniqueCount = 0;
@@ -980,8 +1034,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   if (hasPreRenderedTiles) {
-    const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
-
     grid.querySelectorAll(".card-container").forEach(container => {
       const numEl = container.querySelector("p");
       const img   = container.querySelector("img");
@@ -1037,7 +1089,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const tradeBtn = container.querySelector(".trade");
       if (tradeBtn) {
         tradeBtn.addEventListener("click", () => {
-          if (qty <= 0) return showToast("❌ You do not own this card.");
+          const qtyNow = Number(ownedMap[id] || 0); // use *current* pointer
+          if (qtyNow <= 0) return showToast("❌ You do not own this card.");
           if (!TRADE_MODE || !TRADE_SESSION_ID) {
             return showToast("ℹ️ Start a trade with /trade.");
           }
@@ -1090,7 +1143,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       tradeBtn.className = "trade";
       tradeBtn.textContent = "[TRADE]";
       tradeBtn.addEventListener("click", () => {
-        if (qty <= 0) return showToast("❌ You do not own this card.");
+        const qtyNow = Number(ownedMap[id] || 0); // use *current* pointer
+        if (qtyNow <= 0) return showToast("❌ You do not own this card.");
         if (!TRADE_MODE || !TRADE_SESSION_ID) {
           return showToast("ℹ️ Start a trade with /trade.");
         }
@@ -1115,8 +1169,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       sellBtn.disabled = qty <= 0;
       sellBtn.title = qty <= 0 ? "You don’t own this card" : "Add to sell list";
       sellBtn.addEventListener("click", () => {
-        if (qty <= 0) return showToast("❌ You do not own this card.");
-        addToSellQueueWithPrompt({ id, filename: card.image, rarity: card.rarity, owned: qty });
+        const qtyNow = Number(ownedMap[id] || 0); // use *current* pointer
+        if (qtyNow <= 0) return showToast("❌ You do not own this card.");
+        addToSellQueueWithPrompt({ id, filename: card.image, rarity: card.rarity, owned: qtyNow });
       });
 
       actions.append(tradeBtn, ownedSpan, sellBtn);
@@ -1153,7 +1208,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Start audio (creates toggle & handles autoplay policy)
   initAudio();
 
-  // If we’re in a trade session, hydrate state & banner
+  // NEW: helper to hydrate trade collections and switch the grid view appropriately
+  async function hydrateTradeCollectionsAndSwitchView() {
+    if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) return;
+    const data = await loadTradeCollections();
+    if (!data) return;
+    // update role/stage if backend returns them
+    if (data.role) TRADE_ROLE = data.role;
+    if (data.stage) TRADE_STAGE = data.stage;
+    // patch maps
+    myOwnedMap = data.myMap || myOwnedMap;
+    partnerOwnedMap = data.partnerMap || partnerOwnedMap;
+
+    // flip pointer based on stage
+    if (TRADE_STAGE === "picktheirs") {
+      // Show partner collection during step 2 (initiator can see requestable cards)
+      ownedMap = (TRADE_ROLE === "initiator") ? partnerOwnedMap : myOwnedMap;
+    } else {
+      // pickmine / decision / others
+      ownedMap = myOwnedMap;
+    }
+    // refresh grid presentation
+    applyOwnedMapToGrid(masterById);
+  }
+
+  // If we’re in a trade session, hydrate state, collections & banner
   if (TRADE_MODE) {
     if (!TRADE_SESSION_ID) {
       ensureTradeBanner();
@@ -1165,6 +1244,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       showToast("⚠️ Trading requires a valid API & token.");
     } else {
       await loadTradeState();
+      await hydrateTradeCollectionsAndSwitchView();
+      // If we are already in decision stage, optionally load detailed summary (filenames) if you want to render thumbnails:
+      // const sum = await loadTradeSummary(); // currently unused; id pills already shown
     }
   }
 
