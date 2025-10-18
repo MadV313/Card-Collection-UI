@@ -265,6 +265,45 @@ body, html, div, span, a, p, li, ul, ol, h1, h2, h3, h4, h5, h6, button {
   display: none;
 }
 
+/* NEW: Style trade decision action buttons in the banner */
+#trade-banner-actions {
+  display: flex;
+  gap: 8px;
+}
+#trade-banner-actions button {
+  background: #222;
+  color: #e2e8f0;
+  border: 2px solid #475569;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.25s, background 0.25s, border-color 0.25s;
+}
+#trade-banner-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(148,163,184,0.4);
+}
+/* First button (Accept) */
+#trade-banner-actions button:first-child {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+#trade-banner-actions button:first-child:hover {
+  background: #22c55e;
+  color: #111827;
+}
+/* Last button (Deny) */
+#trade-banner-actions button:last-child {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+#trade-banner-actions button:last-child:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
 #new-unlocked-banner {
   position: fixed;
   top: 30px;
