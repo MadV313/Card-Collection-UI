@@ -972,11 +972,15 @@ document.addEventListener("DOMContentLoaded", async () => {
           updateSellBar();
           playSaleSfx(); // 🔊 play sale sound
           showToast(res.message || `🪙 Sold! +${res.credited ?? 0} coins`);
+          // ensure absolute freshness from source of truth
+          await refreshCoinUI();
         } else if (res && (res.message || res.error)) {
           showToast(`⚠️ ${res.message || res.error}`);
           if (String(res.error || "").toLowerCase().includes("limit")) {
             bar?.classList.add("limit-reached");
           }
+          // even on error, try to show latest server-side balance (if any)
+          await refreshCoinUI();
         }
       });
       bar.appendChild(submitBtn);
@@ -1197,6 +1201,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (totalOwnedEl)      totalOwnedEl.textContent      = `Total Cards Owned: ${totalOwnedCopies} / 250`;
   if (coinBalanceEl)     coinBalanceEl.textContent     = String(stats?.coins ?? 0);
   if (ownershipWarning)  ownershipWarning.style.display = totalOwnedCopies >= 247 ? "block" : "none";
+
+  // --- NEW: always refresh from server truth so it matches /sellcard & /buycard updates ---
+  function formatCoins(n) {
+    const s = Number(n).toFixed(2);
+    return s.replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
+  }
+  async function refreshCoinUI() {
+    try {
+      const headers = {};
+      let url = "/api/meCoins";
+      if (UID) {
+        const qp = new URLSearchParams({ userId: String(UID) });
+        url += `?${qp.toString()}`;
+      } else if (TOKEN) {
+        headers["Authorization"] = `Bearer ${TOKEN}`;
+      }
+      const r = await fetch(url, { headers, cache: "no-store" });
+      const j = await r.json();
+      if (j?.ok && coinBalanceEl) {
+        coinBalanceEl.textContent = formatCoins(j.coins);
+      }
+    } catch (e) {
+      // silent; fallback to stats-rendered number
+    }
+  }
+  await refreshCoinUI();
 
   updateBottomBar();
   updateSellBar();
