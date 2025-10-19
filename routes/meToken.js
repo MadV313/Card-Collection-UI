@@ -1,120 +1,95 @@
-// routes/meToken.js
-// Token-aware routes that resolve :token → userId via linked_decks.json
+// routes/meCoins.js
+// Returns the player's current coin balance from linked_decks.json.
+// Accepts either ?userId=<discordId> OR Authorization: Bearer <playerToken> (or X-Player-Token)
+
+import fs from 'fs/promises';
+import path from 'path';
 import express from 'express';
-import {
-  resolveUserIdByToken,
-  getPlayerCollectionMap,
-  getUserStats,
-  getPlayerProfileByUserId,
-  loadMaster,
-  pad3,
-} from '../utils/deckUtils.js';
 
 const router = express.Router();
 
-/**
- * GET /me/:token/collection
- * Returns an array of owned cards for the user resolved by :token.
- * Shape: [{ number: "001", owned: 2, name, rarity, type, image }, ...]
- */
-router.get('/me/:token/collection', async (req, res) => {
+/* ---------------- config + paths ---------------- */
+function loadConfig() {
   try {
-    res.set('Cache-Control', 'no-store');
-
-    const { token } = req.params;
-    const userId = await resolveUserIdByToken(token);
-    if (!userId) return res.status(404).json({ error: 'Invalid token' });
-
-    const [collectionMap, master] = await Promise.all([
-      getPlayerCollectionMap(userId),
-      loadMaster()
-    ]);
-
-    // Build array enriched with master data when available
-    const masterById = new Map(master.map(c => [pad3(c.card_id), c]));
-    const out = Object.entries(collectionMap)
-      .filter(([id]) => id !== '000')
-      .map(([id, owned]) => {
-        const meta = masterById.get(id);
-        return {
-          number: id,
-          owned: Number(owned) || 0,
-          ...(meta ? {
-            name: meta.name,
-            rarity: meta.rarity,
-            type: meta.type,
-            image: meta.image // filename from CoreMasterReference.json
-          } : {})
-        };
-      })
-      .sort((a, b) => parseInt(a.number, 10) - parseInt(b.number, 10));
-
-    return res.json(out);
-  } catch (e) {
-    console.error('[meToken] /me/:token/collection error:', e);
-    return res.status(500).json({ error: 'Internal error' });
+    const raw = process.env.CONFIG_JSON;
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  try {
+    return JSON.parse(require('fs').readFileSync('config.json', 'utf-8')) || {};
+  } catch {
+    return {};
   }
-});
+}
+const CONFIG = loadConfig();
 
-/**
- * GET /me/:token/stats
- * Returns { coins, wins, losses, discordName, userId }
- */
-router.get('/me/:token/stats', async (req, res) => {
+// Same file the bot updates when /sellcard or /buycard runs
+const LINKED_DECKS_PATH = path.resolve(CONFIG.linked_decks_path || './data/linked_decks.json');
+
+/* ---------------- helpers ---------------- */
+async function readJson(file, fallback = {}) {
   try {
-    res.set('Cache-Control', 'no-store');
+    const raw = await fs.readFile(file, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
 
-    const { token } = req.params;
-    const userId = await resolveUserIdByToken(token);
-    if (!userId) return res.status(404).json({ error: 'Invalid token' });
+/** Format coins with up to 2 decimals, trimming trailing zeros (supports 0.5, 2.5, etc.) */
+function formatCoins(n) {
+  const s = Number(n).toFixed(2);
+  return s.replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
+}
 
-    const [stats, profile] = await Promise.all([
-      getUserStats(userId),
-      getPlayerProfileByUserId(userId)
-    ]);
+/* ---------------- route ---------------- */
+// GET /api/meCoins?userId=1234567890
+// or with header: Authorization: Bearer <playerToken>
+// or with header: X-Player-Token: <playerToken>
+router.get('/meCoins', async (req, res) => {
+  try {
+    res.set('Cache-Control', 'no-store'); // always fresh
+
+    const userId = (req.query.userId || '').toString().trim();
+
+    // Token can come from Authorization: Bearer <token> OR X-Player-Token
+    const auth = req.headers.authorization || '';
+    const bearer = auth.startsWith('Bearer ') ? auth.slice('Bearer '.length).trim() : '';
+    const headerToken = (req.headers['x-player-token'] || '').toString().trim();
+    const token = bearer || headerToken;
+
+    const linked = await readJson(LINKED_DECKS_PATH, {});
+
+    let profile = null;
+
+    // 1) direct lookup by discordId (recommended)
+    if (userId && linked[userId]) {
+      profile = linked[userId];
+    }
+
+    // 2) fallback: lookup by token if provided
+    if (!profile && token) {
+      const id = Object.keys(linked).find(id => linked[id]?.token === token);
+      if (id) profile = linked[id];
+    }
+
+    if (!profile) {
+      return res.status(404).json({ ok: false, error: 'PLAYER_NOT_FOUND' });
+    }
+
+    const coinsNum =
+      typeof profile.coins === 'number' && !Number.isNaN(profile.coins) ? profile.coins : 0;
 
     return res.json({
-      userId,
-      discordName: profile?.discordName || '',
-      coins: stats.coins || 0,
-      wins: stats.wins || 0,
-      losses: stats.losses || 0
+      ok: true,
+      discordId: profile.discordId || null,
+      discordName: profile.discordName || null,
+      coins: coinsNum,                 // raw (use this for math)
+      coinsPretty: formatCoins(coinsNum), // UI-friendly string
+      updatedAt: new Date().toISOString()
     });
-  } catch (e) {
-    console.error('[meToken] /me/:token/stats error:', e);
-    return res.status(500).json({ error: 'Internal error' });
-  }
-});
-
-/**
- * (Compatibility) GET /userStatsToken?token=...
- * Same payload as /me/:token/stats for clients that use a query param.
- */
-router.get('/userStatsToken', async (req, res) => {
-  try {
-    res.set('Cache-Control', 'no-store');
-
-    const { token } = req.query;
-    if (!token) return res.status(400).json({ error: 'Missing token' });
-
-    const userId = await resolveUserIdByToken(String(token));
-    if (!userId) return res.status(404).json({ error: 'Invalid token' });
-
-    const [stats, profile] = await Promise.all([
-      getUserStats(userId),
-      getPlayerProfileByUserId(userId)
-    ]);
-
-    return res.json({
-      userId,
-      discordName: profile?.discordName || '',
-      coins: stats.coins || 0,
-      wins: stats.wins || 0,
-      losses: stats.losses || 0
-    });
-  } catch (e) {
-    console.error('[meToken] /userStatsToken error:', e);
-    return res.status(500).json({ error: 'Internal error' });
+  } catch (err) {
+    console.error('[meCoins] error:', err);
+    return res.status(500).json({ ok: false, error: 'SERVER_ERROR' });
   }
 });
 
