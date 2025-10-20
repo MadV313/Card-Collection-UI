@@ -518,6 +518,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  function recalcAndRenderHeaderCounts() {
+    let uniques = 0;
+    let copies  = 0;
+    for (const v of Object.values(ownedMap || {})) {
+      const n = Number(v) || 0;
+      if (n > 0) {
+        uniques += 1;
+        copies  += n;
+      }
+    }
+    const collectionCountEl = document.getElementById("collection-count");
+    const totalOwnedEl      = document.getElementById("total-owned-count");
+    const ownershipWarning  = document.getElementById("ownership-warning");
+  
+    if (collectionCountEl) collectionCountEl.textContent = `Cards Collected: ${uniques} / 127`;
+    if (totalOwnedEl)      totalOwnedEl.textContent      = `Total Cards Owned: ${copies} / 250`;
+    if (ownershipWarning)  ownershipWarning.style.display = copies >= 247 ? "block" : "none";
+  }
+
   function refreshTileFor(id, masterById) {
     const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
     const tile = [...(grid?.querySelectorAll(".card-container") || [])].find(div => {
@@ -813,7 +832,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // NEW: effective room left considering server remaining and current queue
   function getSellRoomLeft() {
-    const queued = totalSellUnits();
+    const queued    = totalSellUnits();
     const remaining = Number(sellStatus?.soldRemaining ?? DAILY_LIMIT_DEFAULT);
     return Math.max(0, remaining - queued);
   }
@@ -979,10 +998,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       status.style.cssText = "font-weight:600;margin-bottom:6px;";
       bar.prepend(status);
     }
-    const queued = totalSellUnits();
-    const remaining = Number(sellStatus?.soldRemaining ?? DAILY_LIMIT_DEFAULT);
+    const queued   = totalSellUnits();
+    const roomLeft = getSellRoomLeft();
     const resetTxt = sellStatus?.resetAtISO ? ` • resets ${new Date(sellStatus.resetAtISO).toLocaleString()}` : "";
-    status.textContent = `Sell queued: ${queued} • Remaining today: ${remaining}${resetTxt}`;
+    status.textContent = `Sell queued: ${queued} • Remaining today: ${roomLeft}${resetTxt}`;
 
     container.innerHTML = "";
     sellQueue.forEach((entry, index) => {
@@ -1025,6 +1044,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const res = await submitSell();
         if (res?.ok) {
           patchOwnedMapWithServer(res.collection);
+          recalcAndRenderHeaderCounts();
           const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
           // refresh only IDs that changed
           const changedIds = Object.keys((buildSellItems()).items.reduce((m, it) => (m[it.number]=1,m), {}));
@@ -1032,6 +1052,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (coinBalanceEl && res.balance != null) coinBalanceEl.textContent = String(res.balance);
           sellQueue.length = 0;
           updateSellBar();
+          recalcAndRenderHeaderCounts();
           playSaleSfx(); // 🔊 play sale sound
           showToast(res.message || `🪙 Sold! +${res.credited ?? 0} coins`);
           // ensure absolute freshness from source of truth
@@ -1073,7 +1094,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     })();
 
     // Visual limit cue
-    const roomLeft = getSellRoomLeft();
     bar.classList.toggle("limit-reached", roomLeft <= 0);
   }
 
@@ -1356,6 +1376,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     // refresh grid presentation
     applyOwnedMapToGrid(masterById);
+    recalcAndRenderHeaderCounts();
   }
 
   // If we’re in a trade session, hydrate state, collections & banner
@@ -1370,6 +1391,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       showToast("⚠️ Trading requires a valid API & token.");
     } else {
       await loadTradeState();
+    
       await hydrateTradeCollectionsAndSwitchView();
       // If we are already in decision stage, optionally load detailed summary (filenames) if you want to render thumbnails:
       // const sum = await loadTradeSummary(); // currently unused; id pills already shown
