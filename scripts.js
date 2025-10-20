@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "https://madv313.github.io/Card-Collection-UI/logic/CoreMasterReference.json",
     "https://madv313.github.io/Card-Collection-UI/CoreMasterReference.json",
     "https://madv313.github.io/Duel-Bot/logic/CoreMasterReference.json",
-    "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/logic/CoreMasterReference.json",
+    "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/logic/CoreMasterReference.json`,
     "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/CoreMasterReference.json"
   ].filter(Boolean));
 
@@ -1307,7 +1307,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (collectionCountEl) collectionCountEl.textContent = `Cards Collected: ${ownedUniqueCount} / 127`;
   if (totalOwnedEl)      totalOwnedEl.textContent      = `Total Cards Owned: ${totalOwnedCopies} / 250`;
-  if (coinBalanceEl)     coinBalanceEl.textContent     = String(stats?.coins ?? 0);
   if (ownershipWarning)  ownershipWarning.style.display = totalOwnedCopies >= 247 ? "block" : "none";
 
   // --- NEW: always refresh from server truth so it matches /sellcard & /buycard updates ---
