@@ -2,8 +2,8 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import meTokenRouter from './routes/meToken.js';     // if you need it
-import meCoinsRouter from './routes/meCoin.js';      // exposes /meCoins and /meSellStatus
+import meTokenRouter from './routes/meToken.js';   // optional
+import meCoinsRouter from './routes/meCoins.js';   // ✅ corrected plural form
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
@@ -11,12 +11,14 @@ const __dirname  = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 
-// Static UI
+// Serve static UI
 app.use(express.static(path.join(__dirname)));
 
-// API
+// API endpoints
 app.use('/api', meCoinsRouter);
-app.use('/api', meTokenRouter); // optional, if you actually need it
+app.use('/api', meTokenRouter); // optional, remove if unused
 
 const PORT = process.env.PORT || 5173;
-app.listen(PORT, () => console.log(`UI server on http://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`✅ Card Collection UI running at http://localhost:${PORT}`)
+);
