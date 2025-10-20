@@ -2,7 +2,6 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import meTokenRouter from './routes/meToken.js';   // optional
 import meCoinsRouter from './routes/meCoins.js';   // ✅ corrected plural form
 
 const __filename = fileURLToPath(import.meta.url);
@@ -16,7 +15,6 @@ app.use(express.static(path.join(__dirname)));
 
 // API endpoints
 app.use('/api', meCoinsRouter);
-app.use('/api', meTokenRouter); // optional, remove if unused
 
 const PORT = process.env.PORT || 5173;
 app.listen(PORT, () =>
