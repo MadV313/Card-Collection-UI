@@ -18,26 +18,39 @@ try {
 const router = express.Router();
 
 /* ---------------- config + paths ---------------- */
-function loadConfig() {
+async function loadConfig() {
+  // Highest priority: CONFIG_JSON env with inline JSON
   try {
     const raw = process.env.CONFIG_JSON;
     if (raw) return JSON.parse(raw);
   } catch {}
+  // Next: ./config.json file (optional)
   try {
-    return JSON.parse(require('fs').readFileSync('config.json', 'utf-8')) || {};
-  } catch {
-    return {};
-  }
+    const raw = await fs.readFile('config.json', 'utf-8');
+    return JSON.parse(raw);
+  } catch {}
+  return {};
 }
-const CONFIG = loadConfig();
+const CONFIG = await loadConfig();
 
-// Default paths
+// Default paths (can be overridden by CONFIG or env)
 const LINKED_DECKS_FILE = 'data/linked_decks.json';
 const SELLS_BY_DAY_FILE = 'data/sells_by_day.json';
-const LINKED_DECKS_PATH = path.resolve(CONFIG.linked_decks_path || `./${LINKED_DECKS_FILE}`);
-const SELLS_BY_DAY_PATH = path.resolve(CONFIG.sells_by_day_path || `./${SELLS_BY_DAY_FILE}`);
 
-const DAILY_LIMIT = 5;
+const LINKED_DECKS_PATH = path.resolve(
+  process.env.LINKED_DECKS_PATH ||
+  CONFIG.linked_decks_path ||
+  `./${LINKED_DECKS_FILE}`
+);
+
+const SELLS_BY_DAY_PATH = path.resolve(
+  process.env.SELLS_BY_DAY_PATH ||
+  CONFIG.sells_by_day_path ||
+  `./${SELLS_BY_DAY_FILE}`
+);
+
+// Daily limit (configurable, default 5)
+const DAILY_LIMIT = Number(process.env.SELL_DAILY_LIMIT || CONFIG.sell_daily_limit || 5) || 5;
 
 /* ---------------- helpers ---------------- */
 async function readJsonLocal(file, fallback = {}) {
@@ -68,32 +81,46 @@ function nextUTCmidnightISO(d = new Date()) {
   return next.toISOString();
 }
 
+// Extract identity from request, returning { discordId, profile, linked }
+async function getIdentity(req) {
+  const userId = (req.query.userId || '').toString().trim();
+  const auth = req.headers.authorization || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice('Bearer '.length).trim() : '';
+
+  const linked = await readJsonSmart(LINKED_DECKS_FILE, LINKED_DECKS_PATH, {});
+  let discordId = userId;
+  let profile = null;
+
+  // Direct lookup by discordId (if provided)
+  if (discordId && linked[discordId]) {
+    profile = linked[discordId];
+  }
+
+  // Fallback: lookup by token
+  if (!profile && token) {
+    const id = Object.keys(linked).find(id => linked[id]?.token === token);
+    if (id) {
+      discordId = id;
+      profile = linked[id];
+    }
+  }
+  return { discordId, profile, linked };
+}
+
 /* ---------------- route: /meCoins ---------------- */
 // GET /meCoins?userId=1234567890
 // or header: Authorization: Bearer <token>
 router.get('/meCoins', async (req, res) => {
   try {
-    res.set('Cache-Control', 'no-store');
-    const userId = (req.query.userId || '').toString().trim();
-    const auth = req.headers.authorization || '';
-    const token = auth.startsWith('Bearer ') ? auth.slice('Bearer '.length).trim() : '';
+    res.set('Cache-Control', 'no-store, max-age=0');
+    const { profile } = await getIdentity(req);
 
-    const linked = await readJsonSmart(LINKED_DECKS_FILE, LINKED_DECKS_PATH, {});
-    let profile = null;
-
-    // Lookup by discordId
-    if (userId && linked[userId]) profile = linked[userId];
-
-    // Fallback: lookup by token
-    if (!profile && token) {
-      const id = Object.keys(linked).find(id => linked[id]?.token === token);
-      if (id) profile = linked[id];
+    if (!profile) {
+      return res.status(404).json({ ok: false, error: 'PLAYER_NOT_FOUND' });
     }
 
-    if (!profile) return res.status(404).json({ ok: false, error: 'PLAYER_NOT_FOUND' });
-
     const coins =
-      typeof profile.coins === 'number' && !Number.isNaN(profile.coins)
+      typeof profile.coins === 'number' && Number.isFinite(profile.coins)
         ? profile.coins
         : 0;
 
@@ -116,20 +143,12 @@ router.get('/meCoins', async (req, res) => {
 // -> { ok, soldToday, soldRemaining, limit, resetAtISO }
 router.get('/meSellStatus', async (req, res) => {
   try {
-    res.set('Cache-Control', 'no-store');
-    const userId = (req.query.userId || '').toString().trim();
-    const auth = req.headers.authorization || '';
-    const token = auth.startsWith('Bearer ') ? auth.slice('Bearer '.length).trim() : '';
+    res.set('Cache-Control', 'no-store, max-age=0');
+    const { discordId } = await getIdentity(req);
 
-    const linked = await readJsonSmart(LINKED_DECKS_FILE, LINKED_DECKS_PATH, {});
-    let discordId = userId;
-
-    if (!discordId && token) {
-      const id = Object.keys(linked).find(id => linked[id]?.token === token);
-      if (id) discordId = id;
+    if (!discordId) {
+      return res.status(400).json({ ok: false, error: 'MISSING_ID_OR_TOKEN' });
     }
-
-    if (!discordId) return res.status(400).json({ ok: false, error: 'MISSING_ID_OR_TOKEN' });
 
     const sellsByDay = await readJsonSmart(SELLS_BY_DAY_FILE, SELLS_BY_DAY_PATH, {});
     const dayKey = todayKeyUTC();
