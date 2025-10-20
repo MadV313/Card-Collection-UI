@@ -52,6 +52,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   const isAbsoluteUrl = (u) => /^https?:\/\//i.test(String(u || ""));
 
+  // Small debounce utility (used for sell-credit preview)
+  function debounce(fn, delay = 200) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), delay);
+    };
+  }
+
   // derive an absolute path to this repo’s images/cards, regardless of how index.html is served
   function deriveSelfImagesAbs() {
     const url = new URL(location.href);
@@ -102,7 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "https://madv313.github.io/Card-Collection-UI/logic/CoreMasterReference.json",
     "https://madv313.github.io/Card-Collection-UI/CoreMasterReference.json",
     "https://madv313.github.io/Duel-Bot/logic/CoreMasterReference.json",
-    "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/logic/CoreMasterReference.json`,
+    "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/logic/CoreMasterReference.json",
     "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/CoreMasterReference.json"
   ].filter(Boolean));
 
@@ -741,6 +750,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const deny = document.createElement("button");
         deny.textContent = "❌ Deny Trade";
         accept.onclick = async () => {
+          accept.disabled = true; deny.disabled = true;
           const res = await submitTradeDecision("accept");
           if (res?.ok) {
             showToast(res.message || "✅ Trade accepted.");
@@ -749,9 +759,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderTradeBanner({ stage: "closed", role, partnerName, initiatorName });
           } else {
             showToast(res?.message || res?.error || "⚠️ Failed to accept trade.");
+            accept.disabled = false; deny.disabled = false; // re-enable on failure
           }
         };
         deny.onclick = async () => {
+          accept.disabled = true; deny.disabled = true;
           const res = await submitTradeDecision("deny");
           if (res?.ok) {
             showToast(res.message || "❌ Trade denied.");
@@ -759,6 +771,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderTradeBanner({ stage: "closed", role, partnerName, initiatorName });
           } else {
             showToast(res?.message || res?.error || "⚠️ Failed to deny trade.");
+            accept.disabled = false; deny.disabled = false; // re-enable on failure
           }
         };
         actions.style.display = "block";
@@ -833,7 +846,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // NEW: effective room left considering server remaining and current queue
   function getSellRoomLeft() {
     const queued    = totalSellUnits();
-    const remaining = Number(sellStatus?.soldRemaining ?? DAILY_LIMIT_DEFAULT);
+       const remaining = Number(sellStatus?.soldRemaining ?? DAILY_LIMIT_DEFAULT);
     return Math.max(0, remaining - queued);
   }
 
@@ -934,49 +947,63 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!tradeQueue.length) return showToast("⚠️ Trade queue is empty.");
       const cards = tradeQueue.map(e => pad3(e.id));
 
-      // Not in session: fall back to legacy endpoint (or nudge)
-      if (!TRADE_MODE || !TRADE_SESSION_ID) {
-        showToast("ℹ️ Start a trade with /trade.");
-        const res = await submitTradeLegacy(cards);
-        if (res?.ok) {
-          patchOwnedMapWithServer(res.collection);
-          const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
-          [...new Set(cards)].forEach(id => refreshTileFor(id, masterById));
-          if (coinBalanceEl && res.stats?.coins != null) coinBalanceEl.textContent = String(res.stats.coins);
-          tradeQueue.length = 0;
-          updateBottomBar();
-          showToast(res.message || "📦 Trade submitted!");
-        } else if (res && (res.message || res.error)) {
-          showToast(`⚠️ ${res.message || res.error}`);
-        }
-        return;
-      }
+      // Disable to prevent double-clicks
+      submitBtn.disabled = true;
 
-      // In session: use select endpoint
-      const res = await submitTradeSelection(cards);
-      if (res?.ok) {
-        // Stage transition handled by server; re-pull state
-        const state = await loadTradeState();
-
-        // NEW: hydrate collections and switch the view/grid when needed
-        await hydrateTradeCollectionsAndSwitchView();
-
-        if (state?.stage === "pickTheirs".toLowerCase() || state?.stage === "picktheirs") {
-          // If I’m initiator, move to partner picks
-          if (TRADE_ROLE === "initiator") {
-            showToast("📤 Offer saved. Now pick up to 3 from your partner.");
+      try {
+        // Not in session: fall back to legacy endpoint (or nudge)
+        if (!TRADE_MODE || !TRADE_SESSION_ID) {
+          showToast("ℹ️ Start a trade with /trade.");
+          const res = await submitTradeLegacy(cards);
+          if (res?.ok) {
+            patchOwnedMapWithServer(res.collection);
+            const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
+            [...new Set(cards)].forEach(id => refreshTileFor(id, masterById));
+            if (coinBalanceEl && res.stats?.coins != null) coinBalanceEl.textContent = String(res.stats.coins);
             tradeQueue.length = 0;
             updateBottomBar();
-          } else {
-            showToast("✅ Your picks saved.");
+            showToast(res.message || "📦 Trade submitted!");
+            // keep disabled; UI state changed
+            return;
+          } else if (res && (res.message || res.error)) {
+            showToast(`⚠️ ${res.message || res.error}`);
           }
-        } else if (state?.stage === "decision") {
-          showToast(res.message || "📨 Trade proposal sent.");
-        } else {
-          showToast(res.message || "✅ Selection saved.");
+          submitBtn.disabled = false; // re-enable on failure
+          return;
         }
-      } else {
-        showToast(res?.message || res?.error || "⚠️ Failed to submit selection.");
+
+        // In session: use select endpoint
+        const res = await submitTradeSelection(cards);
+        if (res?.ok) {
+          // Stage transition handled by server; re-pull state
+          const state = await loadTradeState();
+
+          // NEW: hydrate collections and switch the view/grid when needed
+          await hydrateTradeCollectionsAndSwitchView();
+
+          if (state?.stage === "pickTheirs".toLowerCase() || state?.stage === "picktheirs") {
+            // If I’m initiator, move to partner picks
+            if (TRADE_ROLE === "initiator") {
+              showToast("📤 Offer saved. Now pick up to 3 from your partner.");
+              tradeQueue.length = 0;
+              updateBottomBar();
+            } else {
+              showToast("✅ Your picks saved.");
+            }
+          } else if (state?.stage === "decision") {
+            showToast(res.message || "📨 Trade proposal sent.");
+          } else {
+            showToast(res.message || "✅ Selection saved.");
+          }
+          // success: keep disabled (stage advanced)
+          return;
+        } else {
+          showToast(res?.message || res?.error || "⚠️ Failed to submit selection.");
+          submitBtn.disabled = false; // re-enable on failure
+        }
+      } catch (e) {
+        showToast("⚠️ Network error");
+        submitBtn.disabled = false; // re-enable on failure
       }
     };
 
@@ -984,6 +1011,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cap = (TRADE_MODE ? 3 : 30);
     bar.classList.toggle("limit-reached", tradeQueue.length >= cap);
   }
+
+  // Debounced preview updater (single instance)
+  const debouncedUpdateSellPreview = debounce(async (previewEl) => {
+    if (!previewEl) return;
+    if (API_BASE && TOKEN && sellQueue.length) {
+      const credited = await previewSellCredit();
+      if (credited != null) {
+        const s = Number(credited).toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
+        previewEl.textContent = `Preview credit: +${s} coins`;
+      } else {
+        previewEl.textContent = "";
+      }
+    } else {
+      previewEl.textContent = "";
+    }
+  }, 200);
 
   function updateSellBar() {
     const container = document.getElementById("bottom-sell-list");
@@ -1041,37 +1084,46 @@ document.addEventListener("DOMContentLoaded", async () => {
       submitBtn.textContent = "[SUBMIT SELL]";
       submitBtn.addEventListener("click", async () => {
         if (!sellQueue.length) return showToast("⚠️ Sell list is empty.");
-        const res = await submitSell();
-        if (res?.ok) {
-          patchOwnedMapWithServer(res.collection);
-          recalcAndRenderHeaderCounts();
-          const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
-          // refresh only IDs that changed
-          const changedIds = Object.keys((buildSellItems()).items.reduce((m, it) => (m[it.number]=1,m), {}));
-          changedIds.forEach(id => refreshTileFor(id, masterById));
-          if (coinBalanceEl && res.balance != null) coinBalanceEl.textContent = String(res.balance);
-          sellQueue.length = 0;
-          updateSellBar();
-          recalcAndRenderHeaderCounts();
-          playSaleSfx(); // 🔊 play sale sound
-          showToast(res.message || `🪙 Sold! +${res.credited ?? 0} coins`);
-          // ensure absolute freshness from source of truth
-          await refreshCoinUI();
-          await refreshSellStatus(); // pick up new remaining
-        } else if (res && (res.message || res.error)) {
-          showToast(`⚠️ ${res.message || res.error}`);
-          if (String(res.error || "").toLowerCase().includes("limit")) {
-            bar?.classList.add("limit-reached");
-            await refreshSellStatus();
+        submitBtn.disabled = true; // prevent double-clicks
+        try {
+          const res = await submitSell();
+          if (res?.ok) {
+            patchOwnedMapWithServer(res.collection);
+            recalcAndRenderHeaderCounts();
+            const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
+            // refresh only IDs that changed
+            const changedIds = Object.keys((buildSellItems()).items.reduce((m, it) => (m[it.number]=1,m), {}));
+            changedIds.forEach(id => refreshTileFor(id, masterById));
+            if (coinBalanceEl && res.balance != null) coinBalanceEl.textContent = String(res.balance);
+            sellQueue.length = 0;
+            updateSellBar();
+            recalcAndRenderHeaderCounts();
+            playSaleSfx(); // 🔊 play sale sound
+            showToast(res.message || `🪙 Sold! +${res.credited ?? 0} coins`);
+            // ensure absolute freshness from source of truth
+            await refreshCoinUI();
+            await refreshSellStatus(); // pick up new remaining
+            // keep disabled; user can queue again to re-enable
+          } else if (res && (res.message || res.error)) {
+            showToast(`⚠️ ${res.message || res.error}`);
+            if (String(res.error || "").toLowerCase().includes("limit")) {
+              bar?.classList.add("limit-reached");
+              await refreshSellStatus();
+            }
+            await refreshCoinUI();
+            submitBtn.disabled = false; // re-enable on failure
+          } else {
+            submitBtn.disabled = false; // generic failure path
           }
-          // even on error, try to show latest server-side balance (if any)
-          await refreshCoinUI();
+        } catch {
+          showToast("⚠️ Network error");
+          submitBtn.disabled = false; // re-enable on failure
         }
       });
       bar.appendChild(submitBtn);
     }
 
-    // Optional credit preview (when API + token present)
+    // Optional credit preview (debounced)
     let previewEl = document.getElementById("sell-preview-line");
     if (!previewEl) {
       previewEl = document.createElement("div");
@@ -1079,19 +1131,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       previewEl.style.cssText = "margin-top:4px; opacity:0.9;";
       bar.appendChild(previewEl);
     }
-    (async () => {
-      if (API_BASE && TOKEN && sellQueue.length) {
-        const credited = await previewSellCredit();
-        if (credited != null) {
-          const s = Number(credited).toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
-          previewEl.textContent = `Preview credit: +${s} coins`;
-        } else {
-          previewEl.textContent = "";
-        }
-      } else {
-        previewEl.textContent = "";
-      }
-    })();
+    debouncedUpdateSellPreview(previewEl);
 
     // Visual limit cue
     bar.classList.toggle("limit-reached", roomLeft <= 0);
