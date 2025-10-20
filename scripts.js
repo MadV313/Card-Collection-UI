@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const BG_MUSIC_SRC  = "audio/bg/Follow the Trail.mp3";
   const SALE_SFX_SRC  = "audio/effects/sale.mp3";
 
-  // Daily sell limit (UI default; server truth comes from /api/meSellStatus)
+  // Daily sell limit (UI default; server truth comes from /me/:token/sell/status)
   const DAILY_LIMIT_DEFAULT = 5;
   let sellStatus = { soldToday: 0, soldRemaining: DAILY_LIMIT_DEFAULT, limit: DAILY_LIMIT_DEFAULT, resetAtISO: null };
 
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function loadMaster() {
-    // Try local copies FIRST (common paths), then the API if needed
+    // Try local copies FIRST (common paths)
     const localCandidates = [
       "data/CoreMasterReference.json",
       "logic/CoreMasterReference.json",
@@ -144,20 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    if ((!Array.isArray(master) || !master.length) && API_BASE) {
-      const apiCandidates = [
-        `${API_BASE}/logic/CoreMasterReference.json`,
-        `${API_BASE}/CoreMasterReference.json`
-      ];
-      for (const p of apiCandidates) {
-        master = await fetchJSON(p);
-        if (Array.isArray(master) && master.length) {
-          console.log(`[ccui] Using API master: ${p}`);
-          break;
-        }
-      }
-    }
-
+    // We avoid probing API_BASE for master to cut down 404 noise; rely on UI repo fallbacks:
     if (!Array.isArray(master) || !master.length) {
       for (const url of BUILTIN_MASTER_FALLBACKS) {
         master = await fetchJSON(url);
@@ -449,28 +436,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch { return null; }
   }
 
-  // NEW: fetch current sell status (remaining/limit/reset) from UI server
+  // NEW: fetch current sell status (remaining/limit/reset) from backend token route
   async function fetchSellStatus() {
     try {
-      const headers = {};
-      let url = "/api/meSellStatus";
-      if (UID) {
-        const qp = new URLSearchParams({ userId: String(UID) });
-        url += `?${qp.toString()}`;
-      } else if (TOKEN) {
-        headers["Authorization"] = `Bearer ${TOKEN}`;
-      } else {
-        // no identity → return defaults
+      if (!API_BASE || !TOKEN) {
         return { soldToday: 0, soldRemaining: DAILY_LIMIT_DEFAULT, limit: DAILY_LIMIT_DEFAULT, resetAtISO: null };
       }
-      const r = await fetch(url, { headers, cache: "no-store" });
-      const j = await r.json();
-      if (j?.ok) return {
-        soldToday: Number(j.soldToday || 0),
-        soldRemaining: Number(j.soldRemaining ?? DAILY_LIMIT_DEFAULT),
-        limit: Number(j.limit || DAILY_LIMIT_DEFAULT),
-        resetAtISO: j.resetAtISO || null
-      };
+      const url = `${API_BASE}/me/${encodeURIComponent(TOKEN)}/sell/status`;
+      const j = await fetchJSON(url);
+      if (j && typeof j.soldRemaining !== "undefined") {
+        return {
+          soldToday: Number(j.soldToday || 0),
+          soldRemaining: Number(j.soldRemaining ?? DAILY_LIMIT_DEFAULT),
+          limit: Number(j.limit || DAILY_LIMIT_DEFAULT),
+          resetAtISO: j.resetAtISO || null
+        };
+      }
     } catch {}
     return { soldToday: 0, soldRemaining: DAILY_LIMIT_DEFAULT, limit: DAILY_LIMIT_DEFAULT, resetAtISO: null };
   }
@@ -1356,21 +1337,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   async function refreshCoinUI() {
     try {
-      const headers = {};
-      let url = "/api/meCoins";
-      if (UID) {
-        const qp = new URLSearchParams({ userId: String(UID) });
-        url += `?${qp.toString()}`;
-      } else if (TOKEN) {
-        headers["Authorization"] = `Bearer ${TOKEN}`;
-      }
-      const r = await fetch(url, { headers, cache: "no-store" });
-      const j = await r.json();
-      if (j?.ok && coinBalanceEl) {
+      if (!API_BASE || !TOKEN) return;
+      const url = `${API_BASE}/me/${encodeURIComponent(TOKEN)}/stats`;
+      const j = await fetchJSON(url);
+      if (j && typeof j.coins !== "undefined" && coinBalanceEl) {
         coinBalanceEl.textContent = formatCoins(j.coins);
       }
     } catch (e) {
-      // silent; fallback to stats-rendered number
+      // silent; keep whatever was rendered from initial stats
     }
   }
   await refreshCoinUI();
