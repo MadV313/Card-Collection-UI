@@ -35,6 +35,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const BG_MUSIC_SRC  = "audio/bg/Follow the Trail.mp3";
   const SALE_SFX_SRC  = "audio/effects/sale.mp3";
 
+  // Daily sell limit (UI default; server truth comes from /api/meSellStatus)
+  const DAILY_LIMIT_DEFAULT = 5;
+  let sellStatus = { soldToday: 0, soldRemaining: DAILY_LIMIT_DEFAULT, limit: DAILY_LIMIT_DEFAULT, resetAtISO: null };
+
   /* ---------------- helpers ---------------- */
   const trimSlash = (s="") => String(s).replace(/\/+$/, "");
   function pad3(id) { return String(id).padStart(3, "0"); }
@@ -425,6 +429,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     return postJson(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/sell`, body);
   }
 
+  // NEW: optional sell credit preview
+  async function previewSellCredit() {
+    try {
+      if (!API_BASE || !TOKEN) return null;
+      const body = buildSellItems();
+      if (!body.items.length) return null;
+      const res = await postJson(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/sell/preview`, body);
+      return res?.ok ? Number(res.credited || 0) : null;
+    } catch { return null; }
+  }
+
+  // NEW: fetch current sell status (remaining/limit/reset) from UI server
+  async function fetchSellStatus() {
+    try {
+      const headers = {};
+      let url = "/api/meSellStatus";
+      if (UID) {
+        const qp = new URLSearchParams({ userId: String(UID) });
+        url += `?${qp.toString()}`;
+      } else if (TOKEN) {
+        headers["Authorization"] = `Bearer ${TOKEN}`;
+      } else {
+        // no identity → return defaults
+        return { soldToday: 0, soldRemaining: DAILY_LIMIT_DEFAULT, limit: DAILY_LIMIT_DEFAULT, resetAtISO: null };
+      }
+      const r = await fetch(url, { headers, cache: "no-store" });
+      const j = await r.json();
+      if (j?.ok) return {
+        soldToday: Number(j.soldToday || 0),
+        soldRemaining: Number(j.soldRemaining ?? DAILY_LIMIT_DEFAULT),
+        limit: Number(j.limit || DAILY_LIMIT_DEFAULT),
+        resetAtISO: j.resetAtISO || null
+      };
+    } catch {}
+    return { soldToday: 0, soldRemaining: DAILY_LIMIT_DEFAULT, limit: DAILY_LIMIT_DEFAULT, resetAtISO: null };
+  }
+
   /* ---------------- NEW: trade collections & summary helpers ---------------- */
   async function loadTradeCollections() {
     if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) return null;
@@ -770,22 +811,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function totalSellUnits() { return sellQueue.length; }
 
+  // NEW: effective room left considering server remaining and current queue
+  function getSellRoomLeft() {
+    const queued = totalSellUnits();
+    const remaining = Number(sellStatus?.soldRemaining ?? DAILY_LIMIT_DEFAULT);
+    return Math.max(0, remaining - queued);
+  }
+
   function addToSellQueueWithPrompt({ id, filename, rarity, owned }) {
     const alreadyQueued = countQueuedSellById(id);
-    const remaining = Math.max(0, owned - alreadyQueued);
-    if (remaining <= 0) {
+    const remainingOwned = Math.max(0, owned - alreadyQueued);
+    if (remainingOwned <= 0) {
       showToast("⚠️ You’ve already queued the maximum you own for this card.");
       return;
     }
-    const roomLeft = Math.max(0, 5 - totalSellUnits());
+    const roomLeft = getSellRoomLeft();
     if (roomLeft <= 0) {
-      showToast("⚠️ You can only sell up to 5 cards every 24 hours.");
+      showToast("⚠️ Daily sell limit reached. Try again after reset.");
       const bar = document.getElementById("sell-bottom-bar");
       bar?.classList.add("limit-reached");
       return;
     }
 
-    const maxQty = Math.min(remaining, roomLeft);
+    const maxQty = Math.min(remainingOwned, roomLeft);
     let qty = prompt(`How many #${id} would you like to sell? (1–${maxQty})`, "1");
     if (qty == null) return; // cancelled
     qty = parseInt(qty, 10);
@@ -923,6 +971,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     const bar = document.getElementById("sell-bottom-bar");
     if (!container || !bar) return;
 
+    // Status line (remaining / reset / preview)
+    let status = document.getElementById("sell-status-line");
+    if (!status) {
+      status = document.createElement("div");
+      status.id = "sell-status-line";
+      status.style.cssText = "font-weight:600;margin-bottom:6px;";
+      bar.prepend(status);
+    }
+    const queued = totalSellUnits();
+    const remaining = Number(sellStatus?.soldRemaining ?? DAILY_LIMIT_DEFAULT);
+    const resetTxt = sellStatus?.resetAtISO ? ` • resets ${new Date(sellStatus.resetAtISO).toLocaleString()}` : "";
+    status.textContent = `Sell queued: ${queued} • Remaining today: ${remaining}${resetTxt}`;
+
     container.innerHTML = "";
     sellQueue.forEach((entry, index) => {
       const div = document.createElement("div");
@@ -941,10 +1002,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const removeBtn = document.createElement("button");
       removeBtn.innerHTML = "🗑";
       removeBtn.title = "Remove one from sell list";
-      removeBtn.addEventListener("click", () => {
+      removeBtn.addEventListener("click", async () => {
         sellQueue.splice(index, 1); // remove single unit
         updateSellBar();
         bar?.classList.remove("limit-reached");
+        await refreshSellStatus(); // keep remaining accurate as user edits
       });
 
       div.appendChild(thumb);
@@ -974,10 +1036,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           showToast(res.message || `🪙 Sold! +${res.credited ?? 0} coins`);
           // ensure absolute freshness from source of truth
           await refreshCoinUI();
+          await refreshSellStatus(); // pick up new remaining
         } else if (res && (res.message || res.error)) {
           showToast(`⚠️ ${res.message || res.error}`);
           if (String(res.error || "").toLowerCase().includes("limit")) {
             bar?.classList.add("limit-reached");
+            await refreshSellStatus();
           }
           // even on error, try to show latest server-side balance (if any)
           await refreshCoinUI();
@@ -986,7 +1050,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       bar.appendChild(submitBtn);
     }
 
-    bar.classList.toggle("limit-reached", sellQueue.length >= 5);
+    // Optional credit preview (when API + token present)
+    let previewEl = document.getElementById("sell-preview-line");
+    if (!previewEl) {
+      previewEl = document.createElement("div");
+      previewEl.id = "sell-preview-line";
+      previewEl.style.cssText = "margin-top:4px; opacity:0.9;";
+      bar.appendChild(previewEl);
+    }
+    (async () => {
+      if (API_BASE && TOKEN && sellQueue.length) {
+        const credited = await previewSellCredit();
+        if (credited != null) {
+          const s = Number(credited).toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
+          previewEl.textContent = `Preview credit: +${s} coins`;
+        } else {
+          previewEl.textContent = "";
+        }
+      } else {
+        previewEl.textContent = "";
+      }
+    })();
+
+    // Visual limit cue
+    const roomLeft = getSellRoomLeft();
+    bar.classList.toggle("limit-reached", roomLeft <= 0);
   }
 
   /* ---------------- Load data ---------------- */
@@ -1227,6 +1315,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
   await refreshCoinUI();
+
+  // NEW: keep sell status in sync
+  async function refreshSellStatus() {
+    sellStatus = await fetchSellStatus();
+    // After fetching status, ensure the bar reflects remaining
+    updateSellBar();
+  }
+  await refreshSellStatus();
 
   updateBottomBar();
   updateSellBar();
