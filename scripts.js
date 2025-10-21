@@ -1,4 +1,18 @@
 // scripts.js — Token-aware Card Collection UI (prefers local master JSON, robust IMG fallbacks + NEW highlight + real Trade/Sell submit + trade-session wiring)
+
+// ───────────────── anti-stale hardeners ─────────────────
+(function hardDisableSWAndBFCache() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations()
+      .then(regs => Promise.allSettled(regs.map(r => r.unregister().catch(()=>{}))))
+      .catch(()=>{});
+  }
+  // If returning from bfcache, force a fresh render
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) location.reload();
+  });
+})();
+
 document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- URL params & config ---------------- */
   const qs = new URLSearchParams(window.location.search);
@@ -38,6 +52,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Daily sell limit (UI default; server truth comes from /me/:token/sell/status)
   const DAILY_LIMIT_DEFAULT = 5;
   let sellStatus = { soldToday: 0, soldRemaining: DAILY_LIMIT_DEFAULT, limit: DAILY_LIMIT_DEFAULT, resetAtISO: null };
+
+  // Bust image cache
+  const IMG_TS = Date.now();
 
   /* ---------------- helpers ---------------- */
   const trimSlash = (s="") => String(s).replace(/\/+$/, "");
@@ -115,15 +132,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/CoreMasterReference.json"
   ].filter(Boolean));
 
+  // Append a one-shot cache-buster to any URL
+function withTs(url) {
+  const ts = Date.now();
+  try {
+    const u = new URL(url, location.href);
+    if (!u.searchParams.has('ts')) u.searchParams.set('ts', String(ts));
+    return u.toString();
+  } catch {
+    // relative URL fallback
+    return url + (url.includes('?') ? '&' : '?') + 'ts=' + ts;
+  }
+}
+
   async function fetchJSON(url, opts) {
     try {
-      const r = await fetch(url, { cache: "no-store", ...opts });
+      const r = await fetch(withTs(url), { cache: "no-store", ...opts });
       if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
       return await r.json();
     } catch (e) {
       console.warn(`[ccui] fetch failed ${url}: ${e?.message}`);
       return null;
     }
+  }
+  
+  async function postJson(url, body) {
+    return fetchJSON(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body || {})
+    });
   }
 
   async function loadMaster() {
@@ -342,38 +380,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   function setImageWithFallback(imgEl, card, { onFailToAll } = {}) {
     const candidates = filenameCandidates(card);
     const bases = imageBases();
-
+  
     const absolutes = candidates.filter(isAbsoluteUrl);
     const relatives = candidates.filter(c => !isAbsoluteUrl(c));
-
+  
     const attempts = [
       ...absolutes,
       ...bases.flatMap(base => relatives.map(file => `${base}/${file}`))
     ];
-
+  
     let idx = 0;
     const tryNext = () => {
       if (idx >= attempts.length) {
         if (typeof onFailToAll === "function") onFailToAll();
         return;
       }
-      const url = attempts[idx++];
+      const url = attempts[idx++]; // <-- define url correctly
+      const finalUrl = /^https?:\/\//i.test(url)
+        ? url
+        : (url + (url.includes('?') ? '&' : '?') + 'ts=' + IMG_TS);
       imgEl.onerror = tryNext;
-      imgEl.src = url;
+      imgEl.src = finalUrl;
     };
-
+  
     tryNext();
   }
 
   /* ---------------- Trade/Sell submit helpers (real API) ---------------- */
-  async function postJson(url, body) {
-    return fetchJSON(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body || {})
-    });
-  }
-
   // Legacy single-endpoint trade (kept for non-session mode)
   async function submitTradeLegacy(cards) {
     if (!API_BASE || !TOKEN) {
