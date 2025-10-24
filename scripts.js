@@ -644,7 +644,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const idx = tradeQueue.findIndex(e => pad3(e.id) === id3);
     if (idx >= 0) {
       tradeQueue.splice(idx, 1);
-      unhighlightTradeButton(id3);
+      unhighlightTradeButton(id3);           // FIX D: clear per-card highlight
       updateBottomBar();
       return true;
     }
@@ -1029,7 +1029,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // remove that entry
         tradeQueue.splice(index, 1);
         // also unhighlight the corresponding card tile button
-        unhighlightTradeButton(entry.id);
+        unhighlightTradeButton(entry.id);     // FIX D
         updateBottomBar();
         bar?.classList.remove("limit-reached");
       });
@@ -1048,73 +1048,86 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     submitBtn.textContent = stageLabel;
 
-    submitBtn.onclick = async () => {
-      if (!tradeQueue.length) return showToast("⚠️ Trade queue is empty.");
-      const cards = tradeQueue.map(e => pad3(e.id));
+    // FIX E: hide submit in decision stage (no stale actions)
+    if (TRADE_MODE && TRADE_STAGE === "decision") {
+      submitBtn.style.display = "none";
+      submitBtn.onclick = null;
+    } else {
+      submitBtn.style.display = "";
+      submitBtn.onclick = async () => {
+        if (!tradeQueue.length) return showToast("⚠️ Trade queue is empty.");
+        const cards = tradeQueue.map(e => pad3(e.id));
 
-      // Disable to prevent double-clicks
-      submitBtn.disabled = true;
-
-      try {
-        // Not in session: fall back to legacy endpoint (or nudge)
-        if (!TRADE_MODE || !TRADE_SESSION_ID) {
-          showToast("ℹ️ Start a trade with /trade.");
-          const res = await submitTradeLegacy(cards);
-          if (res?.ok) {
-            patchOwnedMapWithServer(res.collection);
-            const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
-            [...new Set(cards)].forEach(id => refreshTileFor(id, masterById));
-            if (coinBalanceEl && res.stats?.coins != null) coinBalanceEl.textContent = String(res.stats.coins);
-            tradeQueue.length = 0;
-            clearTradeHighlights(); // PATCH A — remove queued highlights
-            updateBottomBar();
-            clearTradeUIHighlights(false);
-            showToast(res.message || "📦 Trade submitted!");
-            return;
-          } else if (res && (res.message || res.error)) {
-            showToast(`⚠️ ${res.message || res.error}`);
+        // Session guards (FIX B)
+        if (TRADE_MODE) {
+          if (TRADE_ROLE !== 'initiator') {
+            return showToast("ℹ️ Only the trade initiator can submit here.");
           }
-          submitBtn.disabled = false; // re-enable on failure
-          return;
+          if (!(TRADE_STAGE === 'pickmine' || TRADE_STAGE === 'picktheirs')) {
+            if (TRADE_STAGE === 'decision') return showToast("ℹ️ Waiting on partner…");
+            return showToast("ℹ️ Not actionable yet. Try again.");
+          }
         }
 
-        // In session: use select endpoint with explicit stage
-        const explicitStage = (TRADE_STAGE === "picktheirs") ? "pickTheirs" : "pickMine";
-        const res = await submitTradeSelection(cards, explicitStage);
-        if (res?.ok) {
-          // Stage transition handled by server; re-pull state
-          const state = await loadTradeState();
+        // Disable to prevent double-clicks
+        submitBtn.disabled = true;
 
-          // hydrate collections and potentially flip the view
-          await hydrateTradeCollectionsAndSwitchView();
-
-          if (state?.stage === "picktheirs") {
-            if (TRADE_ROLE === "initiator") {
-              showToast("📤 Offer saved. Now pick up to 3 from your partner.");
-              // PATCH A — clear queue & queued highlights on stage advance to Step 2
+        try {
+          if (!TRADE_MODE || !TRADE_SESSION_ID) {
+            showToast("ℹ️ Start a trade with /trade.");
+            const res = await submitTradeLegacy(cards);
+            if (res?.ok) {
+              patchOwnedMapWithServer(res.collection);
+              const masterById = Object.fromEntries(master.map(c => [pad3(c.card_id), c]));
+              [...new Set(cards)].forEach(id => refreshTileFor(id, masterById));
+              if (coinBalanceEl && res.stats?.coins != null) coinBalanceEl.textContent = String(res.stats.coins);
               tradeQueue.length = 0;
-              clearTradeHighlights();
+              clearTradeHighlights();           // PATCH/FIX A — remove queued highlights
               updateBottomBar();
-            } else {
-              showToast("✅ Your picks saved.");
-              clearTradeUIHighlights(true);
+              clearTradeUIHighlights(false);
+              showToast(res.message || "📦 Trade submitted!");
+              return;
+            } else if (res && (res.message || res.error)) {
+              showToast(`⚠️ ${res.message || res.error}`);
             }
-          } else if (state?.stage === "decision") {
-            showToast(res.message || "📨 Trade proposal sent.");
-            clearTradeUIHighlights(true);
-          } else {
-            showToast(res.message || "✅ Selection saved.");
+            submitBtn.disabled = false;
+            return;
           }
-          return;
-        } else {
-          showToast(res?.message || res?.error || "⚠️ Failed to submit selection.");
-          submitBtn.disabled = false; // re-enable on failure
+
+          // FIX C: early feedback toast
+          showToast(TRADE_STAGE === 'picktheirs' ? "Submitting your picks…" : "Saving your offer…");
+
+          // In session: use select endpoint with explicit stage
+          const explicitStage = (TRADE_STAGE === "picktheirs") ? "pickTheirs" : "pickMine";
+          const res = await submitTradeSelection(cards, explicitStage);
+          if (res?.ok) {
+            // Pre-clear to prevent auto-resubmit during flip (FIX A)
+            tradeQueue.length = 0;
+            clearTradeHighlights();
+            updateBottomBar();
+
+            // Pull fresh state and flip
+            const state = await loadTradeState();
+            await hydrateTradeCollectionsAndSwitchView(); // rebinds button via updateBottomBar
+
+            if (state?.stage === "picktheirs") {
+              showToast("📤 Offer saved. Now pick up to 3 from your partner.");
+            } else if (state?.stage === "decision") {
+              showToast(res.message || "📨 Trade proposal sent.");
+            } else {
+              showToast(res.message || "✅ Selection saved.");
+            }
+            return;
+          } else {
+            showToast(res?.message || res?.error || "⚠️ Failed to submit selection.");
+            submitBtn.disabled = false;
+          }
+        } catch (e) {
+          showToast("⚠️ Network error");
+          submitBtn.disabled = false;
         }
-      } catch (e) {
-        showToast("⚠️ Network error");
-        submitBtn.disabled = false; // re-enable on failure
-      }
-    };
+      };
+    }
 
     // Cap changes in trade mode (3) vs legacy (30)
     const cap = (TRADE_MODE ? 3 : 30);
@@ -1523,7 +1536,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // flip pointer based on stage
     if (TRADE_STAGE === "picktheirs") {
       ownedMap = (TRADE_ROLE === "initiator") ? partnerOwnedMap : myOwnedMap;
-      clearTradeUIHighlights(true);
+      clearTradeUIHighlights(true);          // FIX A: ensure queue is empty & highlights cleared **after** flip too
     } else {
       ownedMap = myOwnedMap;
     }
@@ -1534,6 +1547,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     clearTradeHighlights();
     recalcAndRenderHeaderCounts();
     updateOwnerLabel();
+    updateBottomBar();                        // FIX B: rebind submit after flip
   }
 
   /* ---------------- SAVE-OFFER button hook (initiator, Step 1) ---------------- */
@@ -1554,18 +1568,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         return showToast("⚠️ Pick at least 1 card to offer.");
       }
 
+      // FIX C: immediate toast on submit attempt
+      showToast("Saving your offer…");
+
       const cards = tradeQueue.map(e => String(e.id).padStart(3, "0"));
       btn.disabled = true;
       try {
         const res = await submitTradeSelection(cards, "pickMine");
         if (res?.ok) {
+          // FIX A: purge queue & highlights BEFORE view flip
+          tradeQueue.length = 0;
+          clearTradeHighlights();
+          updateBottomBar();
+
           await loadTradeState();
           await hydrateTradeCollectionsAndSwitchView();
 
           if ((TRADE_STAGE || "").toLowerCase() === "picktheirs") {
-            tradeQueue.length = 0;
-            clearTradeHighlights();
-            updateBottomBar();
             showToast("📤 Offer saved. Now pick up to 3 from your partner.");
           } else if ((TRADE_STAGE || "").toLowerCase() === "decision") {
             showToast(res.message || "📨 Trade proposal sent.");
