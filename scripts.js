@@ -417,14 +417,16 @@ function withTs(url) {
   }
 
   // Sessionized trade selection
-  async function submitTradeSelection(cards) {
+  async function submitTradeSelection(cards, stage /* optional: 'pickMine' | 'pickTheirs' */) {
     if (!API_BASE || !TOKEN || !TRADE_MODE || !TRADE_SESSION_ID) {
       showToast("⚠️ Trade session not active. Start with /trade.");
       return null;
     }
+    const body = { token: TOKEN, cards };
+    if (stage) body.stage = stage; // let backend use explicit stage if provided
     return postJson(
       `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select`,
-      { token: TOKEN, cards }
+      body
     );
   }
 
@@ -1401,28 +1403,83 @@ function withTs(url) {
   initAudio();
 
   // NEW: helper to hydrate trade collections and switch the grid view appropriately
-  async function hydrateTradeCollectionsAndSwitchView() {
-    if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) return;
-    const data = await loadTradeCollections();
-    if (!data) return;
-    // update role/stage if backend returns them
-    if (data.role) TRADE_ROLE = data.role;
-    if (data.stage) TRADE_STAGE = data.stage;
-    // patch maps
-    myOwnedMap = data.myMap || myOwnedMap;
-    partnerOwnedMap = data.partnerMap || partnerOwnedMap;
+async function hydrateTradeCollectionsAndSwitchView() {
+  if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) return;
+  const data = await loadTradeCollections();
+  if (!data) return;
 
-    // flip pointer based on stage
-    if (TRADE_STAGE === "picktheirs") {
-      // Show partner collection during step 2 (initiator can see requestable cards)
-      ownedMap = (TRADE_ROLE === "initiator") ? partnerOwnedMap : myOwnedMap;
-    } else {
-      // pickmine / decision / others
-      ownedMap = myOwnedMap;
-    }
-    // refresh grid presentation
-    applyOwnedMapToGrid(masterById);
-    recalcAndRenderHeaderCounts();
+  // update role/stage if backend returns them
+  if (data.role)  TRADE_ROLE  = data.role;
+  if (data.stage) TRADE_STAGE = data.stage;
+
+  // patch maps from server truth
+  myOwnedMap      = data.myMap || myOwnedMap;
+  partnerOwnedMap = data.partnerMap || partnerOwnedMap;
+
+  // flip pointer based on stage
+  if (TRADE_STAGE === "picktheirs") {
+    // Show partner collection during step 2 (initiator views requestable cards)
+    ownedMap = (TRADE_ROLE === "initiator") ? partnerOwnedMap : myOwnedMap;
+  } else {
+    // pickmine / decision / others
+    ownedMap = myOwnedMap;
+  }
+
+  // refresh grid + header counts
+  applyOwnedMapToGrid(masterById);
+  recalcAndRenderHeaderCounts();
+}
+
+/* ---------------- SAVE-OFFER button hook (initiator, Step 1) ---------------- */
+  function wireSaveOfferButton() {
+    const btn = document.getElementById("save-offer-btn");
+    if (!btn) return; // nothing to do if page didn't include it
+    btn.addEventListener("click", async () => {
+      // Basic guards
+      if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) {
+        return showToast("⚠️ Trading requires a valid session, API & token.");
+      }
+      if (TRADE_ROLE !== "initiator") {
+        return showToast("ℹ️ Only the trade initiator can use SAVE here.");
+      }
+      if ((TRADE_STAGE || "").toLowerCase() !== "pickmine") {
+        return showToast("ℹ️ You’re past Step 1 — use the main trade button instead.");
+      }
+      if (!tradeQueue.length) {
+        return showToast("⚠️ Pick at least 1 card to offer.");
+      }
+
+      const cards = tradeQueue.map(e => String(e.id).padStart(3, "0"));
+      btn.disabled = true;
+      try {
+        // Explicitly tell backend we're saving Step 1 (mine)
+        const res = await submitTradeSelection(cards, "pickMine");
+        if (res?.ok) {
+          // Pull latest server stage + collections, then flip UI if needed
+          await loadTradeState();
+          await hydrateTradeCollectionsAndSwitchView();
+
+          // If server advanced us to Step 2, clear local queue & nudge user
+          if ((TRADE_STAGE || "").toLowerCase() === "picktheirs") {
+            tradeQueue.length = 0;
+            updateBottomBar();
+            showToast("📤 Offer saved. Now pick up to 3 from your partner.");
+          } else if ((TRADE_STAGE || "").toLowerCase() === "decision") {
+            showToast(res.message || "📨 Trade proposal sent.");
+          } else {
+            showToast(res.message || "✅ Offer saved.");
+          }
+          // stay disabled on success (state changed)
+          return;
+        }
+        // failure path
+        showToast(res?.message || res?.error || "⚠️ Failed to save offer.");
+        btn.disabled = false;
+      } catch {
+        showToast("⚠️ Network error");
+        btn.disabled = false;
+      }
+    });
   }
 
   // If we’re in a trade session, hydrate state, collections & banner
@@ -1443,6 +1500,9 @@ function withTs(url) {
       // const sum = await loadTradeSummary(); // currently unused; id pills already shown
     }
   }
+
+  // Finally, wire the optional SAVE button (safe no-op if it’s not on the page)
+  wireSaveOfferButton();
 
   /* ---------------- Return to HUB: keep token/api + trade session ---------------- */
   const hubLink = document.getElementById("return-to-hub");
