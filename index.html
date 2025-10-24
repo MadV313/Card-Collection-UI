@@ -214,11 +214,11 @@
     <div id="bottom-trade-list"></div>
   </div>
 
-  <!-- trade footer hook (script will fill with SAVE/SEND) -->
-  <div id="trade-footer"></div>
+  <!-- trade footer (SAVE/SEND get injected here) -->
+  <div id="trade-footer">
     <button id="save-offer-btn" class="btn primary">[SAVE YOUR OFFER]</button>
   </div>
-  
+
   <script>
     // wire the toggle buttons (no other logic touched)
     (function () {
@@ -273,10 +273,8 @@
 
       async function fetchCollections(sessionId) {
         const c = await fetch(`${API_BASE}/trade/${encodeURIComponent(sessionId)}/collections?token=${encodeURIComponent(TOKEN)}`, { cache:'no-store' });
-        if (c.ok) return c.json();
-        const s = await fetch(`${API_BASE}/trade/${encodeURIComponent(sessionId)}/state?token=${encodeURIComponent(TOKEN)}`, { cache:'no-store' });
-        if (!s.ok) throw new Error('state fetch failed');
-        return s.json();
+        if (!c.ok) throw new Error('collections fetch failed');
+        return c.json();
       }
 
       function disablePending() {
@@ -285,22 +283,21 @@
       }
 
       async function sendInitiatorMine(picks) {
-        const body = { role: 'initiator', stage: 'pickMine', picks: picks.slice(0,3) };
-        const r = await fetch(`${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select?token=${encodeURIComponent(TOKEN)}`, {
+        const body = { token: TOKEN, cards: picks.slice(0,3) };
+        const r = await fetch(`${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select`, {
           method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
         });
         const js = await r.json().catch(() => ({}));
         if (!r.ok || !js.ok) throw new Error(js.error || 'Save failed');
         toast(js.message || 'Your cards saved.');
-        if ((js.nextStage || '').toLowerCase() === 'picktheirs') {
-          goToStage('pickTheirs');
-          await renderPartnerSelect();
-        }
+        // backend advances to pickTheirs
+        goToStage('pickTheirs');
+        await renderPartnerSelect();
       }
 
       async function sendInitiatorRequested(picks) {
-        const body = { role: 'initiator', stage: 'pickTheirs', picks: picks.slice(0,3) };
-        const r = await fetch(`${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select?token=${encodeURIComponent(TOKEN)}`, {
+        const body = { token: TOKEN, cards: picks.slice(0,3) };
+        const r = await fetch(`${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select`, {
           method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
         });
         const js = await r.json().catch(() => ({}));
@@ -309,12 +306,25 @@
         disablePending();
       }
 
+      function mapCollectionForGrid(arr) {
+        // server gives: { id, qty, name, rarity, filename, card_id:"#001" }
+        // grid usually wants: { number, owned, name, rarity, filename }
+        return (Array.isArray(arr) ? arr : []).map(c => ({
+          number: String(c.id || '').padStart(3,'0'),
+          owned: Number(c.qty || 0),
+          name: c.name || (`#${c.id}`),
+          rarity: c.rarity || 'Common',
+          filename: c.filename || `${String(c.id||'').padStart(3,'0')}.png`,
+        }));
+      }
+
       async function renderPartnerSelect() {
         const data = await fetchCollections(TRADE_SESSION_ID);
-        const partnerColl = (data.partner && data.partner.collection) || [];
+        // data: { ok, role, status, stage, me:[...], partner:[...] }
+        const partnerCollGrid = mapCollectionForGrid(data.partner);
 
         if (typeof window.renderGrid === 'function') {
-          window.renderGrid(partnerColl, {
+          window.renderGrid(partnerCollGrid, {
             mode: 'request-partner',
             maxPick: 3,
             onPickChange: (ids) => { setPartnerQueue(ids); try { window.refreshBottomBars?.(); } catch {} }
@@ -359,6 +369,7 @@
     }
   })();
   </script>
+
   <script>
     // ── NEW: minimal music bootstrap (scripts.js can also control #bg-music/#sfx-sale)
     (function () {
