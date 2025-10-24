@@ -213,6 +213,12 @@
   <div id="trade-bottom-bar" class="collapsed">
     <div id="bottom-trade-list"></div>
   </div>
+
+  <!-- trade footer hook (script will fill with SAVE/SEND) -->
+  <div id="trade-footer"></div>
+    <button id="save-offer-btn" class="btn primary">[SAVE YOUR OFFER]</button>
+  </div>
+  
   <script>
     // wire the toggle buttons (no other logic touched)
     (function () {
@@ -223,7 +229,137 @@
       sellBtn?.addEventListener('click', () => sellBar?.classList.toggle('collapsed'));
       tradeBtn?.addEventListener('click', () => tradeBar?.classList.toggle('collapsed'));
     })();
+  </script>
 
+  <!-- proposer-mode patch (auto-switch to partner after SAVE) -->
+  <script>
+  (() => {
+    try {
+      const qs = new URLSearchParams(location.search);
+      const MODE         = (qs.get('mode') || '').toLowerCase();          // 'trade'
+      const TRADE_MODE   = MODE === 'trade';
+      const TRADE_SESSION_ID = (qs.get('tradeSession') || qs.get('session') || '').trim();
+      const TRADE_ROLE   = (qs.get('role') || '').toLowerCase();          // 'initiator' | 'partner'
+      let   TRADE_STAGE  = (qs.get('stage') || '').toLowerCase();         // 'pickmine' | 'picktheirs' | 'decision'
+      const TOKEN        = qs.get('token') || '';
+      const API_BASE     = (qs.get('api') || '').replace(/\/+$/, '');
+      if (!TRADE_MODE || !TRADE_SESSION_ID || !TOKEN || !API_BASE) return;
+
+      const $ = (s, r=document) => r.querySelector(s);
+      const tradeFooter = $('#trade-footer');
+      const toast = (m) => {
+        try { if (window.showToast) return window.showToast(m); } catch {}
+        const n = document.createElement('div');
+        n.textContent = m;
+        n.style.cssText = 'position:fixed;left:50%;top:20px;transform:translateX(-50%);background:#111;color:#fff;border:1px solid #0ff;padding:8px 12px;border-radius:6px;z-index:9999';
+        document.body.appendChild(n);
+        setTimeout(() => n.remove(), 2200);
+      };
+      const goToStage = (s) => {
+        const u = new URL(location.href);
+        u.searchParams.set('stage', s);
+        history.replaceState(null, '', u.toString());
+        TRADE_STAGE = s.toLowerCase();
+      };
+
+      // queue helpers (use your existing globals if present)
+      const getMyQueue = () => (window.tradeQueueMine?.slice?.() || []);
+      const getPartnerQueue = () => (window.tradeQueuePartner?.slice?.() || []);
+      const setPartnerQueue = (arr) => {
+        if (!Array.isArray(window.tradeQueuePartner)) window.tradeQueuePartner = [];
+        window.tradeQueuePartner.length = 0;
+        window.tradeQueuePartner.push(...arr.slice(0,3));
+      };
+
+      async function fetchCollections(sessionId) {
+        const c = await fetch(`${API_BASE}/trade/${encodeURIComponent(sessionId)}/collections?token=${encodeURIComponent(TOKEN)}`, { cache:'no-store' });
+        if (c.ok) return c.json();
+        const s = await fetch(`${API_BASE}/trade/${encodeURIComponent(sessionId)}/state?token=${encodeURIComponent(TOKEN)}`, { cache:'no-store' });
+        if (!s.ok) throw new Error('state fetch failed');
+        return s.json();
+      }
+
+      function disablePending() {
+        if (tradeFooter) tradeFooter.innerHTML = `<button class="btn" disabled>Pending partner…</button>`;
+        document.body.classList.add('trade-pending');
+      }
+
+      async function sendInitiatorMine(picks) {
+        const body = { role: 'initiator', stage: 'pickMine', picks: picks.slice(0,3) };
+        const r = await fetch(`${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select?token=${encodeURIComponent(TOKEN)}`, {
+          method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+        });
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok || !js.ok) throw new Error(js.error || 'Save failed');
+        toast(js.message || 'Your cards saved.');
+        if ((js.nextStage || '').toLowerCase() === 'picktheirs') {
+          goToStage('pickTheirs');
+          await renderPartnerSelect();
+        }
+      }
+
+      async function sendInitiatorRequested(picks) {
+        const body = { role: 'initiator', stage: 'pickTheirs', picks: picks.slice(0,3) };
+        const r = await fetch(`${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select?token=${encodeURIComponent(TOKEN)}`, {
+          method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+        });
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok || !js.ok) throw new Error(js.error || 'Send failed');
+        toast(js.message || 'Trade offer sent to partner.');
+        disablePending();
+      }
+
+      async function renderPartnerSelect() {
+        const data = await fetchCollections(TRADE_SESSION_ID);
+        const partnerColl = (data.partner && data.partner.collection) || [];
+
+        if (typeof window.renderGrid === 'function') {
+          window.renderGrid(partnerColl, {
+            mode: 'request-partner',
+            maxPick: 3,
+            onPickChange: (ids) => { setPartnerQueue(ids); try { window.refreshBottomBars?.(); } catch {} }
+          });
+        } else {
+          document.body.setAttribute('data-trade-mode', 'request-partner');
+        }
+
+        if (tradeFooter) {
+          tradeFooter.innerHTML = `<button id="send-offer-btn" class="btn primary">SEND OFFER</button>`;
+          document.getElementById('send-offer-btn')?.addEventListener('click', async () => {
+            const req = getPartnerQueue();
+            if (!req.length) return toast('Pick at least 1 card you want from your partner.');
+            try { await sendInitiatorRequested(req); }
+            catch (e) { console.error(e); toast('Failed to send. Try again.'); }
+          });
+        }
+      }
+
+      // hook your existing SAVE button (id must be #save-offer-btn)
+      function hookSaveMine() {
+        document.addEventListener('click', async (ev) => {
+          const el = ev.target.closest('#save-offer-btn');
+          if (!el) return;
+          if (TRADE_ROLE !== 'initiator') return;
+          const mine = getMyQueue();
+          if (!mine || !mine.length) { toast('Pick at least 1 of your cards.'); return; }
+          el.disabled = true;
+          try { await sendInitiatorMine(mine); }
+          catch (e) { console.error(e); toast('Save failed. Try again.'); el.disabled = false; }
+        });
+      }
+
+      if (TRADE_ROLE === 'initiator') {
+        hookSaveMine();
+        if (TRADE_STAGE === 'picktheirs') {
+          renderPartnerSelect().catch(console.error);
+        }
+      }
+    } catch (e) {
+      console.error('[trade proposer patch] init failed', e);
+    }
+  })();
+  </script>
+  <script>
     // ── NEW: minimal music bootstrap (scripts.js can also control #bg-music/#sfx-sale)
     (function () {
       const audio = document.getElementById('bg-music');
