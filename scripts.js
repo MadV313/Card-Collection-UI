@@ -562,6 +562,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (ownershipWarning)  ownershipWarning.style.display = copies >= 247 ? "block" : "none";
   }
 
+  // PATCH B helper — show correct “whose collection” label
+  function updateCollectionOwnerLabel() {
+    const el = document.getElementById('collection-owner-label');
+    if (!el) return;
+    const viewingPartner = (TRADE_MODE && TRADE_STAGE === 'picktheirs' && TRADE_ROLE === 'initiator');
+    el.textContent = viewingPartner
+      ? `${PARTNER_NAME || 'Partner'}’s Collection`
+      : `Your Collection`;
+  }
+
   function refreshTileFor(id, masterById) {
     const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
     const tile = [...(grid?.querySelectorAll(".card-container") || [])].find(div => {
@@ -592,11 +602,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       img.classList.add("facedown-card");
     }
 
-    // toggle SELL button enable
+    // PATCH B — disable SELL while viewing partner
+    const viewingPartner = (TRADE_MODE && TRADE_STAGE === 'picktheirs' && TRADE_ROLE === 'initiator');
     const sellBtn = tile.querySelector(".sell");
     if (sellBtn) {
-      sellBtn.disabled = qty <= 0;
-      sellBtn.title = qty <= 0 ? "You don’t own this card" : "Add to sell list";
+      if (viewingPartner) {
+        sellBtn.disabled = true;
+        sellBtn.title = "Selling disabled while viewing partner’s collection";
+      } else {
+        sellBtn.disabled = qty <= 0;
+        sellBtn.title = qty <= 0 ? "You don’t own this card" : "Add to sell list";
+      }
     }
   }
 
@@ -725,6 +741,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // PATCH A helper — clear “queued” class on [TRADE] buttons
+  function clearTradeHighlights() {
+    document.querySelectorAll('.card-container .trade.queued').forEach(btn => {
+      btn.classList.remove('queued');
+    });
+  }
+
   // NEW: clear UI highlights on all [TRADE] buttons and (optionally) empty queue
   function clearTradeUIHighlights(clearQueue = false) {
     document.querySelectorAll(".card-actions-vertical .trade.queued").forEach(b => b.classList.remove("queued"));
@@ -769,6 +792,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!TRADE_MODE || !TRADE_SESSION_ID) {
       text.textContent = "Start a trade with /trade";
+      // PATCH C — show SAVE only for Step-1 initiator
+      const saveBtn0 = document.getElementById('save-offer-btn');
+      if (saveBtn0) saveBtn0.style.display = 'none';
       return;
     }
 
@@ -820,16 +846,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else {
         text.textContent = `Waiting for ${partnerName || "partner"} to accept/deny…`;
       }
+      // PATCH C — show SAVE only for Step-1 initiator
+      const saveBtn1 = document.getElementById('save-offer-btn');
+      if (saveBtn1) saveBtn1.style.display = 'none';
       return;
     }
 
     if (stage === "picktheirs") {
       text.textContent = `Step 2 of 2 — select up to 3 from ${partnerName || "partner"}`;
+      // PATCH C — show SAVE only for Step-1 initiator
+      const saveBtn2 = document.getElementById('save-offer-btn');
+      if (saveBtn2) saveBtn2.style.display = 'none';
       return;
     }
 
     // default = pickmine
     text.textContent = `Step 1 of 2 — select up to 3 cards to offer`;
+
+    // PATCH C — show SAVE only for Step-1 initiator
+    const saveBtn = document.getElementById('save-offer-btn');
+    if (saveBtn) {
+      const show = (TRADE_MODE && TRADE_ROLE === 'initiator' && (stage || '').toLowerCase() === 'pickmine');
+      saveBtn.style.display = show ? 'inline-block' : 'none';
+    }
   }
 
   function renderThumbRow(list) {
@@ -1001,6 +1040,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             [...new Set(cards)].forEach(id => refreshTileFor(id, masterById));
             if (coinBalanceEl && res.stats?.coins != null) coinBalanceEl.textContent = String(res.stats.coins);
             tradeQueue.length = 0;
+            clearTradeHighlights(); // PATCH A — remove queued highlights
             updateBottomBar();
             clearTradeUIHighlights(false);
             showToast(res.message || "📦 Trade submitted!");
@@ -1026,7 +1066,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (state?.stage === "picktheirs") {
             if (TRADE_ROLE === "initiator") {
               showToast("📤 Offer saved. Now pick up to 3 from your partner.");
-              clearTradeUIHighlights(true); // clear queue + button highlights
+              // PATCH A — clear queue & queued highlights on stage advance to Step 2
+              tradeQueue.length = 0;
+              clearTradeHighlights();
+              updateBottomBar();
             } else {
               showToast("✅ Your picks saved.");
               clearTradeUIHighlights(true);
@@ -1391,6 +1434,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (totalOwnedEl)      totalOwnedEl.textContent      = `Total Cards Owned: ${totalOwnedCopies} / 250`;
   if (ownershipWarning)  ownershipWarning.style.display = totalOwnedCopies >= 247 ? "block" : "none";
 
+  // Call both owner labels once after initial render (PATCH B + legacy label support)
+  updateCollectionOwnerLabel(); // PATCH B new label
+  updateOwnerLabel();           // legacy/title fallback
+
   // --- NEW: always refresh from server truth so it matches /sellcard & /buycard updates ---
   function formatCoins(n) {
     const s = Number(n).toFixed(2);
@@ -1453,10 +1500,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       ownedMap = myOwnedMap;
     }
 
-    // refresh grid + header counts + label
+    // refresh grid + header counts + labels
     applyOwnedMapToGrid(masterById);
+    updateCollectionOwnerLabel(); // PATCH B — update label on view flip
+    clearTradeHighlights();       // PATCH A — reset local queued highlights on new view
     recalcAndRenderHeaderCounts();
-    updateOwnerLabel();
+    updateOwnerLabel();           // keep legacy header title in sync
   }
 
   /* ---------------- SAVE-OFFER button hook (initiator, Step 1) ---------------- */
@@ -1490,7 +1539,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
           // If server advanced us to Step 2, clear local queue & nudge user
           if ((TRADE_STAGE || "").toLowerCase() === "picktheirs") {
-            clearTradeUIHighlights(true);
+            // PATCH A — clear queue & highlights here too
+            tradeQueue.length = 0;
+            clearTradeHighlights();
+            updateBottomBar();
             showToast("📤 Offer saved. Now pick up to 3 from your partner.");
           } else if ((TRADE_STAGE || "").toLowerCase() === "decision") {
             showToast(res.message || "📨 Trade proposal sent.");
