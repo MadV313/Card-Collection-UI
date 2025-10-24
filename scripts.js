@@ -133,17 +133,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   ].filter(Boolean));
 
   // Append a one-shot cache-buster to any URL
-function withTs(url) {
-  const ts = Date.now();
-  try {
-    const u = new URL(url, location.href);
-    if (!u.searchParams.has('ts')) u.searchParams.set('ts', String(ts));
-    return u.toString();
-  } catch {
-    // relative URL fallback
-    return url + (url.includes('?') ? '&' : '?') + 'ts=' + ts;
+  function withTs(url) {
+    const ts = Date.now();
+    try {
+      const u = new URL(url, location.href);
+      if (!u.searchParams.has('ts')) u.searchParams.set('ts', String(ts));
+      return u.toString();
+    } catch {
+      // relative URL fallback
+      return url + (url.includes('?') ? '&' : '?') + 'ts=' + ts;
+    }
   }
-}
 
   async function fetchJSON(url, opts) {
     try {
@@ -395,7 +395,7 @@ function withTs(url) {
         if (typeof onFailToAll === "function") onFailToAll();
         return;
       }
-      const url = attempts[idx++]; // <-- define url correctly
+      const url = attempts[idx++];
       const finalUrl = /^https?:\/\//i.test(url)
         ? url
         : (url + (url.includes('?') ? '&' : '?') + 'ts=' + IMG_TS);
@@ -710,6 +710,30 @@ function withTs(url) {
     } catch {}
   }
 
+  // NEW: update the header to show whose collection is visible
+  function updateOwnerLabel() {
+    const mineText = "Your Card Collection";
+    const partnerText = `${PARTNER_NAME || "Partner"}'s Card Collection`;
+    const label = (document.getElementById("page-owner-label")
+      || document.getElementById("page-title")
+      || document.querySelector("h1"));
+    if (!label) return;
+    if (TRADE_MODE && TRADE_STAGE === "picktheirs" && TRADE_ROLE === "initiator") {
+      label.textContent = partnerText;
+    } else {
+      label.textContent = mineText;
+    }
+  }
+
+  // NEW: clear UI highlights on all [TRADE] buttons and (optionally) empty queue
+  function clearTradeUIHighlights(clearQueue = false) {
+    document.querySelectorAll(".card-actions-vertical .trade.queued").forEach(b => b.classList.remove("queued"));
+    if (clearQueue) {
+      tradeQueue.length = 0;
+      updateBottomBar();
+    }
+  }
+
   function ensureTradeBanner() {
     let b = document.getElementById("trade-banner");
     if (!b) {
@@ -862,7 +886,7 @@ function withTs(url) {
   // NEW: effective room left considering server remaining and current queue
   function getSellRoomLeft() {
     const queued    = totalSellUnits();
-       const remaining = Number(sellStatus?.soldRemaining ?? DAILY_LIMIT_DEFAULT);
+    const remaining = Number(sellStatus?.soldRemaining ?? DAILY_LIMIT_DEFAULT);
     return Math.max(0, remaining - queued);
   }
 
@@ -978,6 +1002,7 @@ function withTs(url) {
             if (coinBalanceEl && res.stats?.coins != null) coinBalanceEl.textContent = String(res.stats.coins);
             tradeQueue.length = 0;
             updateBottomBar();
+            clearTradeUIHighlights(false);
             showToast(res.message || "📦 Trade submitted!");
             // keep disabled; UI state changed
             return;
@@ -988,26 +1013,27 @@ function withTs(url) {
           return;
         }
 
-        // In session: use select endpoint
-        const res = await submitTradeSelection(cards);
+        // In session: use select endpoint with explicit stage
+        const explicitStage = (TRADE_STAGE === "picktheirs") ? "pickTheirs" : "pickMine";
+        const res = await submitTradeSelection(cards, explicitStage);
         if (res?.ok) {
           // Stage transition handled by server; re-pull state
           const state = await loadTradeState();
 
-          // NEW: hydrate collections and switch the view/grid when needed
+          // hydrate collections and potentially flip the view
           await hydrateTradeCollectionsAndSwitchView();
 
-          if (state?.stage === "pickTheirs".toLowerCase() || state?.stage === "picktheirs") {
-            // If I’m initiator, move to partner picks
+          if (state?.stage === "picktheirs") {
             if (TRADE_ROLE === "initiator") {
               showToast("📤 Offer saved. Now pick up to 3 from your partner.");
-              tradeQueue.length = 0;
-              updateBottomBar();
+              clearTradeUIHighlights(true); // clear queue + button highlights
             } else {
               showToast("✅ Your picks saved.");
+              clearTradeUIHighlights(true);
             }
           } else if (state?.stage === "decision") {
             showToast(res.message || "📨 Trade proposal sent.");
+            clearTradeUIHighlights(true);
           } else {
             showToast(res.message || "✅ Selection saved.");
           }
@@ -1257,8 +1283,8 @@ function withTs(url) {
       const tradeBtn = container.querySelector(".trade");
       if (tradeBtn) {
         tradeBtn.addEventListener("click", () => {
-          const qtyNow = Number(ownedMap[id] || 0); // use *current* pointer
-          if (qtyNow <= 0) return showToast("❌ You do not own this card.");
+          const qtyNow = Number(ownedMap[id] || 0); // use *current* pointer (my map in step 1; partner map in step 2)
+          if (qtyNow <= 0) return showToast("❌ You do not own this card."); // when viewing partner, ownedMap is theirs, so this still correctly requires partner to have >0
           if (!TRADE_MODE || !TRADE_SESSION_ID) {
             return showToast("ℹ️ Start a trade with /trade.");
           }
@@ -1403,34 +1429,37 @@ function withTs(url) {
   initAudio();
 
   // NEW: helper to hydrate trade collections and switch the grid view appropriately
-async function hydrateTradeCollectionsAndSwitchView() {
-  if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) return;
-  const data = await loadTradeCollections();
-  if (!data) return;
+  async function hydrateTradeCollectionsAndSwitchView() {
+    if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) return;
+    const data = await loadTradeCollections();
+    if (!data) return;
 
-  // update role/stage if backend returns them
-  if (data.role)  TRADE_ROLE  = data.role;
-  if (data.stage) TRADE_STAGE = data.stage;
+    // update role/stage if backend returns them
+    if (data.role)  TRADE_ROLE  = data.role;
+    if (data.stage) TRADE_STAGE = data.stage;
 
-  // patch maps from server truth
-  myOwnedMap      = data.myMap || myOwnedMap;
-  partnerOwnedMap = data.partnerMap || partnerOwnedMap;
+    // patch maps from server truth
+    myOwnedMap      = data.myMap || myOwnedMap;
+    partnerOwnedMap = data.partnerMap || partnerOwnedMap;
 
-  // flip pointer based on stage
-  if (TRADE_STAGE === "picktheirs") {
-    // Show partner collection during step 2 (initiator views requestable cards)
-    ownedMap = (TRADE_ROLE === "initiator") ? partnerOwnedMap : myOwnedMap;
-  } else {
-    // pickmine / decision / others
-    ownedMap = myOwnedMap;
+    // flip pointer based on stage
+    if (TRADE_STAGE === "picktheirs") {
+      // Show partner collection during step 2 (initiator views requestable cards)
+      ownedMap = (TRADE_ROLE === "initiator") ? partnerOwnedMap : myOwnedMap;
+      // important: when switching to partner view, clear current selections/highlights
+      clearTradeUIHighlights(true);
+    } else {
+      // pickmine / decision / others
+      ownedMap = myOwnedMap;
+    }
+
+    // refresh grid + header counts + label
+    applyOwnedMapToGrid(masterById);
+    recalcAndRenderHeaderCounts();
+    updateOwnerLabel();
   }
 
-  // refresh grid + header counts
-  applyOwnedMapToGrid(masterById);
-  recalcAndRenderHeaderCounts();
-}
-
-/* ---------------- SAVE-OFFER button hook (initiator, Step 1) ---------------- */
+  /* ---------------- SAVE-OFFER button hook (initiator, Step 1) ---------------- */
   function wireSaveOfferButton() {
     const btn = document.getElementById("save-offer-btn");
     if (!btn) return; // nothing to do if page didn't include it
@@ -1461,11 +1490,11 @@ async function hydrateTradeCollectionsAndSwitchView() {
 
           // If server advanced us to Step 2, clear local queue & nudge user
           if ((TRADE_STAGE || "").toLowerCase() === "picktheirs") {
-            tradeQueue.length = 0;
-            updateBottomBar();
+            clearTradeUIHighlights(true);
             showToast("📤 Offer saved. Now pick up to 3 from your partner.");
           } else if ((TRADE_STAGE || "").toLowerCase() === "decision") {
             showToast(res.message || "📨 Trade proposal sent.");
+            clearTradeUIHighlights(true);
           } else {
             showToast(res.message || "✅ Offer saved.");
           }
@@ -1494,10 +1523,9 @@ async function hydrateTradeCollectionsAndSwitchView() {
       showToast("⚠️ Trading requires a valid API & token.");
     } else {
       await loadTradeState();
-    
       await hydrateTradeCollectionsAndSwitchView();
-      // If we are already in decision stage, optionally load detailed summary (filenames) if you want to render thumbnails:
-      // const sum = await loadTradeSummary(); // currently unused; id pills already shown
+      // If we are already in decision stage, optionally load detailed summary:
+      // const sum = await loadTradeSummary();
     }
   }
 
