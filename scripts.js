@@ -621,6 +621,36 @@ document.addEventListener("DOMContentLoaded", async () => {
   const sellQueue  = []; // unit entries: [{ id, filename, rarity }, ...]
   let coinBalanceEl = null;
 
+  // NEW helpers: locate & unhighlight the [TRADE] button for a given id
+  function findTradeButtonById(id) {
+    const id3 = pad3(id);
+    const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
+    const tile = [...(grid?.querySelectorAll(".card-container") || [])].find(div => {
+      const p = div.querySelector("p");
+      return p && p.textContent.replace("#","") === id3;
+    });
+    return tile ? tile.querySelector(".trade") : null;
+  }
+  function unhighlightTradeButton(id) {
+    const btn = findTradeButtonById(id);
+    if (btn) btn.classList.remove("queued");
+  }
+  function queueHas(id) {
+    const id3 = pad3(id);
+    return tradeQueue.some(e => pad3(e.id) === id3);
+  }
+  function removeFromTradeQueue(id) {
+    const id3 = pad3(id);
+    const idx = tradeQueue.findIndex(e => pad3(e.id) === id3);
+    if (idx >= 0) {
+      tradeQueue.splice(idx, 1);
+      unhighlightTradeButton(id3);
+      updateBottomBar();
+      return true;
+    }
+    return false;
+  }
+
   function showToast(message) {
     const existing = document.getElementById("mock-toast");
     if (existing) existing.remove();
@@ -792,7 +822,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!TRADE_MODE || !TRADE_SESSION_ID) {
       text.textContent = "Start a trade with /trade";
-      // PATCH C — show SAVE only for Step-1 initiator
       const saveBtn0 = document.getElementById('save-offer-btn');
       if (saveBtn0) saveBtn0.style.display = 'none';
       return;
@@ -801,7 +830,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (stage === "decision") {
       if (role === "partner") {
         text.textContent = `Trade Offer from ${initiatorName || "player"}`;
-        // summary thumbnails (if provided)
         if (summary?.youGive || summary?.youGet) {
           summaryBox.style.display = "block";
           summaryBox.innerHTML = `
@@ -809,7 +837,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div style="margin-top:4px;"><strong>You’ll give:</strong> ${renderThumbRow(summary.youGive || [])}</div>
           `;
         }
-        // Accept / Deny
         const accept = document.createElement("button");
         accept.textContent = "✅ Accept Trade";
         accept.style.marginRight = "8px";
@@ -820,12 +847,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           const res = await submitTradeDecision("accept");
           if (res?.ok) {
             showToast(res.message || "✅ Trade accepted.");
-            // lock UI
             TRADE_STAGE = "closed";
             renderTradeBanner({ stage: "closed", role, partnerName, initiatorName });
           } else {
             showToast(res?.message || res?.error || "⚠️ Failed to accept trade.");
-            accept.disabled = false; deny.disabled = false; // re-enable on failure
+            accept.disabled = false; deny.disabled = false;
           }
         };
         deny.onclick = async () => {
@@ -837,7 +863,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderTradeBanner({ stage: "closed", role, partnerName, initiatorName });
           } else {
             showToast(res?.message || res?.error || "⚠️ Failed to deny trade.");
-            accept.disabled = false; deny.disabled = false; // re-enable on failure
+            accept.disabled = false; deny.disabled = false;
           }
         };
         actions.style.display = "block";
@@ -846,7 +872,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else {
         text.textContent = `Waiting for ${partnerName || "partner"} to accept/deny…`;
       }
-      // PATCH C — show SAVE only for Step-1 initiator
       const saveBtn1 = document.getElementById('save-offer-btn');
       if (saveBtn1) saveBtn1.style.display = 'none';
       return;
@@ -854,7 +879,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (stage === "picktheirs") {
       text.textContent = `Step 2 of 2 — select up to 3 from ${partnerName || "partner"}`;
-      // PATCH C — show SAVE only for Step-1 initiator
       const saveBtn2 = document.getElementById('save-offer-btn');
       if (saveBtn2) saveBtn2.style.display = 'none';
       return;
@@ -863,7 +887,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // default = pickmine
     text.textContent = `Step 1 of 2 — select up to 3 cards to offer`;
 
-    // PATCH C — show SAVE only for Step-1 initiator
     const saveBtn = document.getElementById('save-offer-btn');
     if (saveBtn) {
       const show = (TRADE_MODE && TRADE_ROLE === 'initiator' && (stage || '').toLowerCase() === 'pickmine');
@@ -1003,7 +1026,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       removeBtn.innerHTML = "🗑";
       removeBtn.title = "Remove from trade queue";
       removeBtn.addEventListener("click", () => {
+        // remove that entry
         tradeQueue.splice(index, 1);
+        // also unhighlight the corresponding card tile button
+        unhighlightTradeButton(entry.id);
         updateBottomBar();
         bar?.classList.remove("limit-reached");
       });
@@ -1044,7 +1070,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             updateBottomBar();
             clearTradeUIHighlights(false);
             showToast(res.message || "📦 Trade submitted!");
-            // keep disabled; UI state changed
             return;
           } else if (res && (res.message || res.error)) {
             showToast(`⚠️ ${res.message || res.error}`);
@@ -1080,7 +1105,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           } else {
             showToast(res.message || "✅ Selection saved.");
           }
-          // success: keep disabled (stage advanced)
           return;
         } else {
           showToast(res?.message || res?.error || "⚠️ Failed to submit selection.");
@@ -1185,10 +1209,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             recalcAndRenderHeaderCounts();
             playSaleSfx(); // 🔊 play sale sound
             showToast(res.message || `🪙 Sold! +${res.credited ?? 0} coins`);
-            // ensure absolute freshness from source of truth
             await refreshCoinUI();
-            await refreshSellStatus(); // pick up new remaining
-            // keep disabled; user can queue again to re-enable
+            await refreshSellStatus();
           } else if (res && (res.message || res.error)) {
             showToast(`⚠️ ${res.message || res.error}`);
             if (String(res.error || "").toLowerCase().includes("limit")) {
@@ -1251,7 +1273,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   function applyNewHighlight(container, id) {
     if (!newIds.has(id) || alreadySeenThisBatch) return;
     container.classList.add("is-new");
-    // add a small badge
     let badge = container.querySelector(".new-badge");
     if (!badge) {
       badge = document.createElement("div");
@@ -1264,9 +1285,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       container.classList.remove("is-new");
       badge?.remove();
     };
-    // clear on click
     container.addEventListener("click", clear, { once: true });
-    // auto clear after 12s
     setTimeout(clear, 12000);
   }
 
@@ -1309,7 +1328,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       span.textContent = `Owned: ${qty}`;
       container.dataset.owned = String(qty);
 
-      // Wire SELL handler (quantity prompt + cap 5 / respect owned)
+      // Wire SELL handler
       const sellBtn = container.querySelector(".sell");
       if (sellBtn) {
         sellBtn.disabled = qty <= 0;
@@ -1322,20 +1341,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
       }
 
-      // TRADE handler — gated by session mode
+      // TRADE handler — session mode, toggle behavior
       const tradeBtn = container.querySelector(".trade");
       if (tradeBtn) {
         tradeBtn.addEventListener("click", () => {
-          const qtyNow = Number(ownedMap[id] || 0); // use *current* pointer (my map in step 1; partner map in step 2)
-          if (qtyNow <= 0) return showToast("❌ You do not own this card."); // when viewing partner, ownedMap is theirs, so this still correctly requires partner to have >0
+          const qtyNow = Number(ownedMap[id] || 0); // use *current* pointer (mine in step1; partner in step2)
+          if (qtyNow <= 0) return showToast("❌ You do not own this card.");
           if (!TRADE_MODE || !TRADE_SESSION_ID) {
             return showToast("ℹ️ Start a trade with /trade.");
           }
           if (TRADE_STAGE === "decision") {
             return showToast("ℹ️ Waiting for decision — cannot modify picks now.");
           }
-          const cap = 3;
-          if (tradeQueue.length >= cap) return showToast(`⚠️ Trade queue is full (${cap}).`);
+
+          // Toggle: if already queued, remove & unhighlight; else add (cap 3)
+          if (queueHas(id)) {
+            removeFromTradeQueue(id);
+            showToast(`↩️ Removed #${id} from trade queue.`);
+            return;
+          }
+
+          if (tradeQueue.length >= 3) return showToast(`⚠️ Trade queue is full (3).`);
           tradeQueue.push({ id, filename: masterCard?.image || "", rarity: masterCard?.rarity || "Common" });
           tradeBtn.classList.add("queued");
           showToast(`✅ Card #${id} added to trade queue.`);
@@ -1388,8 +1414,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (TRADE_STAGE === "decision") {
           return showToast("ℹ️ Waiting for decision — cannot modify picks now.");
         }
-        const cap = 3;
-        if (tradeQueue.length >= cap) return showToast(`⚠️ Trade queue is full (${cap}).`);
+
+        if (queueHas(id)) {
+          removeFromTradeQueue(id);
+          showToast(`↩️ Removed #${id} from trade queue.`);
+          return;
+        }
+
+        if (tradeQueue.length >= 3) return showToast(`⚠️ Trade queue is full (3).`);
         tradeQueue.push({ id, filename: card.image, rarity: card.rarity });
         tradeBtn.classList.add("queued");
         showToast(`✅ Card #${id} added to trade queue.`);
@@ -1460,7 +1492,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // NEW: keep sell status in sync
   async function refreshSellStatus() {
     sellStatus = await fetchSellStatus();
-    // After fetching status, ensure the bar reflects remaining
     updateSellBar();
   }
   await refreshSellStatus();
@@ -1491,29 +1522,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // flip pointer based on stage
     if (TRADE_STAGE === "picktheirs") {
-      // Show partner collection during step 2 (initiator views requestable cards)
       ownedMap = (TRADE_ROLE === "initiator") ? partnerOwnedMap : myOwnedMap;
-      // important: when switching to partner view, clear current selections/highlights
       clearTradeUIHighlights(true);
     } else {
-      // pickmine / decision / others
       ownedMap = myOwnedMap;
     }
 
     // refresh grid + header counts + labels
     applyOwnedMapToGrid(masterById);
-    updateCollectionOwnerLabel(); // PATCH B — update label on view flip
-    clearTradeHighlights();       // PATCH A — reset local queued highlights on new view
+    updateCollectionOwnerLabel();
+    clearTradeHighlights();
     recalcAndRenderHeaderCounts();
-    updateOwnerLabel();           // keep legacy header title in sync
+    updateOwnerLabel();
   }
 
   /* ---------------- SAVE-OFFER button hook (initiator, Step 1) ---------------- */
   function wireSaveOfferButton() {
     const btn = document.getElementById("save-offer-btn");
-    if (!btn) return; // nothing to do if page didn't include it
+    if (!btn) return;
     btn.addEventListener("click", async () => {
-      // Basic guards
       if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE || !TOKEN) {
         return showToast("⚠️ Trading requires a valid session, API & token.");
       }
@@ -1530,16 +1557,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       const cards = tradeQueue.map(e => String(e.id).padStart(3, "0"));
       btn.disabled = true;
       try {
-        // Explicitly tell backend we're saving Step 1 (mine)
         const res = await submitTradeSelection(cards, "pickMine");
         if (res?.ok) {
-          // Pull latest server stage + collections, then flip UI if needed
           await loadTradeState();
           await hydrateTradeCollectionsAndSwitchView();
 
-          // If server advanced us to Step 2, clear local queue & nudge user
           if ((TRADE_STAGE || "").toLowerCase() === "picktheirs") {
-            // PATCH A — clear queue & highlights here too
             tradeQueue.length = 0;
             clearTradeHighlights();
             updateBottomBar();
@@ -1550,10 +1573,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           } else {
             showToast(res.message || "✅ Offer saved.");
           }
-          // stay disabled on success (state changed)
           return;
         }
-        // failure path
         showToast(res?.message || res?.error || "⚠️ Failed to save offer.");
         btn.disabled = false;
       } catch {
@@ -1576,8 +1597,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       await loadTradeState();
       await hydrateTradeCollectionsAndSwitchView();
-      // If we are already in decision stage, optionally load detailed summary:
-      // const sum = await loadTradeSummary();
+      // const sum = await loadTradeSummary(); // optionally use
     }
   }
 
@@ -1598,7 +1618,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       hubLink.href = u.toString();
     } catch {
-      // If original was a relative without protocol, build safely
       let base = hubLink.getAttribute("href") || "https://madv313.github.io/HUB-UI/";
       const params = [];
       if (TOKEN) params.push(`token=${encodeURIComponent(TOKEN)}`);
