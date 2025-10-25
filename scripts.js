@@ -575,8 +575,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Refresh the entire grid based on the *current* ownedMap pointer
   function applyOwnedMapToGrid(masterById) {
-    const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
-    if (!grid) return;
+    let grid = document.getElementById("card-grid") || document.getElementById("cards-container");
+    if (!grid) {
+      const tradeFooter = document.getElementById("trade-footer") || document.body;
+      grid = document.createElement("div");
+      grid.id = "card-grid";
+      grid.className = "card-grid";
+      tradeFooter.parentNode.insertBefore(grid, tradeFooter);
+    }
     grid.querySelectorAll(".card-container").forEach(container => {
       const numEl = container.querySelector("p");
       if (!numEl) return;
@@ -1312,10 +1318,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   let ownedMap = myOwnedMap; // pointer that can flip to partner view in trade mode
 
   /* ---------------- Build OR Hydrate grid ---------------- */
-  const grid = document.getElementById("card-grid") || document.getElementById("cards-container");
+  let grid = document.getElementById("card-grid") || document.getElementById("cards-container");
   if (!grid) {
-    console.error("[ccui] Missing #card-grid or #cards-container container in HTML");
-    return;
+    const tradeFooter = document.getElementById("trade-footer") || document.body;
+    grid = document.createElement("div");
+    grid.id = "card-grid";
+    grid.className = "card-grid";
+    tradeFooter.parentNode.insertBefore(grid, tradeFooter);
   }
 
   const hasPreRenderedTiles = !!grid.querySelector(".card-container");
