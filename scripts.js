@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  /* === NEW: smart fetch with API-aware throttling, de-dup & 429 backoff === */
+  /* === smart fetch with API-aware throttling, de-dup & 429 backoff === */
   const inflight = new Map(); // key: "METHOD url" → Promise
   const apiCooldown = { until: 0 }; // global gentle cooldown
 
@@ -311,21 +311,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     return map;
   }
 
+  // NOTE: When API is present, call the primary route only; do NOT probe backups on failure (prevents over-calling/429 storms).
   async function loadCollection() {
-    // Preferred: token routes on your backend
+    // Preferred: token route
     if (TOKEN && API_BASE) {
-      let d = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/collection`);
+      const d = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/collection`);
       if (d) return { map: toOwnershipMap(d), src: "token" };
-
-      // If first attempt failed for any reason other than (likely) rate limiting,
-      // we still try the legacy token query route once.
-      d = await fetchJSON(`${API_BASE}/collection?token=${encodeURIComponent(TOKEN)}`);
-      if (d) return { map: toOwnershipMap(d), src: "token-query" };
+      // No second probe here; fetchJSON already applied 429 backoff if needed.
     }
 
-    // Secondary: uid route
-    if (UID && API_BASE) {
-      let d = await fetchJSON(`${API_BASE}/collection?userId=${encodeURIComponent(UID)}`);
+    // Secondary: uid route (only if TOKEN missing)
+    if (!TOKEN && UID && API_BASE) {
+      const d = await fetchJSON(`${API_BASE}/collection?userId=${encodeURIComponent(UID)}`);
       if (d) return { map: toOwnershipMap(d), src: "uid" };
     }
 
@@ -339,14 +336,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return { map: {}, src: "empty" };
   }
 
+  // NOTE: When API is present, call the primary route only; do NOT probe backups on failure.
   async function loadStats() {
     if (TOKEN && API_BASE) {
-      let s = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/stats`);
+      const s = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/stats`);
       if (s) return s;
-      s = await fetchJSON(`${API_BASE}/userStatsToken?token=${encodeURIComponent(TOKEN)}`);
-      if (s) return s;
+      // No second probe (e.g., /userStatsToken or ?token) — avoids extra API pressure.
     }
-    if (UID && API_BASE) {
+    if (!TOKEN && UID && API_BASE) {
       const s = await fetchJSON(`${API_BASE}/userStats/${encodeURIComponent(UID)}`);
       if (s) return s;
     }
