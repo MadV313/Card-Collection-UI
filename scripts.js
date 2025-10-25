@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     `${trimSlash(SELF_REPO_ROOT)}/CoreMasterReference.json`,
     "https://madv313.github.io/Card-Collection-UI/logic/CoreMasterReference.json",
     "https://madv313.github.io/Card-Collection-UI/CoreMasterReference.json",
-    "https://madv313.github.io/Duel-Bot/logic/CoreMasterReference.json",
+    "https://madv313.github.io/Duel-Bot/logic/CoreMasterReference.json`,
     "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/logic/CoreMasterReference.json",
     "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/CoreMasterReference.json"
   ].filter(Boolean));
@@ -804,6 +804,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch {}
   }
 
+  // Optional: send the final proposal summary to partner via backend "notify" route.
+  // If your backend already auto-DMs on proposal, this will just no-op safely.
+  async function sendFinalTradeDM(summary) {
+    try {
+      if (!API_BASE || !TOKEN || !TRADE_MODE || !TRADE_SESSION_ID) return false;
+      // Try a conventional notify endpoint; ignore failures silently
+      const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/notify`;
+      const res = await postJson(url, { token: TOKEN, type: "proposal", summary });
+      return !!(res && res.ok);
+    } catch { return false; }
+  }
+  
+  // Close/hide the trade UI (fallbacks if window.close isn't allowed)
+  function closeTradeUIAfter(ms = 10000) {
+    setTimeout(() => {
+      // Prefer navigating back to HUB with your preserved params
+      const hub = document.getElementById("return-to-hub")?.href;
+      if (hub) {
+        location.href = hub;
+        return;
+      }
+      // Try closing the tab if it was window.open()-ed
+      try { window.close(); } catch {}
+      // Otherwise just collapse the bars and banner
+      document.getElementById("trade-bottom-bar")?.classList.add("collapsed");
+      document.getElementById("sell-bottom-bar")?.classList.add("collapsed");
+      const b = document.getElementById("trade-banner");
+      if (b) b.style.display = "none";
+    }, ms);
+  }
+
   // NEW: update the header to show whose collection is visible
   function updateOwnerLabel() {
     const mineText = "Your Card Collection";
@@ -1149,21 +1180,38 @@ document.addEventListener("DOMContentLoaded", async () => {
           const explicitStage = (TRADE_STAGE === "picktheirs") ? "pickTheirs" : "pickMine";
           const res = await submitTradeSelection(cards, explicitStage);
           if (res?.ok) {
-            // Pre-clear to prevent auto-resubmit during flip (FIX A)
+            // 1) Clear queue & UI highlight immediately
             tradeQueue.length = 0;
             clearTradeHighlights();
             updateBottomBar();
-
-            // Pull fresh state and flip
+          
+            // 2) Lock the submit button to avoid double sends
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Sent";
+          
+            // 3) Pull fresh state and flip view
             const state = await loadTradeState();
-            await hydrateTradeCollectionsAndSwitchView(); // rebinds button via updateBottomBar
-
-            if (state?.stage === "picktheirs") {
+            await hydrateTradeCollectionsAndSwitchView();
+          
+            // 4) If we’ve reached the decision stage, DM partner + schedule UI close
+            if (state?.stage === "decision") {
+              // Try to fetch a concise summary you already support
+              let summary = null;
+              try { summary = await loadTradeSummary(); } catch {}
+              // Fire-and-forget DM (backend should handle the actual delivery)
+              sendFinalTradeDM(summary).catch(() => {});
+              // User feedback + close UX
+              showToast(res.message || "📨 Trade proposal sent. Closing in 10s…");
+              // Hide the submit in decision stage to match your FIX E behavior
+              submitBtn.style.display = "none";
+              closeTradeUIAfter(10000);
+            } else if (state?.stage === "picktheirs") {
               showToast("📤 Offer saved. Now pick up to 3 from your partner.");
-            } else if (state?.stage === "decision") {
-              showToast(res.message || "📨 Trade proposal sent.");
+              // Keep button enabled for the next step, but make sure it reflects the new label
+              submitBtn.disabled = false;
             } else {
               showToast(res.message || "✅ Selection saved.");
+              submitBtn.disabled = false;
             }
             return;
           } else {
