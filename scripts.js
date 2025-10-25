@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     `${trimSlash(SELF_REPO_ROOT)}/CoreMasterReference.json`,
     "https://madv313.github.io/Card-Collection-UI/logic/CoreMasterReference.json",
     "https://madv313.github.io/Card-Collection-UI/CoreMasterReference.json",
-    "https://madv313.github.io/Duel-Bot/logic/CoreMasterReference.json`,
+    "https://madv313.github.io/Duel-Bot/logic/CoreMasterReference.json",
     "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/logic/CoreMasterReference.json",
     "https://raw.githubusercontent.com/MadV313/Duel-Bot/main/CoreMasterReference.json"
   ].filter(Boolean));
