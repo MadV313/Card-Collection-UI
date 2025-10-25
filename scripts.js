@@ -145,47 +145,60 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ---- NEW: API awareness + backoff (prevents 429s) ----
-  function isApiUrl(url) {
-    try { return !!API_BASE && new URL(url, location.href).href.startsWith(API_BASE); }
-    catch { return false; }
-  }
+  /* === NEW: smart fetch with API-aware throttling, de-dup & 429 backoff === */
+  const inflight = new Map(); // key: "METHOD url" → Promise
+  const apiCooldown = { until: 0 }; // global gentle cooldown
 
-  async function fetchAPI(url, opts = {}, retries = 3) {
-    let attempt = 0;
-    while (true) {
-      const res = await fetch(url, { cache: "no-store", ...opts });
-      if (res.ok) return res.json();
-      if ((res.status === 429 || res.status === 503) && attempt < retries) {
-        const base = 400; // ms
-        const delay = base * Math.pow(2, attempt) + Math.floor(Math.random() * 150);
-        await new Promise(r => setTimeout(r, delay));
-        attempt++;
-        continue;
+  const isApiUrl = (url) => {
+    if (!API_BASE) return false;
+    try { return new URL(url, location.href).href.startsWith(API_BASE + "/"); }
+    catch { return String(url || "").startsWith(API_BASE + "/"); }
+  };
+
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  async function fetchJSON(url, opts = {}) {
+    const method = (opts.method || "GET").toUpperCase();
+    const key = `${method} ${url}`;
+
+    // Coalesce duplicate in-flight requests
+    if (inflight.has(key)) return inflight.get(key);
+
+    const runner = (async () => {
+      // Respect a short global cooldown after a 429
+      const now = Date.now();
+      if (apiCooldown.until > now && isApiUrl(url)) {
+        await sleep(apiCooldown.until - now);
       }
-      throw new Error(`${res.status} ${res.statusText}`);
-    }
-  }
 
-  async function fetchJSON(url, opts) {
-    try {
-      // Never cache-bust API endpoints; only static assets
-      const isApi = isApiUrl(url);
-      const finalUrl = isApi ? url : withTs(url);
+      // Only append ts for NON-API (static) requests
+      const finalUrl = isApiUrl(url) ? url : withTs(url);
 
-      if (isApi) {
-        return await fetchAPI(finalUrl, opts, 3);
-      } else {
+      try {
         const r = await fetch(finalUrl, { cache: "no-store", ...opts });
+        if (r.status === 429) {
+          // Set a brief global cooldown and retry once
+          const retryAfter = Number(r.headers.get("retry-after")) || 1;
+          apiCooldown.until = Date.now() + retryAfter * 1000;
+          await sleep(retryAfter * 1000);
+          // single retry
+          const r2 = await fetch(finalUrl, { cache: "no-store", ...opts });
+          if (!r2.ok) throw new Error(`${r2.status} ${r2.statusText}`);
+          return await r2.json();
+        }
         if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
         return await r.json();
+      } catch (e) {
+        console.warn(`[ccui] fetch failed ${url}: ${e?.message}`);
+        return null;
       }
-    } catch (e) {
-      console.warn(`[ccui] fetch failed ${url}: ${e?.message}`);
-      return null;
-    }
+    })();
+
+    inflight.set(key, runner);
+    try { return await runner; }
+    finally { inflight.delete(key); }
   }
-  
+
   async function postJson(url, body) {
     return fetchJSON(url, {
       method: "POST",
@@ -304,6 +317,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       let d = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/collection`);
       if (d) return { map: toOwnershipMap(d), src: "token" };
 
+      // If first attempt failed for any reason other than (likely) rate limiting,
+      // we still try the legacy token query route once.
       d = await fetchJSON(`${API_BASE}/collection?token=${encodeURIComponent(TOKEN)}`);
       if (d) return { map: toOwnershipMap(d), src: "token-query" };
     }
@@ -932,7 +947,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- Trade state fetch ---------------- */
   async function loadTradeState() {
     if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE) return null;
-    const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/state?token=${encodeURIComponent(TOKEN)}`;
+    const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/state`;
     const state = await fetchJSON(url);
     if (!state) return null;
 
@@ -1288,10 +1303,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   /* ---------------- Load data ---------------- */
-  const needCollection = !(TRADE_MODE && TRADE_SESSION_ID); // skip extra call if trade session will hydrate /collections
   const [master, collectionResult, stats] = await Promise.all([
     loadMaster(),
-    needCollection ? loadCollection() : Promise.resolve({ map: {}, src: "skipped" }),
+    loadCollection(),
     loadStats()
   ]);
 
