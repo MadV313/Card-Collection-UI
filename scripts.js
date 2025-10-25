@@ -145,11 +145,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // ---- NEW: API awareness + backoff (prevents 429s) ----
+  function isApiUrl(url) {
+    try { return !!API_BASE && new URL(url, location.href).href.startsWith(API_BASE); }
+    catch { return false; }
+  }
+
+  async function fetchAPI(url, opts = {}, retries = 3) {
+    let attempt = 0;
+    while (true) {
+      const res = await fetch(url, { cache: "no-store", ...opts });
+      if (res.ok) return res.json();
+      if ((res.status === 429 || res.status === 503) && attempt < retries) {
+        const base = 400; // ms
+        const delay = base * Math.pow(2, attempt) + Math.floor(Math.random() * 150);
+        await new Promise(r => setTimeout(r, delay));
+        attempt++;
+        continue;
+      }
+      throw new Error(`${res.status} ${res.statusText}`);
+    }
+  }
+
   async function fetchJSON(url, opts) {
     try {
-      const r = await fetch(withTs(url), { cache: "no-store", ...opts });
-      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-      return await r.json();
+      // Never cache-bust API endpoints; only static assets
+      const isApi = isApiUrl(url);
+      const finalUrl = isApi ? url : withTs(url);
+
+      if (isApi) {
+        return await fetchAPI(finalUrl, opts, 3);
+      } else {
+        const r = await fetch(finalUrl, { cache: "no-store", ...opts });
+        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+        return await r.json();
+      }
     } catch (e) {
       console.warn(`[ccui] fetch failed ${url}: ${e?.message}`);
       return null;
@@ -902,7 +932,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* ---------------- Trade state fetch ---------------- */
   async function loadTradeState() {
     if (!TRADE_MODE || !TRADE_SESSION_ID || !API_BASE) return null;
-    const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/state`;
+    const url = `${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/state?token=${encodeURIComponent(TOKEN)}`;
     const state = await fetchJSON(url);
     if (!state) return null;
 
@@ -1258,9 +1288,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   /* ---------------- Load data ---------------- */
+  const needCollection = !(TRADE_MODE && TRADE_SESSION_ID); // skip extra call if trade session will hydrate /collections
   const [master, collectionResult, stats] = await Promise.all([
     loadMaster(),
-    loadCollection(),
+    needCollection ? loadCollection() : Promise.resolve({ map: {}, src: "skipped" }),
     loadStats()
   ]);
 
