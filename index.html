@@ -28,7 +28,7 @@
       background-color: #004d4d;
     }
 
-    /* ── NEW: music toggle button ───────────────────────────────────────── */
+    /* ── Music toggle button (scripts.js also supports this id) ─────────── */
     #music-toggle {
       position: fixed;
       right: 20px;
@@ -40,7 +40,7 @@
       font-size: 0.85rem;
       cursor: pointer;
       background-color: #111;
-      border: 2px solid #7dd3fc; /* cyan-ish */
+      border: 2px solid #7dd3fc;
       color: #7dd3fc;
     }
     #music-toggle:hover {
@@ -150,14 +150,12 @@
       margin-top: 4px;
     }
 
-    /* small helper for the trade bar title (scripts will create if missing) */
     .bar-title {
       font-weight: 700;
       margin-right: 10px;
       white-space: nowrap;
     }
 
-    /* optional: initial placeholder banner (scripts will control visibility/content) */
     #trade-banner {
       position: sticky;
       top: 0;
@@ -175,7 +173,7 @@
 <body>
   <div class="snow"></div>
 
-  <!-- NEW: audio elements (scripts.js can also control these) -->
+  <!-- Optional audio tags; scripts.js also creates/controls audio objects -->
   <audio id="bg-music" src="audio/bg/Follow the Trail.mp3" preload="auto" loop></audio>
   <audio id="sfx-sale" src="audio/effects/sale.mp3" preload="auto"></audio>
 
@@ -188,13 +186,13 @@
 
   <a id="return-to-hub" href="https://madv313.github.io/HUB-UI/">← Return to HUB</a>
 
-  <!-- NEW: music toggle button -->
+  <!-- Music toggle (scripts.js will wire this if present) -->
   <button id="music-toggle" title="Music: Off">🔇 Music</button>
 
   <button id="toggle-sell-bar">⬆️ Toggle Sell Queue</button>
   <button id="toggle-bottom-bar">⬆️ Toggle Trade Queue</button>
 
-  <h1>Players Card Collection</h1>
+  <h1 id="page-title">Your Card Collection</h1>
 
   <div id="coin-balance-display" style="margin-bottom: 20px; font-size: 1.2rem;">
     🪙 <span id="coin-balance">13</span>
@@ -219,8 +217,8 @@
     <button id="save-offer-btn" class="btn primary">[SAVE YOUR OFFER]</button>
   </div>
 
+  <!-- Only keep harmless UI toggles; all API logic lives in scripts.js -->
   <script>
-    // wire the toggle buttons (no other logic touched)
     (function () {
       const sellBtn = document.getElementById('toggle-sell-bar');
       const tradeBtn = document.getElementById('toggle-bottom-bar');
@@ -230,338 +228,6 @@
       tradeBtn?.addEventListener('click', () => tradeBar?.classList.toggle('collapsed'));
     })();
   </script>
-
-  <!-- proposer-mode patch (auto-switch to partner after SAVE) -->
-  <script>
-  (() => {
-    try {
-      const qs = new URLSearchParams(location.search);
-      const MODE         = (qs.get('mode') || '').toLowerCase();          // 'trade'
-      const TRADE_MODE   = MODE === 'trade';
-      const TRADE_SESSION_ID = (qs.get('tradeSession') || qs.get('session') || '').trim();
-      const TRADE_ROLE   = (qs.get('role') || '').toLowerCase();          // 'initiator' | 'partner'
-      let   TRADE_STAGE  = (qs.get('stage') || '').toLowerCase();         // 'pickmine' | 'picktheirs' | 'decision'
-      const TOKEN        = qs.get('token') || '';
-      const API_BASE     = (qs.get('api') || '').replace(/\/+$/, '');
-      if (!TRADE_MODE || !TRADE_SESSION_ID || !TOKEN || !API_BASE) return;
-
-      const $ = (s, r=document) => r.querySelector(s);
-      const tradeFooter = $('#trade-footer');
-      const toast = (m) => {
-        try { if (window.showToast) return window.showToast(m); } catch {}
-        const n = document.createElement('div');
-        n.textContent = m;
-        n.style.cssText = 'position:fixed;left:50%;top:20px;transform:translateX(-50%);background:#111;color:#fff;border:1px solid #0ff;padding:8px 12px;border-radius:6px;z-index:9999';
-        document.body.appendChild(n);
-        setTimeout(() => n.remove(), 2200);
-      };
-      const goToStage = (s) => {
-        const u = new URL(location.href);
-        u.searchParams.set('stage', s);
-        history.replaceState(null, '', u.toString());
-        TRADE_STAGE = s.toLowerCase();
-      };
-
-      // queue helpers (use your existing globals if present)
-      const getMyQueue = () => (window.tradeQueueMine?.slice?.() || []);
-      const getPartnerQueue = () => (window.tradeQueuePartner?.slice?.() || []);
-      const setPartnerQueue = (arr) => {
-        if (!Array.isArray(window.tradeQueuePartner)) window.tradeQueuePartner = [];
-        window.tradeQueuePartner.length = 0;
-        window.tradeQueuePartner.push(...arr.slice(0,3));
-      };
-
-      async function fetchCollections(sessionId) {
-        const c = await fetch(`${API_BASE}/trade/${encodeURIComponent(sessionId)}/collections?token=${encodeURIComponent(TOKEN)}`, { cache:'no-store' });
-        if (!c.ok) throw new Error('collections fetch failed');
-        return c.json();
-      }
-
-      function disablePending() {
-        if (tradeFooter) tradeFooter.innerHTML = `<button class="btn" disabled>Pending partner…</button>`;
-        document.body.classList.add('trade-pending');
-      }
-
-      async function sendInitiatorMine(picks) {
-        const body = { token: TOKEN, cards: picks.slice(0,3) };
-        const r = await fetch(`${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select`, {
-          method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
-        });
-        const js = await r.json().catch(() => ({}));
-        if (!r.ok || !js.ok) throw new Error(js.error || 'Save failed');
-        toast(js.message || 'Your cards saved.');
-        // backend advances to pickTheirs
-        goToStage('pickTheirs');
-        await renderPartnerSelect();
-      }
-
-      async function sendInitiatorRequested(picks) {
-        const body = { token: TOKEN, cards: picks.slice(0,3) };
-        const r = await fetch(`${API_BASE}/trade/${encodeURIComponent(TRADE_SESSION_ID)}/select`, {
-          method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
-        });
-        const js = await r.json().catch(() => ({}));
-        if (!r.ok || !js.ok) throw new Error(js.error || 'Send failed');
-        toast(js.message || 'Trade offer sent to partner.');
-        disablePending();
-      }
-
-      function mapCollectionForGrid(arr) {
-        // server gives: { id, qty, name, rarity, filename, card_id:"#001" }
-        // grid usually wants: { number, owned, name, rarity, filename }
-        return (Array.isArray(arr) ? arr : []).map(c => ({
-          number: String(c.id || '').padStart(3,'0'),
-          owned: Number(c.qty || 0),
-          name: c.name || (`#${c.id}`),
-          rarity: c.rarity || 'Common',
-          filename: c.filename || `${String(c.id||'').padStart(3,'0')}.png`,
-        }));
-      }
-
-      async function renderPartnerSelect() {
-        const data = await fetchCollections(TRADE_SESSION_ID);
-        // data: { ok, role, status, stage, me:[...], partner:[...] }
-        const partnerCollGrid = mapCollectionForGrid(data.partner);
-
-        if (typeof window.renderGrid === 'function') {
-          window.renderGrid(partnerCollGrid, {
-            mode: 'request-partner',
-            maxPick: 3,
-            onPickChange: (ids) => { setPartnerQueue(ids); try { window.refreshBottomBars?.(); } catch {} }
-          });
-        } else {
-          document.body.setAttribute('data-trade-mode', 'request-partner');
-        }
-
-        if (tradeFooter) {
-          tradeFooter.innerHTML = `<button id="send-offer-btn" class="btn primary">SEND OFFER</button>`;
-          document.getElementById('send-offer-btn')?.addEventListener('click', async () => {
-            const req = getPartnerQueue();
-            if (!req.length) return toast('Pick at least 1 card you want from your partner.');
-            try { await sendInitiatorRequested(req); }
-            catch (e) { console.error(e); toast('Failed to send. Try again.'); }
-          });
-        }
-      }
-
-      // hook your existing SAVE button (id must be #save-offer-btn)
-      function hookSaveMine() {
-        document.addEventListener('click', async (ev) => {
-          const el = ev.target.closest('#save-offer-btn');
-          if (!el) return;
-          if (TRADE_ROLE !== 'initiator') return;
-          const mine = getMyQueue();
-          if (!mine || !mine.length) { toast('Pick at least 1 of your cards.'); return; }
-          el.disabled = true;
-          try { await sendInitiatorMine(mine); }
-          catch (e) { console.error(e); toast('Save failed. Try again.'); el.disabled = false; }
-        });
-      }
-
-      if (TRADE_ROLE === 'initiator') {
-        hookSaveMine();
-        if (TRADE_STAGE === 'picktheirs') {
-          renderPartnerSelect().catch(console.error);
-        }
-      }
-    } catch (e) {
-      console.error('[trade proposer patch] init failed', e);
-    }
-  })();
-  </script>
-
-  <script>
-    // ── NEW: minimal music bootstrap (scripts.js can also control #bg-music/#sfx-sale)
-    (function () {
-      const audio = document.getElementById('bg-music');
-      const toggle = document.getElementById('music-toggle');
-      if (!audio || !toggle) return;
-
-      const KEY = 'ccui:bgm:on';
-      const saved = localStorage.getItem(KEY);
-      let wantOn = saved !== '0'; // default ON unless explicitly off
-
-      function reflect() {
-        if (audio.paused) {
-          toggle.textContent = '🔇 Music';
-          toggle.title = 'Music: Off';
-        } else {
-          toggle.textContent = '🔊 Music';
-          toggle.title = 'Music: On';
-        }
-      }
-
-      // attempt to start on first user gesture if desired
-      function primeAutoplayOnce() {
-        const handler = () => {
-          document.removeEventListener('click', handler, { capture: true });
-          if (!wantOn) return reflect();
-          audio.volume = 0.6;
-          audio.play().catch(() => {/* ignored: user can toggle manually */});
-          reflect();
-        };
-        document.addEventListener('click', handler, { capture: true, once: true });
-      }
-
-      toggle.addEventListener('click', async () => {
-        if (audio.paused) {
-          try { await audio.play(); } catch {}
-          localStorage.setItem(KEY, '1');
-          wantOn = true;
-        } else {
-          audio.pause();
-          localStorage.setItem(KEY, '0');
-          wantOn = false;
-        }
-        reflect();
-      });
-
-      // initial state
-      primeAutoplayOnce();
-      reflect();
-    })();
-  </script>
-
-  <div id="cards-container" class="card-grid">
-    <!-- Helper shared by both loaders -->
-    <script>
-      function getRarityBorder(rarity) {
-        const map = {
-          "Common": "common-border",
-          "Uncommon": "uncommon-border",
-          "Rare": "rare-border",
-          "Legendary": "legendary-border",
-          "Unique": "unique-border"
-        };
-        return map[rarity] || '';
-      }
-    </script>
-
-    <!-- 1) MOCK loader (unchanged behavior, properly scoped) -->
-    <script>
-      (function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const mockMode  = urlParams.get("mockMode") === "true";
-        if (!mockMode) return;
-
-        fetch('mock_deckData.json')
-          .then(res => res.json())
-          .then(cards => {
-            const cardMap = {};
-            let totalOwned = 0;
-
-            cards.forEach(card => {
-              const id = card.card_id.replace(/-DUP\d*$/, '');
-              cardMap[id] = (cardMap[id] || { ...card, count: 0 });
-              cardMap[id].count++;
-              totalOwned++;
-            });
-
-            document.querySelectorAll('.card-container').forEach(container => {
-              const number = container.querySelector('p')?.textContent?.replace('#', '');
-              if (!number || !cardMap[number]) return;
-
-              const owned  = cardMap[number];
-              const img    = container.querySelector('img');
-              const span   = container.querySelector('span.owned-count') || container.querySelector('.owned-count');
-              const rarity = owned["Card Rarity"];
-
-              img.src = `images/cards/${owned.image}`;
-              img.classList.remove('facedown-card');
-              container.className = `card-container ${getRarityBorder(rarity)}`;
-              container.dataset.rarity = rarity;
-              container.dataset.owned  = owned.count;
-              if (span) span.textContent = `Owned: ${owned.count}`;
-            });
-
-            document.getElementById('collection-count').textContent  =
-              `Cards Collected: ${Object.keys(cardMap).length} / 127`;
-            document.getElementById('total-owned-count').textContent =
-              `Total Cards Owned: ${totalOwned} / 250`;
-          });
-      })();
-    </script>
-
-    <!-- 2) TOKEN/API loader (runs only when ?token= & ?api= are present) -->
-    <script>
-      (function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const mockMode  = urlParams.get("mockMode") === "true";
-        const token     = urlParams.get("token");
-        const apiBase   = urlParams.get("api");
-        if (mockMode || !token || !apiBase) return; // keep mock behavior if requested
-
-        const base = apiBase.replace(/\/+$/, "");
-
-        (async () => {
-          try {
-            // Load collection via token
-            const collRes = await fetch(`${base}/me/${encodeURIComponent(token)}/collection`, { cache: "no-store" });
-            if (!collRes.ok) throw new Error(`collection ${collRes.status}`);
-            const coll = await collRes.json(); // [{ number, owned, name, rarity, type, filename }, ... ]
-
-            // Build quick lookup and counters
-            const byNum = Object.create(null);
-            let collected = 0;
-            let totalOwned = 0;
-
-            for (const c of coll) {
-              const num   = String(c.number).padStart(3, "0");
-              const count = Number(c.owned || 0);
-              byNum[num]  = { ...c, count };
-              if (count > 0) {
-                collected += 1;
-                totalOwned += count;
-              }
-            }
-
-            // Update each pre-rendered tile
-            document.querySelectorAll(".card-container").forEach(container => {
-              const numEl = container.querySelector("p");
-              const img   = container.querySelector("img");
-              const span  = container.querySelector(".owned-count");
-              if (!numEl || !img || !span) return;
-
-              const number = (numEl.textContent || "").replace("#", "");
-              const info   = byNum[number];
-
-              if (info && info.count > 0) {
-                img.src = `images/cards/${info.filename}`;
-                img.classList.remove("facedown-card");
-                container.className = `card-container ${getRarityBorder(info.rarity)}`;
-                container.dataset.rarity = info.rarity || "";
-                container.dataset.owned  = String(info.count);
-                span.textContent = `Owned: ${info.count}`;
-              } else {
-                span.textContent = "Owned: 0";
-              }
-            });
-
-            // Totals header
-            const collHdr  = document.getElementById("collection-count");
-            const totalHdr = document.getElementById("total-owned-count");
-            if (collHdr)  collHdr.textContent  = `Cards Collected: ${collected} / 127`;
-            if (totalHdr) totalHdr.textContent = `Total Cards Owned: ${totalOwned} / 250`;
-
-            // Coins/stats (optional)
-            try {
-              const statRes = await fetch(`${base}/me/${encodeURIComponent(token)}/stats`, { cache: "no-store" });
-              if (statRes.ok) {
-                const stats = await statRes.json();
-                const coinEl = document.getElementById("coin-balance");
-                if (coinEl && typeof stats?.coins !== "undefined") {
-                  coinEl.textContent = String(Number(stats.coins) || 0);
-                }
-              }
-            } catch (e) {
-              console.warn("Stats fetch failed:", e?.message || e);
-            }
-          } catch (err) {
-            console.error("Failed to load collection via API:", err?.message || err);
-          }
-        })();
-      })();
-    </script>
     
     <div class="card-container unique-border" data-rarity="Unique" data-owned="0">
       <img class="facedown-card" class="facedown-card" src="images/cards/000_CardBack_Unique.png" alt="WinterLand Death Deck (Face-Down)">
