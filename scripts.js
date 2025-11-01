@@ -38,6 +38,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const IMG_BASE  = (qs.get("imgbase") || "images/cards").replace(/\/+$/, ""); // primary image base (front-end repo)
   const IMG_ALT_Q = (qs.get("imgalt")  || "").replace(/\/+$/, "");             // optional alt host via URL
 
+  // 🔹 NEW: ME base (persistent-data service) for /me/:token/* reads
+  const ME_BASE  = (() => {
+    const fromUrl = (qs.get("me") || "").replace(/\/+$/, "");
+    const fromLS  = (() => { try { return (localStorage.getItem("sv13.me") || "").replace(/\/+$/, ""); } catch { return ""; } })();
+    const val = fromUrl || fromLS || "";
+    try {
+      if (val) localStorage.setItem("sv13.me", val);
+    } catch {}
+    return val;
+  })();
+
   // "new" cards highlighting
   const NEW_PARAM = (qs.get("new") || "").trim();           // e.g. "004,018"
   const NEW_TS    = (qs.get("ts") || "").trim();            // bust cache / unique session marker
@@ -149,10 +160,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const inflight = new Map(); // key: "METHOD url" → Promise
   const apiCooldown = { until: 0 }; // global gentle cooldown
 
-  const isApiUrl = (url) => {
-    if (!API_BASE) return false;
-    try { return new URL(url, location.href).href.startsWith(API_BASE + "/"); }
-    catch { return String(url || "").startsWith(API_BASE + "/"); }
+  // 🔹 NEW: treat both API_BASE and ME_BASE as "service" URLs (no ts=, share cooldown)
+  const SERVICE_BASES = [API_BASE, ME_BASE].filter(Boolean).map(b => trimSlash(b) + "/");
+  const isServiceUrl = (url) => {
+    try {
+      const abs = new URL(url, location.href).href;
+      return SERVICE_BASES.some(base => abs.startsWith(base));
+    } catch {
+      return SERVICE_BASES.some(base => String(url || "").startsWith(base));
+    }
   };
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -167,12 +183,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const runner = (async () => {
       // Respect a short global cooldown after a 429
       const now = Date.now();
-      if (apiCooldown.until > now && isApiUrl(url)) {
+      if (apiCooldown.until > now && isServiceUrl(url)) {
         await sleep(apiCooldown.until - now);
       }
 
-      // Only append ts for NON-API (static) requests
-      const finalUrl = isApiUrl(url) ? url : withTs(url);
+      // Only append ts for NON-service (static) requests
+      const finalUrl = isServiceUrl(url) ? url : withTs(url);
 
       try {
         const r = await fetch(finalUrl, { cache: "no-store", ...opts });
@@ -311,13 +327,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     return map;
   }
 
-  // NOTE: When API is present, call the primary route only; do NOT probe backups on failure (prevents over-calling/429 storms).
+  // 🔹 UPDATED: Prefer ME_BASE for /me/:token/collection
   async function loadCollection() {
-    // Preferred: token route
+    // Preferred: token via ME_BASE (persistent-data)
+    if (TOKEN && ME_BASE) {
+      const d = await fetchJSON(`${ME_BASE}/me/${encodeURIComponent(TOKEN)}/collection`);
+      if (d) return { map: toOwnershipMap(d), src: "me-base" };
+    }
+
+    // Fallback: token via API_BASE (legacy)
     if (TOKEN && API_BASE) {
       const d = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/collection`);
       if (d) return { map: toOwnershipMap(d), src: "token" };
-      // No second probe here; fetchJSON already applied 429 backoff if needed.
     }
 
     // Secondary: uid route (only if TOKEN missing)
@@ -336,12 +357,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     return { map: {}, src: "empty" };
   }
 
-  // NOTE: When API is present, call the primary route only; do NOT probe backups on failure.
+  // 🔹 UPDATED: Prefer ME_BASE for /me/:token/stats (coins/wins/losses/name)
   async function loadStats() {
+    if (TOKEN && ME_BASE) {
+      const s = await fetchJSON(`${ME_BASE}/me/${encodeURIComponent(TOKEN)}/stats`);
+      if (s) return s;
+    }
     if (TOKEN && API_BASE) {
       const s = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/stats`);
       if (s) return s;
-      // No second probe (e.g., /userStatsToken or ?token) — avoids extra API pressure.
     }
     if (!TOKEN && UID && API_BASE) {
       const s = await fetchJSON(`${API_BASE}/userStats/${encodeURIComponent(UID)}`);
@@ -1587,11 +1611,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const s = Number(n).toFixed(2);
     return s.replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
   }
+  // 🔹 UPDATED: prefer ME_BASE for coin refresh reads
   async function refreshCoinUI() {
     try {
-      if (!API_BASE || !TOKEN) return;
-      const url = `${API_BASE}/me/${encodeURIComponent(TOKEN)}/stats`;
-      const j = await fetchJSON(url);
+      let j = null;
+      if (TOKEN && ME_BASE) {
+        j = await fetchJSON(`${ME_BASE}/me/${encodeURIComponent(TOKEN)}/stats`);
+      }
+      if (!j && TOKEN && API_BASE) {
+        j = await fetchJSON(`${API_BASE}/me/${encodeURIComponent(TOKEN)}/stats`);
+      }
       if (j && typeof j.coins !== "undefined" && coinBalanceEl) {
         coinBalanceEl.textContent = formatCoins(j.coins);
       }
@@ -1722,13 +1751,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Finally, wire the optional SAVE button (safe no-op if it’s not on the page)
   wireSaveOfferButton();
 
-  /* ---------------- Return to HUB: keep token/api + trade session ---------------- */
+  /* ---------------- Return to HUB: keep token/api + trade session + me ---------------- */
   const hubLink = document.getElementById("return-to-hub");
   if (hubLink) {
     try {
       const u = new URL(hubLink.href);
-      if (TOKEN) u.searchParams.set("token", TOKEN);
+      if (TOKEN)   u.searchParams.set("token", TOKEN);
       if (API_BASE) u.searchParams.set("api", API_BASE);
+      if (ME_BASE)  u.searchParams.set("me", ME_BASE);
       if (TRADE_MODE && TRADE_SESSION_ID) {
         u.searchParams.set("mode", "trade");
         u.searchParams.set("tradeSession", TRADE_SESSION_ID);
@@ -1738,8 +1768,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch {
       let base = hubLink.getAttribute("href") || "https://madv313.github.io/HUB-UI/";
       const params = [];
-      if (TOKEN) params.push(`token=${encodeURIComponent(TOKEN)}`);
+      if (TOKEN)   params.push(`token=${encodeURIComponent(TOKEN)}`);
       if (API_BASE) params.push(`api=${encodeURIComponent(API_BASE)}`);
+      if (ME_BASE)  params.push(`me=${encodeURIComponent(ME_BASE)}`);
       if (TRADE_MODE && TRADE_SESSION_ID) {
         params.push(`mode=trade`, `tradeSession=${encodeURIComponent(TRADE_SESSION_ID)}`);
         if (TRADE_ROLE) params.push(`role=${encodeURIComponent(TRADE_ROLE)}`);
